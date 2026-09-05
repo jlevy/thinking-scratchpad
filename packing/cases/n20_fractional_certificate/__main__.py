@@ -6,6 +6,7 @@ report. Run as ``python -m cases.n20_fractional_certificate``.
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 from cases.n20_fractional_certificate.replay import CERTIFICATE_PATH, snapshot
@@ -46,9 +47,26 @@ def replay(path: Path) -> int:
     return 0
 
 
-def main() -> int:
-    """The retained certificate must replay."""
-    return replay(CERTIFICATE_PATH)
+def main(argv: list[str] | None = None) -> int:
+    """The retained certificate must replay; a named rung replays in its place.
+
+    The package retains more than one rung -- the top at ``certificate.json`` and the
+    superseded sides beside it -- and a rung whose evidence entry names it has to be
+    replayable by that name rather than only through whichever file is currently the
+    top. An argument is that name; without one the top rung replays, which is what
+    every existing caller and every declared command does.
+    """
+    arguments = sys.argv[1:] if argv is None else argv
+    if not arguments:
+        return replay(CERTIFICATE_PATH)
+    if len(arguments) > 1:
+        print("REFUSED: replay takes at most one certificate path")
+        return 1
+    path = Path(arguments[0])
+    if not path.is_file():
+        print(f"REFUSED: no certificate at {path}")
+        return 1
+    return replay(path)
 
 
 if __name__ == "__main__":

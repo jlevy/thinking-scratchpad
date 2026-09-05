@@ -77,6 +77,7 @@ action for each are in [`frontier/RESULTS.md`](packing/frontier/RESULTS.md); the
 | [T-014](packing/frontier/RESULTS.md) | 5 | `V3` | `C5` | `S3` | `apparently-novel` | For s = 2 + sqrt(2)/2 and Goebel’s labeled pose P0 in C = (R^2 x S^1)^5, P0 is an isolated point of Feas(s) -- closed unit squares in [0, s]^2, pairwise disjoint interiors -- equivalently there is no nonconstant continuous feasible path from P0 and no sequence of distinct feasible poses converging to it; hence the n = 5 optimum is rigid at fixed side in the catalogue’s sense. |
 | [T-001](packing/frontier/RESULTS.md) | 17 | `V4` | `C4` | `S3` | `apparently-novel` | Sixteen points make [0, 4426213/1000000]^2 unavoidable for open squares of side above one, so s(17) >= 4426213/1000000 = 4.426213. |
 | [T-002](packing/frontier/RESULTS.md) | 18 | `V4` | `C4` | `S3` | `apparently-novel` | s(18) >= 4426213/1000000, by monotonicity from T-001 (a packing of 18 unit squares contains a packing of 17). |
+| [T-021](packing/frontier/RESULTS.md) | 20, 21 | `V4` | `C4` | `S3` | `apparently-novel` | s(20) >= 97/20 and s(21) >= 97/20, from a first-party weighted fractional unavoidable-set certificate at container side 97/20 = 4.85. |
 | [T-004](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | Bentz 2010, Theorem 8: the printed 45-point unavoidable-set argument for s(46) >= 7 is correct as printed, machine-audited in full. |
 | [T-008](packing/frontier/RESULTS.md) | 46 | `V4` | `C3` | `S3` | `previously-published` | s(46) = 7: the lower half by T-004’s audited unavoidable set, the upper half by the exact 7 x 7 grid packing of 46 squares. |
 | [T-009](packing/frontier/RESULTS.md) | 29 | `V4` | `C3` | `S3` | `apparently-novel` | s(29) <= 5.93383346267692918974379895098, by a Krawczyk interval certificate over the retained rational 29-square witness at a declared relaxation of 1e-20. |
@@ -127,9 +128,13 @@ The detailed implementation statuses remain in [What Is Built](#what-is-built).
 | Visualization | Inspect the exact `n = 3` moduli SVG and design evidence-typed views from retained artifacts | The scalable basin atlas and the first `n = 5` ambiguity view are unbuilt; endpoint rows must not be pictured as components | [Visualization ladder](docs/project/reviews/review-2026-08-23-mathematical-frontier-strategy.md#basin-ontology-and-visualization-ladder) |
 | Unattended numerical execution | Run bounded supervised slices and let an agent resume dependency-ready work | The numerical runner remains **NO-GO** until its independent validity, recovery, receipt, and capacity gates pass | [Numeric launch agenda](docs/project/specs/active/plan-2026-08-23-overnight-cartography-run.md#the-numeric-runner-launch-gate) |
 
-The generated ledger currently derives six confirmed hypotheses, six refuted hypotheses,
-three open hypotheses, seven open questions, and thirty-seven blocked hypotheses.
-No hypothesis waits on review and five are unresolved.
+The generated ledger currently derives eight confirmed hypotheses, seven refuted
+hypotheses, one open hypothesis, seven open questions, and thirty-five blocked
+hypotheses. No hypothesis waits on review and four are unresolved.
+H-062 left that set on 2026-09-05: its fifth rung walled on both constructions and
+pinned the `m = 5` covering wall to a bracket of width 0.015 where it had registered
+0.02. One, H-064, is abandoned in the ledger’s word — its round expired resumable with
+the exact floor it raised.
 One, H-061, has no round and reads `result registered`: T-017 and T-018 name it in their
 `produced_by`, and the ledger’s `results` column shows them.
 The set includes one claim whose formal prerequisite is missing, H-044 whose registered
@@ -419,93 +424,57 @@ controller, not permission to blur contracts.
 
 ### Current Handoff
 
-[Agenda 017](packing/campaign/agendas/agenda-017-six-hour-generator-rigidity-ceilings-and-w9-block.md)
-ran far past its declared 360-minute wall — the first commit on this branch lands at
-`00:35:17Z` on 2026-09-04 and the last one plainly in its scope lands past `21:56Z` the
-same day, with no deadline honoured along the way.
-No `session-NNN` record was opened while it ran; it is recorded retrospectively, at the
-closing milestone, as terminal
-[session-085](packing/campaign/agent-sessions/session-085-agenda017-continuation-and-efficiency-block.md),
-which says so in its own words rather than pretending contemporaneity.
-Of the agenda’s four lanes, only Lane A — the first-party weighted fractional
-unavoidable-set certificate generator — left a trace in this branch’s history; Lane B
-(the general rigidity theorem, the Stromquist Theorem 3 audit), Lane C (ten
-verified-upper-bound promotions and `T-009`’s raise to `C4`) and Lane D (the
-`think-ldq2` W9 handoff) do not appear in it.
+[Agenda 022](packing/campaign/agendas/agenda-022-the-conditional-route.md) is running on
+2026-09-05 as the continuation of the overnight pass an account rate limit interrupted,
+recorded contemporaneously as
+[session-087](packing/campaign/agent-sessions/session-087-agenda022-continuation.md).
+Agenda 021 closed first, with `T-021` raising `s(20)` and `s(21)` to `97/20 = 4.85`;
+[session-086](packing/campaign/agent-sessions/session-086-agenda021-overnight-pass.md)
+holds that block’s record.
 
-Lane A retained four results across seven distinct cases, all `V4` and all `C4` when the
-block closed, `T-018` having since been raised to `C5` by a mapped review artifact:
-`T-018` raises `s(11) >= 381/100`, the smallest open case moving for the first time
-located in the public record since Stromquist stated `2 + 4/√5` in 2003; `T-017` raises
-`s(12) >= 99/25`, the first bound specific to `n = 12` in the retained corpus, climbed
-across eight rungs from
-[H-061](packing/campaign/hypotheses/H-061-n12-first-party-fractional-certificate.md)’s
-fixed `19/5` threshold; `T-019` raises `s(17)`, `s(18) >= 459/100`, displacing
-Massaccesi’s published `22529/5000`; and `T-020` raises `s(19)`, `s(20)`,
-`s(21) >= 24/5`, the first bound of any kind proved about twenty or twenty-one squares
-rather than read off Nagamochi’s 2005 closed form — `T-019` is superseded at `n = 19`
-and keeps both its claim and its rungs.
-Fourteen defects were filed (`D-430` through `D-443`); thirteen are fixed and one,
-`D-431` (`T-009`’s significance rationale compared its interval certificate against a
-rational certificate on a different `n = 29` packing), is outstanding.
-Two searches stopped on cost rather than an answer, not as negatives: `n = 18` at side
-`4.68` (three site sets converged to exactly `18.000000` without separating a genuine
-covering-value plateau from a degenerate vertex) and `n = 11` at side `3.82` (the
-rejection route’s exact maximum depth caps the feasible total well short of the eleven a
-ceiling needs). Both are reported covering values in
-[`CERTIFICATE-REACH.md`](packing/frontier/CERTIFICATE-REACH.md) with nothing frozen
-beside them. Full detail is in
-[the block-close handoff](docs/project/handoff-2026-09-04-block-close.md).
+**What moved.** `H-062` is accepted.
+`BC-213` decided the one remaining rung of its pre-registered bisection, at
+`973/200 = 4.865`, and both declared constructions walled — the uniform grids at LP
+round 16 with `20.001502` and 543 placements still violated, the grids unioned with
+`T-021`’s atoms at round 34 with `20.000223` and 213 violated
+([exp-062](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md)).
+That pins the `m = 5` covering wall to `[97/20, 973/200]`, width `0.015` against the
+`0.02` the hypothesis registered, its lower end a retained certificate and its upper end
+two independent walls sitting `0.1235` below the ceiling.
+It is the first covering wall this project has measured to the width it asked for, and
+it says directly that at `m = 5` the covering value binds and the ceiling never does.
 
-The same evening, entered directly on the operator’s own direction rather than drawn
-from a queued candidate,
-[Agenda 020](packing/campaign/agendas/agenda-020-efficiency-block-the-exact-sweep.md)
-recorded a separate, complete W5 efficiency-loop block: the exact event-cell sweep that
-decides `Condition 5` at the retention gate now decides in integers on the atom weights’
-common scale, holding reachable cells as spans and running the 181 directions in
-parallel — `68×` faster at `n = 17` and `139×` at `n = 20` on a loaded box, about `183×`
-on a quiet one, the identical least covered mass every time and the `Fraction` route
-kept unchanged as the reference.
-No bound, verdict, or certificate moved.
-[Agenda 019](packing/campaign/agendas/agenda-019-efficiency-first-retarget-and-deep-strategy.md),
-the standing queue, holds the two efficiency-loop entries this retires or re-bases:
-`BC-191`, pricing row generation’s own cost against the container side — `79`–`94%` of
-every round, site density never set as a function of side, an untuned grid costing
-`8.8×` at `n = 20`’s own side — and `BC-190`, whether the generator’s accept-or-reject
-decision belongs on the interval route, now re-based on the integer sweep rather than
-the Fraction sweep it was drafted against.
-[X-013](packing/campaign/explorations/X-013-where-the-certificate-should-go-next.md)
-reads what three certificates actually attained against their reach ceiling
-(`0.98171`–`0.98270`, mean `0.98229`) and recommends `n = 26` next, once `BC-191` and
-`BC-192`/`BC-194` price it.
+**One clause needed an argument rather than a run.** `H-062` asks its bracket’s upper
+end to carry a *converged* restricted optimum at or above twenty, and neither run
+converged. The clause is met because adding rows can only raise a restricted optimum, so
+each site set’s converged optimum is bounded below by its crossing — the criterion asks
+for the bound, not the value.
+The monotonicity is in rows at a fixed site set; adding *sites* lowers an optimum, and
+no column round completed, so neither set grew.
+`exp-062` states this rather than leaving a reader to reconstruct it, because this
+document’s own limits reading had taken the conservative view of the same clause.
 
-**Selected next entry:** `think-ji0r`, `BC-191` in Agenda 019 — Agenda 020’s own
-closeout selects it directly, as the one candidate whose measurement Agenda 020 did not
-already change the terms of.
-`think-jgeg` (`BC-190`) follows once `BC-191` lands.
-`think-5j8d` remains the marker Agenda 016’s closeout discharged and is not this
-session’s selection.
+**What the block also fixed.** `D-458`: the covering-value register’s `24/5` row named
+the moving `certificate.json` pointer instead of the immutable rung, so promoting
+`T-021` into that pointer made a superseded row quote its own successor’s atoms.
+Nothing unsound — every artifact named exists and every mass quoted is that file’s true
+mass — but the join between a row and its evidence was broken, and six tests plus the
+reach renderer’s prose still described the corpus as it stood before `T-021` moved the
+`n = 20` package from certifying `n = 19` to certifying `n = 20`. The renderer now
+derives its count word, case list, band width and per-run stop reasons from the corpus;
+[`conventions.md`](conventions.md) carries the pointer rule where a record author will
+find it.
 
-On 2026-09-05, on the branch of PR #81 after merging PR #82, a W3 report and a W7 block
-followed. [X-015](packing/campaign/explorations/X-015-the-map-and-the-three-programs.md)
-maps every recorded direction of the campaign (114 rows in six programs), joins the
-twenty results to the instruments that produced them, ranks three programs by expected
-significance per agent-hour, prices the grid-frontier stepping stones by reading Bentz’s
-proofs in X-014’s terms, and lays out the next twelve hours as
-[Agenda 021](packing/campaign/agendas/agenda-021-three-numbers-and-a-wall.md) and
-[Agenda 022](packing/campaign/agendas/agenda-022-the-conditional-route.md), both
-`paused` behind this handoff’s selected entry: `BC-191` is Lane C’s own first half in
-Agenda 021, so nothing there displaces it.
-Four hypotheses, `H-062` to `H-065`, are registered for those blocks.
-The W7 block added a covering-values register with a `converged` flag, `produced_by` on
-results, `program` on agenda cells with a “By program” section in the agenda map, the
-packing-side cap in the reach table, a `variant` refusal at the retention gate, and a
-bead-staleness report; the ledger’s dependency check now resolves `depends_on` across
-agendas.
+**Selected next entry:** `think-wufn`, `BC-213` — which
+[session-086](packing/campaign/agent-sessions/session-086-agenda021-overnight-pass.md)
+handed over and this block has taken and completed, as above.
+`BC-206`, the `n = 12` ladder above `99/25`, and `BC-201`, the near-tight-cell census at
+`n = 11`, are in flight as this is written.
 
-The recommended follow-up beyond `BC-191` is the same retarget the reach table already
-ranks: `BC-192` and `BC-194` at `n = 26`, blocked on `BC-191` pricing what a run at a
-larger side actually costs.
+What session-087 will hand over in its place is agenda-021’s `BC-198`, the two-threshold
+form of Condition 5 (`H-063`). It is the only cell left that unblocks anything: `BC-208`
+waits on its class cuts and `BC-207` waits on `BC-208`, so the whole conditional route
+behind them opens or stays shut on that one.
 
 ### Handoff Record
 
@@ -2619,10 +2588,10 @@ round that names the hypothesis, control roles included.
 | [H-059](packing/campaign/hypotheses/H-059-n50-producer-refusal-ordering.md) | confirmed | The frozen n = 50 producer refuses an existing result before every downstream observation and evaluation seam | 1 | — |
 | [H-060](packing/campaign/hypotheses/H-060-n5-local-rigidity.md) | confirmed | Goebel’s exact `n = 5` optimum is locally rigid when the container side is fixed | 1 | 11s wall |
 | [H-061](packing/campaign/hypotheses/H-061-n12-first-party-fractional-certificate.md) | result registered | A first-party fractional unavoidable-set certificate at side `19/5` proves `s(12) ≥ 3.8`, the first `n = 12`-specific bound; carried well past its own claim to `393/100` ([T-017](packing/frontier/RESULTS.md)) and to `s(11) ≥ 19/5` ([T-018](packing/frontier/RESULTS.md)), with the whole ladder retained and verified, and the round that closes the hypothesis is not yet written | 0 | — |
-| [H-062](packing/campaign/hypotheses/H-062-n20-covering-wall.md) | open | The `m = 5` covering wall — the side at which a converged restricted optimum at `n = 20` first reaches twenty — lies strictly below the ceiling `5B = 4.9885`, and four pre-registered rungs bracket it to within `0.02`; registered for Agenda 021’s `BC-197` | 0 | — |
-| [H-063](packing/campaign/hypotheses/H-063-n11-class-certificate.md) | blocked | A two-cell `{0°, 45°}` class certificate refutes the composition `(11, 0)` at or above Trump’s `3.877084`, and every near-axis class inside `θ₀` closes the compositions with at most one tilted square; blocked on the two-threshold program `BC-198` builds | 0 | — |
-| [H-064](packing/campaign/hypotheses/H-064-n11-fractional-packing-floor.md) | open | An exact-depth fractional packing at `77/20` with total weight at least eleven puts `τ*(3.85)` at or above eleven, so the `n = 11` certificate ladder’s top lies below `3.85`; registered for `BC-200` | 0 | — |
-| [H-065](packing/campaign/hypotheses/H-065-n11-near-tight-cell-census.md) | blocked | The near-tight cells (mass at most `1 + 1/20`) on the retained `381/100` certificate are fewer than one fifth of the reachable cells, so Corollary 1a’s exact cover is a check rather than a search; blocked on the census tool `BC-201` builds | 0 | — |
+| [H-062](packing/campaign/hypotheses/H-062-n20-covering-wall.md) | confirmed | The `m = 5` covering wall — the side at which a converged restricted optimum at `n = 20` first reaches twenty — lies strictly below the ceiling `5B = 4.9885`, and the pre-registered rungs bracket it to within `0.02`; accepted at `[97/20, 973/200]`, width `0.015`, by Agenda 021’s `BC-197` and Agenda 022’s `BC-213` | 2 | 109.8m wall |
+| [H-063](packing/campaign/hypotheses/H-063-n11-class-certificate.md) | refuted | A two-cell `{0°, 45°}` class certificate refutes the composition `(11, 0)` at or above Trump’s `3.877084`, and every near-axis class inside `θ₀` closes the compositions with at most one tilted square; blocked on the two-threshold program `BC-198` builds | 1 | 27.8m wall |
+| [H-064](packing/campaign/hypotheses/H-064-n11-fractional-packing-floor.md) | abandoned | An exact-depth fractional packing at `77/20` with total weight at least eleven puts `τ*(3.85)` at or above eleven, so the `n = 11` certificate ladder’s top lies below `3.85`; registered for `BC-200` | 1 | 66m wall |
+| [H-065](packing/campaign/hypotheses/H-065-n11-near-tight-cell-census.md) | confirmed | The near-tight cells (mass at most `1 + 1/20`) on the retained `381/100` certificate are fewer than one fifth of the reachable cells — measured at `0.040754` by `BC-201`, a fifth of the registered threshold. The clause the claim attached to that number does not follow: the cover is a search, not a check | 1 | 16.1m wall |
 
 ### Confirmed
 
@@ -2712,6 +2681,16 @@ the same archive boundary are named in the record and not closed.
 No live round has passed through the repaired boundary, so admitting it unattended is
 still a review decision rather than a settled one.
 
+`D-460` is the other entry standing `contained`, and it is a contract gap rather than a
+finding: agenda-022’s `BC-206` declared `purpose: research` with no hypothesis, and the
+experiment contract requires at least one, so a cell could be drafted, budgeted,
+dispatched and completed before anything noticed its output had nowhere to go.
+Its hundred minutes and thirteen run blocks are retained as nine covering-value rows and
+a run register — the more accurate description, since nothing was pre-registered and so
+nothing was tested — but the ledger’s round count and effort attribution do not see
+them. The check that would refuse the shape at draft time, rather than at the experiment
+record, is named in the entry and not built.
+
 The [idea board](packing/campaign/ideas.md) carries the full registered portfolio
 alongside raw ideas and dead ends.
 The registry artifact, not the review’s historical prose or this summary, owns each
@@ -2769,9 +2748,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Rollups | count | turns | tool calls | errors | one-off code | wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| claimed by a session | 114 | 28,689 | 16,232 | 327 | 2,712 | 151.73 h |
+| claimed by a session | 115 | 29,742 | 16,800 | 349 | 2,808 | 170.08 h |
 | claimed by none | 10 | 1,460 | 878 | 32 | 173 | 6.87 h |
-| **measured** | **124** | **30,149** | **17,110** | **359** | **2,885** | **158.6 h** |
+| **measured** | **125** | **31,202** | **17,678** | **381** | **2,981** | **176.95 h** |
 
 | Session | Phases | Rollups | Turns | Tool calls | Errors | Wall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -2800,7 +2779,9 @@ in separate tables: their units differ, and the same work can appear in both.
 | [session-083](packing/campaign/agent-sessions/session-083-agenda016-ten-hour-coordinator.md) | 3 | 34 | 5,397 | 3,090 | 43 | 15.16 h |
 | [session-084](packing/campaign/agent-sessions/session-084-bc148-n17-fresh-successor-completion.md) | 3 | 1 | 329 | 166 | 0 | 2.74 h |
 | [session-085](packing/campaign/agent-sessions/session-085-agenda017-continuation-and-efficiency-block.md) | 4 | 23 | 3,244 | 1,801 | 45 | 22.09 h |
-| *shared by 25 sessions* | — | 5 | 15,599 | 8,561 | 204 | 101.96 h |
+| [session-086](packing/campaign/agent-sessions/session-086-agenda021-overnight-pass.md) | 2 | 0 | 0 | 0 | 0 | 0 h |
+| [session-087](packing/campaign/agent-sessions/session-087-agenda022-continuation.md) | 2 | 0 | 0 | 0 | 0 | 0 h |
+| *shared by 27 sessions* | — | 6 | 16,652 | 9,129 | 226 | 120.31 h |
 
 | Codex interval receipt | declaring sessions | model responses | agent time | active union | wall window | live lower bound |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
@@ -2823,9 +2804,9 @@ in separate tables: their units differ, and the same work can appear in both.
 
 | Coverage | sessions |
 | --- | ---: |
-| measured | 41 |
+| measured | 43 |
 | closed before `resource_rollups` existed, logs not retained | 44 |
-| **total** | **85** |
+| **total** | **87** |
 
 <!-- END GENERATED: session-close-report -->
 
@@ -2840,9 +2821,9 @@ The relevant generator writes the receipt, and the entry fills in on the next
 
 ## Experiments Conducted
 
-There are 59 terminal rounds registered in `series-000`.
+There are 64 terminal rounds registered in `series-000`.
 
-They record 1903.1 agent-minutes and 825.0 wall-minutes.
+They record 2152.1 agent-minutes and 1044.7 wall-minutes.
 Exp-056 stopped at its fixed timebox with a 170-row agreeing prefix and no canonical
 result; exp-057 stopped before target access; exp-058 stopped on the review it was
 waiting for, which arrived and accepted it.
@@ -2937,6 +2918,11 @@ archive beside it.
 | [exp-057](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-057-h-058-n68-one-parent-localization.md) | 68 | calibration | H-058 | side-semantics binding over the unchanged exp-054 adapter | literal point model retained; six-decimal side provenance absent; no target access | **unresolved** |
 | [exp-058](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-058-h-060-n5-chart-and-proof.md) | 5 | target | H-060 | scratchpad sympy chart-and-proof replay set, read-only; the W7 instrument and the BC-153 reviewer’s from-scratch sympy reconstruction | all 400 elementary inequalities classified exactly and the 16/64 and 4/6 counts confirmed; `w · q_chart = -2√2 < 0`; the frozen criterion met as written on BC-153’s PASS, so the pose is isolated at fixed side | **accepted** |
 | [exp-059](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-059-h-052-n17-fresh-successor-completion.md) | 17 | target | H-052 | fresh successor driver over the frozen exp-056 parent checkpoint and exp-052 chain genesis | all 181 exact direction cells agree; both 181-row manifest summaries byte-identical, every row minimum exactly 1/1, decision derived from the preconditions, mutations and instrument validity | accepted |
+| [exp-060](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-060-h-064-n11-fractional-packing-floor.md) | 11 | target | H-064 | cutting-plane loop over exact-depth fractional packings at 191/50, then 77/20 warm-started, the exact vertex check as the separation oracle | nu*(3.82) >= 9.907906 and nu*(3.85) >= 9.049861 exactly; the row loop converged at 3.82 to 11.055617 on 12,761 sites; no family reached eleven, so the claim stays unresolved and the round is resumable from the retained 3.82 state | abandoned |
+| [exp-061](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md) | 20 | target | H-062 | pre-registered bisection of [24/5, 9977/2000], two site sets per rung, refutation on a crossing and confirmation only by a converged row loop | certificates at 97/20 (T-021) and 193/40, walls at 39/8, 979/200 and 997/200, so the m = 5 covering wall is bracketed to width 0.025 against the 0.02 registered; the exactly round 25.000000 at 997/200 is explained by the overlap-strip geometry | unresolved |
+| [exp-062](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md) | 20 | target | H-062 | the one remaining pre-registered rung, at the schedule’s own midpoint 973/200, on the same two site-set rules | both constructions wall — the grids at LP round 16 (20.001502, 543 violated) and the certificate-seeded set at round 34 (20.000223, 213 violated) — closing the bracket to [97/20, 973/200], width 0.015, its upper end 0.1235 below the ceiling | accepted |
+| [exp-063](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-063-h-065-n11-near-tight-cell-census.md) | 11 | target | H-065 | census the reachable event cells within four margins of covered mass one, per direction, through the same mass grid the retention decision reads | the epsilon = 1/20 tight set is 0.040754 of 567,130,649 reachable cells, a fifth of the registered 0.20 — and still a search rather than a check: positive area, a bounding box equal to the centre domain’s in all 181 directions, 22,132 extended components | accepted |
+| [exp-064](packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-064-h-063-two-threshold-class-program.md) | 11 | target | H-063 | build X-014’s Lemma 3 as per-direction-class thresholds and run its two pre-registered controls | the nine-point bound is exactly nine, but the two-end-cell class cannot refute (11, 0) at Trump’s side and provably never could: `B(2 + (4/3)√2) = 3.876681` sits `0.000403` below the side the control was asked to reach | rejected |
 
 ### Cost and provenance
 
@@ -3001,10 +2987,15 @@ archive beside it.
 | exp-057 | one 150-minute target-blind BC-138 lane | 1,000 s | 16.6667 m | guard | `11ce70ee` |
 | exp-058 | the 360-minute BC-152 `n = 5` lane of agenda-016 | 11.33 s | — | criterion | — (no engine; exact sympy replay) |
 | exp-059 | one fixed BC-148 process-exclusive lease, 08:58Z–09:58Z | 1991 s | 33 m | criterion | `2796174b` |
+| exp-060 | Lane B of Agenda 021, BC-200, one core, 07:39Z–09:15Z | 3960 s | 96 m | timebox | `26e8a6e3` |
+| exp-061 | Lane A of Agenda 021, BC-197, one core, 07:53Z–09:21Z | 5000 s | 88 m | guard | `5d07a24a` |
+| exp-062 | Lane A of Agenda 022, BC-213, one core nominally and three lanes actually, 17:00Z–17:26Z | 1590 s | 24 m | criterion | `ca51821f` |
+| exp-063 | Lane B of Agenda 021, BC-201 re-run, one core, 17:36Z–17:52Z | 967 s | 16 m | criterion | `394a0fee` |
+| exp-064 | Lane A of Agenda 021, BC-198, one core shared with two lanes, 18:07Z–18:35Z | 1,665 s | 25 m | criterion | `07155377` |
 
-### What the 59 rounds jointly establish
+### What the 64 rounds jointly establish
 
-The 59 rounds use 1903.1 agent-minutes and 825.0 wall-minutes under the campaign’s
+The 64 rounds use 2152.1 agent-minutes and 1044.7 wall-minutes under the campaign’s
 retained effort accounting.
 
 **The numerical basin event trust boundary now retains complete declared blocks through
@@ -3207,15 +3198,15 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 457 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 460 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
 | --- | ---: | --- |
 | soundness | 94 | asserted something false about the mathematics |
 | validity | 117 | was correct, but the measurement did not bear on the question |
-| bookkeeping | 171 | recorded something its own evidence contradicts |
-| robustness | 58 | did not finish, or finished only by luck |
+| bookkeeping | 173 | recorded something its own evidence contradicts |
+| robustness | 59 | did not finish, or finished only by luck |
 | performance | 17 | worked, but cost far more than it should |
 
 Two observations the log exists to make.
@@ -3224,7 +3215,7 @@ Two observations the log exists to make.
 direction**, where the error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught sixty-seven defects in 457, and no soundness defect
+**The automated gate has caught sixty-nine defects in 460, and no soundness defect
 ever.** Every soundness failure was found by a control cell whose answer was known in
 advance, a rule written down before the measurement, a generated view contradicting its
 source, or someone reading carefully.
@@ -3765,18 +3756,18 @@ the best known packing runs near half a unit — eleven cases above `+0.49`, hea
 `n = 51` at `+0.5364`, then `68`, `84`, `39`, `86`, `66`, `38`, `83`, `37`, `53` and
 `26`. Two cautions travel with that ranking.
 The prize is what the *ceiling* allows; the real limit is the covering value at that
-side. Seven values have been reported for the restricted program, at sides `3.82`,
-`3.95`, `3.96`, `4.58`, `4.59`, `4.68` and `4.80` — reports, not measurements this
-repository can reproduce, since no covering-search run log or solver checkpoint was
-retained for any of the seven.
-Exactly one is recomputable from a tracked artifact, at side `3.95`, and what it
-recomputes is the frozen certificate’s own feasible mass — an upper bound on the
-covering value there, not the optimum a search reported.
-Seven heterogeneous reports across a side band `0.98` wide fit a curve, and a fitted
-curve is not a measurement.
-And the cost of a run grows with the container: the site set, the row set and the exact
-sweep all scale with `L²` or worse, so a case at `n = 51` is not an `n = 12` run with a
-different constant.
+side. 18 values have been reported for the restricted program, at sides `3.82`, `3.85`,
+`3.95`, `3.96`, `3.97`, `3.98`, `3.985`, `3.99`, `4.58`, `4.59`, `4.68`, `4.80`,
+`4.825`, `4.85`, `4.865`, `4.875`, `4.895` and `4.985` — the first eight reports, not
+measurements this repository can reproduce, since no covering-search run log or solver
+checkpoint was retained for any of them; the ten added on 2026-09-05 by Agenda 021’s
+`BC-200` and `BC-197` and Agenda 022’s `BC-213` and `BC-206` carry their logs, their
+resumable state and, where one exists, the frozen certificate the value belongs to.
+Several sides are reported more than once from site sets built differently, which is the
+point of reporting them that way: at `4.85` the difference is between a wall and the
+certificate `T-021` rests on, at `4.865` it is two independent walls, and at `3.97` it
+is a converged grid optimum of `12.364038` above a cutting-plane row LP of `12.248227`
+with an exact floor of `10.845594` beneath it.
 
 The middle tier is built and works within the explicit boundaries above.
 Two instruments now agree on the cell decomposition to `4.4e-16` and on the corner’s

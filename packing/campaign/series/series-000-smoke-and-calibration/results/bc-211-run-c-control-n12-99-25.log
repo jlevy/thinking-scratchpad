@@ -1,0 +1,32 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+{
+ "n": 12,
+ "outer_side": "99/25",
+ "square_side": "9977/10000",
+ "grid_counts": [
+  23,
+  31,
+  38
+ ],
+ "inset": "1/2",
+ "angle_limit": "207107/500000",
+ "direction_steps": 180,
+ "scale": 200000,
+ "column_rounds": 1,
+ "max_rounds": 60,
+ "rows_per_direction": 3
+}
+round 0: rows=4715 orbits=400 sites=2921 lp_rounds=21 objective=12.312895576 depth=1.586769842 cost=-4.694158736 least_covered=1.000000000 seconds=63.9 | adding 1 orbits, deepest at (Fraction(161163, 54350), Fraction(448391, 151700))
+ceiling: proved=False total 10.302645 over 256 squares, max pointwise depth 1.608912 at 296392 vertices (12384 decided exactly), feasible total 6.403486
+rationalised total 1231423/100000 = 12.314230000 against LP optimum 12.312895576 over 529 atoms
+round    rows  orbits   sites lp_rounds     objective least_covered      depth   seconds  note
+----------------------------------------------------------------------------------------------
+    0    4715     400    2921        21     12.312896      1.000000   1.586770      63.9  adding 1 orbits, deepest at (Fraction(161163, 54350), Fraction(448391, 151700))
+stopped: converged: every placement covers mass 1
+objective: 12.312895575912833
+least covered mass: 0.9999999999999976
+total mass: 1231423/100000 = 12.31423
+least cell mass: None
+atoms: 529
+frozen: None
+seconds: 89.6

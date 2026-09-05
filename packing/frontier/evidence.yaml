@@ -1431,6 +1431,57 @@ evidence:
       E-fractional-interval-decision, which decides the same bytes by a different
       method.
     source_reviewed: '2026-09-04'
+  - id: E-n020-fractional-certificate-97-20
+    claim: lower-bound
+    source_reviewed: '2026-09-05'
+    scope:
+      n_values:
+        - 20
+        - 21
+    assurance: verified
+    method: exact-algebraic
+    performed_by: repository
+    relationship_to_generator: same-implementation
+    origin: audited-here
+    novelty: apparently-novel
+    novelty_basis:
+      corpus: >-
+        The retained literature archive under packing/resources/ and the frontier source
+        register, which for n = 20 and n = 21 hold Nagamochi's 2005 closed form, Bentz's
+        2016 proof at n = 22, Friedman's record tables, and this project's own T-020 at
+        24/5. No source in the corpus states a bound specific to either size above that.
+      searched: >-
+        The corpus search is E-n020-fractional-certificate's, unchanged: no lower bound
+        on s(20) or s(21) above the closed form appears in it, and this rung raises this
+        project's own value rather than a published one. The known hole is the same --
+        no systematic sweep of recent preprints.
+      novel_object: >-
+        The certificate and the side. The method is Burns's, the parametrisation
+        Massaccesi's, and the previous rung this project's own; what is new is a
+        certificate at 97/20, found by seeding the generator's site set with the 24/5
+        certificate's own atoms scaled to the new side after the uniform grid walled
+        there.
+    certificate: cases/n20_fractional_certificate/certificate.json
+    replay: uv run --frozen --all-extras python -m cases.n20_fractional_certificate
+    replay_status: passed
+    limitations: >-
+      Decides five conditions in exact rational arithmetic over 1680 atoms on a
+      D4-symmetric site set: the atom multiset is closed under the container's D4 group,
+      the total mass is 19848723/1000000 = 19.848723, the 181-direction net reaches
+      pi/4, containment B(1 + D) < 1 holds at B = 9977/10000, and every reachable event
+      cell at every net direction carries mass at least 1, the least being 200001/200000.
+      The bound proved is the container side itself, 97/20.
+      Two sizes, and neither by monotonicity. Only Condition 2 mentions n among the five
+      conditions, so this atom set certifies its side for every integer strictly above
+      its own mass, which is 20 and upward. It says nothing about n = 19, where 24/5
+      remains the register's bound on the rung retained beside it; from n = 22 on the
+      register already holds 5, so the certificate is true there and weaker.
+      It was decided from its bytes by two verifiers that fail differently. The exact
+      event-cell sweep accepted in 18 s at 200001/200000; the interval branch and bound
+      certified all 361 doubled-net directions in 4,850,263 boxes with none stalled and
+      an enclosure equal to that same value, in 98 s. Both were run by this repository
+      on the frozen file, and the sha256 the gate printed on acceptance is
+      445935ccfd9bae87577c80174b1c2efb1704133bf85e0e07ceb85539d8317a13.
   - id: E-n020-fractional-certificate
     claim: lower-bound
     scope:
@@ -1460,8 +1511,8 @@ evidence:
         The certificate and the side. The method is Burns's and the parametrisation is
         Massaccesi's; what is new is a certificate at a side no published bound reaches
         at any of these three sizes, found by this project's generator.
-    certificate: cases/n20_fractional_certificate/certificate.json
-    replay: uv run --frozen --all-extras python -m cases.n20_fractional_certificate
+    certificate: cases/n20_fractional_certificate/certificate-24-5.json
+    replay: uv run --frozen --all-extras python -m cases.n20_fractional_certificate cases/n20_fractional_certificate/certificate-24-5.json
     replay_status: passed
     limitations: >-
       Decides five conditions in exact rational arithmetic over 2260 atoms on a

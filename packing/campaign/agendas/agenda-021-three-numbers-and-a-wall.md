@@ -9,7 +9,7 @@ agenda:
   id: agenda-021
   title: "Three Numbers and a Wall — the m = 5 Ladder, the n = 11 Endgame, and a Priced Rung"
   updated: '2026-09-05'
-  status: paused
+  status: completed
   objective: >-
     X-014 ends with a verdict and a bill. The two mechanisms the owner asked about are
     real -- a certificate that has stopped proving infeasibility still constrains the
@@ -44,7 +44,7 @@ agenda:
     purpose: research
     owner_focus: correctness
     instances: [19, 20, 21]
-    state: blocked
+    state: complete
     priority: 0
     question: >-
       Where does the restricted covering optimum at m = 5 reach twenty, and does it reach
@@ -102,8 +102,8 @@ agenda:
       Every rung above that side must land in [19, 21), and a rung the n = 20 reading
       refutes may still be an n = 21 certificate.
     entry: >-
-      BC-211 is terminal so the lane core is free; T-020 is retained at 24/5 with total
-      946131/50000; ceiling_side gives 5B = 4.9885
+      BC-211 is terminal (time-limited, continuing under its own bead) so the lane core
+      is free; T-020 is retained at 24/5 with total 946131/50000; ceiling_side gives 5B = 4.9885
       for n = 20 and n = 21, the reach table's packing cap coincides with it there
       because the grid packing is axis-parallel and every tilt offset is zero, so one
       number is both structural limits; devtools.decide_certificate is the retention gate
@@ -119,9 +119,52 @@ agenda:
       covering value's or the ceiling's.
     bead: think-g73w
     workflows: [research-loop]
-    depends_on: [BC-211]
+    depends_on: []
     parallel_group: agenda021-lane-a
     program: grid-frontier-exact-values
+    artifacts:
+    - packing/cases/n20_fractional_certificate/certificate.json
+    - packing/cases/n20_fractional_certificate/certificate-193-40.json
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-ladder-register.txt
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-r2t.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-r3.json
+    - packing/devtools/declare_least_cell_mass.py
+    outcomes:
+    - scope: >-
+        The m = 5 ladder: one rung at 997/200 read on the n = 21 criterion, then the
+        pre-registered bisection of [24/5, 9977/2000] for the n = 20 wall, two site sets
+        per rung, inside a 200-minute lane budget on one core.
+      classification: achieved
+      result: >-
+        Five sides decided and a bound moved. The certificate is at 97/20 = 4.85, total
+        mass 19848723/1000000 over 1680 atoms, retained through the gate on both routes
+        at 200001/200000 and registered as T-021: s(20) >= 97/20 and s(21) >= 97/20, up
+        from T-020's 24/5, with n = 19 left where it was because the mass sits above
+        nineteen. A second certificate at 193/40 (19.862092 converged, 1076 atoms) is
+        retained as a lower rung. The rungs at 39/8, 979/200 and 997/200 crossed their
+        threshold on both constructions and wall, so the covering wall lies in
+        [97/20, 39/8], width 0.025 against the 0.02 H-062 registered: the hypothesis is
+        unresolved and one rung short, and exp-061 records the round. The cell's own exit is met at
+        every rung, so it retires; the rung H-062 still wants is BC-213's, which this
+        block's closeout selects.
+        Two findings beyond the rungs. The 4.85 rung is the seeded construction's, not
+        the grid's -- the uniform grid crossed twenty at round 31 of 32 by four parts in
+        ten thousand at the very side where the previous rung's atoms, scaled, converged
+        below it -- which is the reason H-062 asks for two constructions before a
+        crossing reads as a wall. And the exactly round 25.000000 at 997/200 has a
+        mechanism rather than a mystery: with 5B - L = 0.0035 the twenty-five
+        axis-parallel B-squares overlap only in strips of that width, the restricted dual
+        is checked at sites only, and no uniform inset-1/2 grid the lane could afford
+        puts a site in every strip, so twenty-five unit weights are dual-feasible
+        whatever the covering value is.
+      evidence:
+      - packing/frontier/results.yaml T-021
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - 'devtools.decide_certificate on the frozen bytes: RETAINABLE at 200001/200000, sha256 445935cc...'
+      - session-086 Lane A delegation, 88 agent-minutes of the 200 budgeted
+      disposition: retire-success
+      follow_up: null
     next_evidence: >-
       The first measurement of a covering wall above a retained rung, which BC-203's
       first doubling-down rule reads directly and which decides whether block two spends
@@ -130,7 +173,7 @@ agenda:
     purpose: tool_validation
     owner_focus: correctness
     instances: [11, 12]
-    state: blocked
+    state: complete
     priority: 1
     question: >-
       Does the two-threshold form of Condition 5 -- per-direction-class thresholds as LP
@@ -186,6 +229,67 @@ agenda:
     depends_on: [BC-197]
     parallel_group: agenda021-lane-a
     program: n11-closure
+    outcomes:
+    - scope: >-
+        The two-threshold class-certificate program and its two controls, the third cell
+        of Lane A.
+      classification: never-opened
+      result: >-
+        Never opened. Lane A spent its budget on BC-211 and BC-197, and the pass's
+        sub-agents were then ended by an account rate limit at 09:21 UTC, an external
+        blocker rather than a decision; no command was run for this cell and nothing was
+        built. Its entry condition -- a terminal BC-197 -- is now met, and the cell is
+        unchanged and takeable.
+      evidence:
+      - session-086 stop reason and its Lane A delegation
+      disposition: defer-dependency
+      follow_up: think-m3sx
+    - scope: >-
+        The two-threshold class-certificate program and its two controls, opened in
+        session-087 once BC-197 was terminal.
+      classification: achieved
+      result: >-
+        Built and both controls run. classcert.py partitions the net's half-gap cells into
+        classes with boundaries as exact tangents, adds w0 and w1 as LP variables under one
+        normalisation row, and decides the object exactly on the event-cell sweep; nothing
+        geometric moved, so the non-convex domain stays BC-204's.
+        Control one passes exactly: the near-axis class at 3877/1000 gives 9.000000 in
+        floats and exactly 9 in exact arithmetic from nine unit atoms, and the lane closed
+        the bound from below as well, so it is exactly nine rather than at most nine. The
+        instrument-defect clause does not fire.
+        Control two refuses, and the refusal is proved rather than observed. At Trump's
+        3.877084 the two-end-cell class gives 11885/1024 = 11.606445 against the eleven a
+        refutation needs, and six independent site sets never go below 11.6 -- but the
+        figure that settles it mentions no site set: L/B = 969271/249425 = 3.886021850
+        exceeds 2 + (4/3)sqrt(2) = 3.885618083, so eleven pairwise disjoint B-squares fit
+        and no measure of mass below eleven can cover them. The control's ceiling is
+        B(2 + (4/3)sqrt(2)) = 3.876681, 0.000403 below the side it was asked to reach: the
+        shrink costs 0.008937 of side against Stromquist's 0.008534 of headroom. It was
+        unreachable before the first command ran. H-063 is rejected on its own kill
+        condition, that conditioning on direction buys too little.
+        What conditioning does buy is measured rather than dismissed: two thresholds
+        separate once the site set is fine enough (w0 = 0.093383 against w1 = 0.079777 at
+        composition (9, 2)), and X-014's step-1 design point is reachable -- (11, 0) over
+        the leading nineteen cells at Trump's side, grid 79, exact 39123/4096 = 9.551514,
+        margin -5933/4096, refuted.
+        The price, which is what the cell existed to produce: one class LP is 14.4 ms at 78
+        orbits and 49.4 ms at 210; a whole class program over 181 directions to convergence
+        is 8.57 s at grid 23 and 27.66 s at grid 39, so twelve compositions price at about
+        5.5 minutes of one core. The LP is under two per cent of it -- separation is what a
+        composition sweep buys, which is the number BC-208 needs.
+        Nothing was retained: decide_certificate decides a five-condition Certificate and
+        not a two-threshold object.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-064-h-063-two-threshold-class-program.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-198-class-program-register.txt
+      disposition: retire-success
+      follow_up: null
+    artifacts:
+    - packing/src/sqpack/fractional/classcert.py
+    - packing/devtools/run_class_program.py
+    - packing/tests/test_fractional_classcert.py
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-064-h-063-two-threshold-class-program.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-198-class-program-register.txt
     next_evidence: >-
       Whether conditioning on direction buys anything at all, which is the premise
       BC-208's two class theorems in block two rest on entirely.
@@ -193,7 +297,7 @@ agenda:
     purpose: measurement_validation
     owner_focus: correctness
     instances: [13]
-    state: ready
+    state: stopped
     priority: 0
     question: >-
       Does the existing generator, run unchanged at n = 13 and side 399/100, converge to a
@@ -236,6 +340,41 @@ agenda:
     depends_on: []
     parallel_group: agenda021-lane-a
     program: grid-frontier-exact-values
+    artifacts:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-211-run-a-n13-399-100.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-211-run-a-n13-399-100.log
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-211-run-c-control-n12-99-25.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-211-run-c-control-n12-99-25.log
+    - packing/devtools/run_fractional_colgen.py
+    outcomes:
+    - scope: >-
+        The generator unchanged at n = 13, side 399/100, inside a 70-minute lane budget
+        on one core, with the n = 12 control at 99/25 the cell's reading rule requires.
+      classification: time-limited
+      result: >-
+        Neither of the cell's two readings was earned: no run at 399/100 converged, so
+        there is no restricted optimum there and nothing was frozen. Run A (grids
+        23, 31, 38 from the density rule as it stood mid-lane; 2921 sites, 400 orbits)
+        hit the 60-round limit at objective 16.000000 with least covered mass 0.929161
+        -- not an optimum, and the round number the handoff names as the artefact
+        signature; 7.72 s per row round against 3.04 s at n = 12's 99/25 with the same
+        seed. Runs B (grids 23, 31, 39, 300: 92989 sites, 11742 orbits) and D (grids
+        23, 31, 39, 100) each spent their whole budget inside one un-logged round,
+        which fired the cell's 25-minute kill; generate_adaptive writes nothing until
+        a column round returns, so both stops left no table and no resumable state.
+        The control decides what the readings may mean: at n = 12's own retained side
+        99/25 the same seed converged to 12.312896 above twelve, where the retained
+        certificate carries 149987/12500 = 11.998960 on atoms that lie on grids
+        (23, 31, 39, 297) plus seven column additions -- a seed that cannot reproduce
+        a retained rung cannot refute one, so run A does not read as "the m = 4 wall
+        sits below 3.99". The price is recorded: at the density the retained rungs
+        used, one round at 399/100 costs more than the 25 minutes the cell allows.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-211-run-a-n13-399-100.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-211-run-c-control-n12-99-25.json
+      - session-086 Lane A delegation, 3982 s platform-measured, 66 of 70 budgeted minutes plus the close-out
+      disposition: continue
+      follow_up: think-2ib0
     next_evidence: >-
       Whether the first exact grid value by machine is one certificate away, which
       BC-203's fourth rule reads directly and which decides whether block two opens the
@@ -244,7 +383,7 @@ agenda:
     purpose: research
     owner_focus: insight
     instances: [11]
-    state: ready
+    state: complete
     priority: 0
     question: >-
       What explicit isolation radius and quadratic constant follow from exp-013's 128
@@ -298,6 +437,42 @@ agenda:
     depends_on: []
     parallel_group: agenda021-lane-b
     program: n11-closure
+    artifacts:
+    - packing/cases/trump11/isolation_radius.py
+    - packing/tests/test_trump_isolation_radius.py
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-199-trump-isolation-radius.json
+    outcomes:
+    - scope: >-
+        The isolation radius and the quadratic stress constant at Trump's pose, in the
+        anchored centre-angle chart at fixed side, from exp-013's 128 branch
+        certificates; the numbers, not the packet.
+      classification: achieved
+      result: >-
+        rho_0 >= 288616983/125000000000 = 0.0023089 with the uniform curvature bound
+        K = 4972105219/500000000 = 9.944210 on the declared box of sup-radius 1/64, the
+        binding cap being the modulus 2 kappa_b / K itself (the per-feature gap cap is
+        0.0058755, the symmetry cap 1/16, the box 1/64); with per-row curvature the same
+        derivation gives rho_0 >= 808514697/200000000000 = 0.0040426. C <= 22.467763
+        with the uniform K and <= 12.873063 per row. kappa_b takes exactly two values,
+        0.011480272 on 64 branches and 0.016423845 on the other 64, decided by which
+        option of contact (9, 10) the branch takes, with the minimising face theta_10
+        = +-1 in every branch. The stress ratio ||lambda_b||_1 / Lambda_b = 4.518763 is
+        the same in all 128 branches by an exact identity (1 - rho e_far lies in every
+        row space), so the ratio-minimising LP X-014 proposed is empty. The kill
+        (rho_0 below 1e-6) did not fire. Four corrections to X-014's sketch are recorded
+        in the tool: the g_min/Lip cap is far too weak and is replaced by a per-feature
+        cap; the stress bound needs lambda >= 0 and Lambda > 0 rather than strict
+        positivity; the ratio LP is empty; K is a supremum over a box that must be
+        declared first. Every branch row was matched exactly to the gradient of a tied
+        elementary function, so the chart is exp-013's. No result is registered: the
+        theorem form is agenda-018's BC-176 and its review BC-177.
+      evidence:
+      - packing/cases/trump11/isolation_radius.py
+      - packing/tests/test_trump_isolation_radius.py (6 tests, 6.9 s)
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-199-trump-isolation-radius.json (sha256 db124b99...; three independent runs agree)
+      - session-086 Lane B delegation, 3107 s platform-measured, 51 of 120 budgeted minutes
+      disposition: retire-success
+      follow_up: null
     next_evidence: >-
       Whether the local box is reachable by any tree, which BC-203's third doubling-down
       rule reads directly and which decides whether block two opens a conditional lead
@@ -306,7 +481,7 @@ agenda:
     purpose: measurement_validation
     owner_focus: correctness
     instances: [11]
-    state: blocked
+    state: complete
     priority: 1
     question: >-
       Is the covering value at n = 11 already at or above eleven at 3.82 and at 3.85,
@@ -361,6 +536,41 @@ agenda:
     depends_on: [BC-199]
     parallel_group: agenda021-lane-b
     program: n11-closure
+    artifacts:
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-060-h-064-n11-fractional-packing-floor.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-family-191-50.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-family-77-20.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-summary-191-50.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-summary-77-20.json
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-state-191-50.json
+    - packing/src/sqpack/fractional/cutting.py
+    - packing/devtools/run_fractional_cutting.py
+    outcomes:
+    - scope: >-
+        The n = 11 covering value measured from below at 191/50 and 77/20 by an
+        exact-depth fractional packing, inside a 110-minute lane budget on one core.
+      classification: achieved
+      result: >-
+        The exit was met and the hypothesis is unresolved in its own words. At 191/50
+        nine iterations raised the exact depth-scaled total from the retained 1152/175
+        = 6.5829 to 9.907906 (2,769,100 arrangement vertices, exact maximum depth
+        1.115838 before scaling), and the row loop converged at iteration 5 to a
+        restricted optimum of 11.055617 on 12,761 sites, so 9.907906 <= nu*(3.82) <=
+        tau*(3.82) <= 11.055617. At 77/20, warm-started, three iterations reached
+        9.049861 (2,419,348 vertices, depth 1.243643) and the row loop did not converge.
+        Neither family reached eleven, so nothing was frozen under the case package;
+        both loops stopped on the cell's wall with the exact check carrying every
+        vertex. The n = 11 ladder's top is unchanged at 381/100 with 3.82 open, and the
+        record now holds nu*(3.82) >= 9.907906 and nu*(3.85) >= 9.049861 exactly. The
+        loop's bottleneck moved from separation to row generation as the site support
+        grew, which a resumed run bounds.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-060-h-064-n11-fractional-packing-floor.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-summary-191-50.json
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-summary-77-20.json
+      - session-086 Lane B delegation, 5758 s platform-measured, 96 of 110 budgeted minutes
+      disposition: retire-success
+      follow_up: null
     next_evidence: >-
       The side every block-two n = 11 cell would have to work at, and BC-203's second
       doubling-down rule reads the 3.85 outcome directly.
@@ -368,7 +578,7 @@ agenda:
     purpose: tool_validation
     owner_focus: insight
     instances: [11]
-    state: blocked
+    state: complete
     priority: 2
     question: >-
       How large is the near-tight set on the retained 381/100 certificate -- the reachable
@@ -411,6 +621,62 @@ agenda:
     depends_on: [BC-200]
     parallel_group: agenda021-lane-b
     program: n11-closure
+    outcomes:
+    - scope: >-
+        The census of near-tight event cells on the retained 381/100 certificate at four
+        margins, as a devtool with a test.
+      classification: technical-failure
+      result: >-
+        Stopped by an external blocker with the tool half-built. The lane had read the
+        sweep's mass grid and was refactoring it to expose the per-cell masses the census
+        counts when the account's rate limit ended every sub-agent of the pass at 09:21
+        UTC. The half-built devtools/census_tight_cells.py was then swept into a commit
+        by a broad `git add -A packing/devtools`, which contradicted this outcome and put
+        four errors in the type floor; it was removed on 2026-09-05, so nothing is
+        retained here and H-065 is untouched. The refactor the cell needs did land on its
+        own: sweep.MassGrid and scaled_mass_grid split the integer route's grid out as a
+        value, so the seam a census reads through is in place. The cell is otherwise
+        unchanged and takeable as written.
+      evidence:
+      - session-086 stop reason and its Lane B delegation
+      disposition: fix-and-rerun
+      follow_up: think-614o
+    - scope: >-
+        The same census, re-run in session-087 with the tool and its test built properly.
+      classification: achieved
+      result: >-
+        Delivered in full: devtools/census_tight_cells.py with
+        tests/test_census_tight_cells.py behind it, reading through the MassGrid and
+        scaled_mass_grid seam so the census and the retention decision read the same
+        int64 array, and the per-direction table at all four margins retained as
+        bc-201-n11-tight-cell-census.json.
+        Over 567,130,649 reachable cells in 181 directions, the epsilon = 1/20 tight set
+        is 23,112,904 cells, a summed ratio of 0.040754 -- a fifth of the 0.20 H-065
+        registered and an eighth of its 0.50 kill line, so the hypothesis is accepted.
+        The census reproduces the certificate's own least_cell_mass, 4001/4000, as the
+        minimum in every direction, and epsilon = 0 is empty everywhere, so Condition 5
+        holds with a uniform margin of 1/4000 and epsilon is a band above a floor.
+        The cell's own reading goes the other way and both are recorded. Corollary 1a's
+        exact cover is a search, not a check: the median direction carries 78,016 tight
+        cells against a bar of a few hundred, the set has positive area (7.596 per cent
+        of the centre domain, 19.77 per cent in one direction, still 1.519 per cent at
+        epsilon = 1/100), its bounding box equals the centre domain's own box in all 181
+        directions at every non-empty margin, and its 22,132 components are extended
+        regions of median about 554 cells rather than positions. That is what BC-207
+        consumes and could not start without.
+        The record says plainly what this is not: the census measures the LP solution's
+        near-active set, not the integer optimum, so it is consistent with an integrality
+        gap and is not evidence of one.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-063-h-065-n11-near-tight-cell-census.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-201-n11-tight-cell-census.json
+      disposition: retire-success
+      follow_up: null
+    artifacts:
+    - packing/devtools/census_tight_cells.py
+    - packing/tests/test_census_tight_cells.py
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-063-h-065-n11-near-tight-cell-census.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-201-n11-tight-cell-census.json
     next_evidence: >-
       Whether Corollary 1a's exact-cover step is a check or a search, which BC-207 in
       block two consumes directly and cannot start without.
@@ -418,7 +684,7 @@ agenda:
     purpose: research
     owner_focus: correctness
     instances: [26]
-    state: blocked
+    state: stopped
     priority: 1
     question: >-
       With row generation finally priced against the container side, does a
@@ -467,6 +733,42 @@ agenda:
     depends_on: [BC-191]
     parallel_group: agenda021-lane-c
     program: reach-table-ladder
+    artifacts:
+    - packing/devtools/colgen_checkpoint.py
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-202-n26-138-25.json
+    outcomes:
+    - scope: >-
+        The n = 26 column-generation run at the registered side 138/25, carried toward
+        convergence rather than a clock, on one core.
+      classification: time-limited
+      result: >-
+        A measured negative at the side, and no ratio. Twenty-two column rounds and 137
+        LP rounds over 7983 s brought the restricted optimum to 26.464317 with the row
+        loop converged inside the last column round (least covered mass 1.000000) on
+        8521 sites; the column loop had not converged -- it was still finding orbits of
+        negative reduced cost, the last at averaged depth 1.0712 -- when the run stopped.
+        Above twenty-six on this site set means no certificate here, and no more: adding
+        sites can only lower a restricted optimum, so the number is an upper bound on the
+        covering value and says nothing about whether a certificate exists at 138/25.
+        X-013's third proposal asked for a converged seventh covering-value point and
+        this is not one, so the attainment ratio is not reported.
+        The cost is the reusable part. A cold column round cost 2130.6 s where the model
+        priced 580 to 870, not because a round costs more than the law says -- over
+        BC-191's own fitting window it cost 14.593 s against the law's 14.07 -- but
+        because the cold row loop needed 58 rounds and their cost grows inside the loop;
+        warm column rounds then averaged 244.7 s. The checkpoint is resumable and the
+        resume path was exercised on the real artifact rather than only in a unit test.
+        One thing the lane started and did not finish is deliberately not on the branch:
+        a test asserting that a resumed leg which runs no round of its own reports an
+        empty round list rather than the checkpoint's. The driver returns the
+        checkpoint's, and changing that would change what the fields of this cell's
+        already retained summary mean, so it is left to think-4in0 with the checkpoint
+        it inherits.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-202-n26-138-25.json
+      - session-086 Lane C delegation
+      disposition: continue
+      follow_up: think-4in0
     next_evidence: >-
       The first covering-value point outside the 3.82-to-4.80 band, which is what X-013's
       third proposal asks for and what block two's reach-table rungs are priced against.
@@ -474,7 +776,7 @@ agenda:
     purpose: tool_validation
     owner_focus: process
     instances: [11, 20, 21, 26]
-    state: blocked
+    state: complete
     priority: 2
     question: >-
       What did the three lanes measure, and which two of block two's three leads does
@@ -538,9 +840,204 @@ agenda:
     bead: think-jv2d
     workflows: [review-planning-oversight]
     depends_on: [BC-197, BC-198, BC-199, BC-200, BC-201, BC-202, BC-211]
+    artifacts:
+    - packing/campaign/agent-sessions/session-086-agenda021-overnight-pass.md
+    outcomes:
+    - scope: >-
+        The block's W10 closeout: outcomes on every cell, the four doubling-down rules
+        evaluated against the measured numbers, and one next entry selected.
+      classification: achieved
+      result: >-
+        Run at minute 530 rather than 390, after an account rate limit ended every
+        sub-agent of the pass at 09:21 UTC and the container was restarted; the
+        coordinator resumed, gated the two frozen candidates the lanes had left, and
+        closed the block. Every cell carries an outcome at its smallest honest scope.
+        None of the four rules fired. Rule one asked whether the m = 5 wall lands within
+        0.02 of five: it is bracketed to [97/20, 39/8], so the covering value binds at
+        about 4.86 and the ceiling at 4.9885 never becomes the binding limit -- the
+        opposite of the rule's condition, and the first direct evidence anywhere in this
+        register about where a covering wall sits. Rule two asked whether the n = 11
+        covering value is below eleven at 3.85: BC-200 produced no certificate there, so
+        it did not fire. Rule three asked whether rho_0 is below 1e-6: it is 0.0023089,
+        three orders above, so the local box is reachable and no lead closes. Rule four
+        asked whether the n = 13 optimum converges below thirteen at 399/100: BC-211
+        never converged, so it did not fire.
+        With no rule firing, agenda-022 opens as drafted rather than reordered. What the
+        block adds to it is one cell it did not have: BC-213, the remaining rung at
+        973/200, the midpoint of the bracket by the schedule's own rule, which settles
+        H-062 either way at a cost the ladder has already measured.
+      evidence:
+      - packing/campaign/agendas/agenda-021-three-numbers-and-a-wall.md closeout
+      - packing/campaign/agent-sessions/session-086-agenda021-overnight-pass.md
+      disposition: retire-success
+      follow_up: null
     next_evidence: >-
       Which of agenda-022's leads open, which is the whole of what every cell in that
       agenda is blocked on.
+  closeout:
+    documentation_review:
+    - path: SYNOPSIS.md
+      decision: updated
+      reason: >-
+        T-021 enters the results headline and the registry aggregate, the round table
+        and cost table gain exp-060 and exp-061, the reported covering values go from
+        eight sides to fourteen, and the current handoff names this block's selected
+        next entry.
+    - path: README.md
+      decision: checked-current
+      reason: >-
+        Its bound figures are rendered from the register rather than written by hand,
+        and the front door's claims about what the project has proved are unchanged by
+        a rung at two sizes it does not name.
+    - path: TUTORIAL.md
+      decision: checked-current
+      reason: >-
+        The tutorial teaches the certificate from first principles at n = 11 and quotes
+        no n = 20 figure; nothing it explains changed.
+    - path: conventions.md
+      decision: checked-current
+      reason: >-
+        No new term, id shape or naming rule was introduced. The one convention this
+        block leaned on -- certificate.json is the moving top-rung pointer and
+        certificate-A-B.json an immutable rung -- was already written down, and this
+        block is the first case of the pointer actually moving.
+    - path: operating-rules.md
+      decision: checked-current
+      reason: >-
+        OR-1 through OR-11 governed the block as written and none needed amending; the
+        rate limit that ended the lanes is the external blocker OR-8 already names.
+    - path: development.md
+      decision: checked-current
+      reason: >-
+        No build, test or validation command changed. The one entry point that gained an
+        argument, the n = 20 package replay, keeps its old invocation as the default.
+    changes:
+    - name: m5-ladder-and-t021
+      result: >-
+        s(20) and s(21) raised from 24/5 to 97/20 by a certificate retained through the
+        gate on both routes, with the 193/40 rung beside it and the m = 5 covering wall
+        bracketed to width 0.025.
+      paths:
+      - packing/cases/n20_fractional_certificate/certificate.json
+      - packing/cases/n20_fractional_certificate/certificate-193-40.json
+      - packing/cases/n20_fractional_certificate/certificate-24-5.json
+      - packing/frontier/results.yaml
+      - packing/frontier/evidence.yaml
+      - packing/frontier/n-020.md
+      - packing/frontier/n-021.md
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+    - name: n11-covering-value-from-below
+      result: >-
+        nu*(3.82) >= 9.907906 and nu*(3.85) >= 9.049861 exactly, up from the retained
+        1152/175 = 6.5829, with the cutting-plane loop retained as a module and a driver.
+      paths:
+      - packing/src/sqpack/fractional/cutting.py
+      - packing/devtools/run_fractional_cutting.py
+      - packing/tests/test_fractional_cutting.py
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-060-h-064-n11-fractional-packing-floor.md
+    - name: trump-isolation-radius
+      result: >-
+        rho_0 and C at Trump's pose as exact rationals, with four corrections to X-014's
+        sketch and the stress-ratio identity that empties the LP it proposed.
+      paths:
+      - packing/cases/trump11/isolation_radius.py
+      - packing/tests/test_trump_isolation_radius.py
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-199-trump-isolation-radius.json
+    - name: generator-cost-model-and-drivers
+      result: >-
+        Row generation priced against the container side, the site-density rule expressed
+        as a function of it, the default rationalisation scale raised at flat
+        verification cost, and three drivers the lanes ran their searches through.
+      paths:
+      - packing/devtools/bench_colgen.py
+      - packing/devtools/colgen_checkpoint.py
+      - packing/devtools/run_fractional_colgen.py
+      - packing/src/sqpack/fractional/colgen.py
+      - packing/campaign/agendas/agenda-019-efficiency-first-retarget-and-deep-strategy.md
+    - name: moved-pointer-detector
+      result: >-
+        check_rung_figures accepts a superseded result that names only the rung it
+        produced, exactly when the live pointer beside it is declared by its successor.
+      paths:
+      - packing/devtools/check_rung_figures.py
+      - packing/tests/test_rung_figures.py
+    validation:
+    - scope: records
+      status: passed
+      evidence: >-
+        uv run --frozen --all-extras --group dev packing-validate --records at the
+        closeout commit: every record step green, including the results register, the
+        rung-figure and case-prose detectors, the covering-value register's schema, the
+        synopsis check and every generated view.
+    - scope: retention-gate
+      status: passed
+      evidence: >-
+        devtools.decide_certificate on both frozen candidates: 97/20 RETAINABLE at
+        200001/200000 (sha256 445935cc...), 193/40 RETAINABLE at 1000003/1000000
+        (sha256 085e1392...), each accepted by the exact sweep and the interval route
+        with the two routes agreeing on the value.
+    - scope: tests
+      status: passed
+      evidence: >-
+        The touched modules: rung figures 37, trump isolation radius 6, fractional
+        cutting 8, bench colgen 7, colgen checkpoint 8, run_fractional_colgen 8; ruff
+        and ruff format clean repository-wide, basedpyright clean on every file this
+        block wrote.
+    - scope: push-tier
+      status: pending
+      evidence: >-
+        Not run locally at the closeout: the container was restarted mid-block and the
+        remaining budget went to landing the result and the records. Hosted CI runs the
+        full gate on the pushed head.
+    replanning:
+      candidates:
+      - bead: think-wufn
+        workflow: research-loop
+        priority: 0
+        rationale: >-
+          BC-213, the remaining rung at 973/200. H-062 is one rung from a verdict: the
+          bracket is 0.025 against the 0.02 it registered, and the midpoint settles it
+          either way. The ladder has measured what the rung costs -- about 17 s per LP
+          round at this side, a converged rung in under twenty minutes at 193/40 -- so
+          this is the cheapest registered question in the queue.
+      - bead: think-m3sx
+        workflow: pipeline-improvement
+        priority: 1
+        rationale: >-
+          BC-198, the class-certificate program, never opened. It is the cheap half of
+          the conditioning question and block two's BC-208 rests on it entirely.
+      - bead: think-614o
+        workflow: pipeline-improvement
+        priority: 1
+        rationale: >-
+          BC-201, the near-tight census, stopped with its tool half-built. H-065 is
+          untouched and the readout is an hour's work from where the lane left it.
+      - bead: think-gku0
+        workflow: pipeline-improvement
+        priority: 2
+        rationale: >-
+          BC-204, the admissible-domain generalisation, which no rule reordered and
+          which block two's conditional route cannot start without.
+      - bead: think-4in0
+        workflow: research-loop
+        priority: 2
+        rationale: >-
+          BC-209 inherits BC-202's resumable checkpoint at 138/25 and the cost model
+          that now separates a cold column round from a warm one.
+      selected:
+        bead: think-wufn
+        workflow: research-loop
+        rationale: >-
+          One rung closes a registered hypothesis that four rungs left open by 0.005 of
+          bracket width, at a cost this block measured rather than estimated, and it is
+          the only candidate whose outcome is a verdict rather than an instrument.
+      operator_input:
+        status: unavailable
+        note: >-
+          The operator directed the pass to run autonomously overnight and was not
+          consulted at the closeout. The rate limit that ended the lanes at 09:21 UTC and
+          the container restart that followed are recorded as the block's stop reason
+          rather than as a decision.
 ---
 # Agenda 021 — Three Numbers and a Wall
 

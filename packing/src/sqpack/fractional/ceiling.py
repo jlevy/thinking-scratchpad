@@ -358,7 +358,8 @@ def arrangement_lines(certificate: CeilingCertificate) -> list[Line]:
     return lines
 
 
-def _exact_intersection(first: Line, second: Line) -> tuple[Fraction, Fraction] | None:
+def exact_intersection(first: Line, second: Line) -> tuple[Fraction, Fraction] | None:
+    """Where two lines meet, exactly, or None when they are parallel."""
     determinant = first[0] * second[1] - first[1] * second[0]
     if determinant == 0:
         return None
@@ -391,7 +392,7 @@ def container_vertices(
         inside = (x >= -SCREEN_MARGIN) & (x <= high) & (y >= -SCREEN_MARGIN) & (y <= high)
         decide = (np.abs(determinant) <= NEAR_PARALLEL) | inside
         for offset in np.flatnonzero(decide):
-            exact = _exact_intersection(lines[i], lines[i + 1 + int(offset)])
+            exact = exact_intersection(lines[i], lines[i + 1 + int(offset)])
             if exact is None:
                 continue
             if 0 <= exact[0] <= side and 0 <= exact[1] <= side:
@@ -399,7 +400,7 @@ def container_vertices(
     return sorted(found)
 
 
-def _float_family(
+def float_family(
     certificate: CeilingCertificate,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Slab normals, offsets, half-sides and weights of the family, as floats."""
@@ -416,7 +417,7 @@ def _float_family(
     return np.array(normals), np.array(offsets), np.array(halves), np.array(weights)
 
 
-def _loose_membership(
+def loose_membership(
     points: np.ndarray,
     normals: np.ndarray,
     offsets: np.ndarray,
@@ -446,7 +447,7 @@ def maximum_depth(
     """
     if not vertices:
         return Fraction(0), 0, None
-    normals, offsets, halves, weights = _float_family(certificate)
+    normals, offsets, halves, weights = float_family(certificate)
     points = np.array([[float(x), float(y)] for x, y in vertices])
     worst = Fraction(0)
     where: tuple[Fraction, Fraction] | None = None
@@ -454,7 +455,7 @@ def maximum_depth(
     chunk = max(1, 2_000_000 // max(1, len(certificate.placements)))
     for start in range(0, points.shape[0], chunk):
         block = points[start : start + chunk]
-        loose = _loose_membership(block, normals, offsets, halves)
+        loose = loose_membership(block, normals, offsets, halves)
         depth = loose.astype(float) @ weights
         for local in np.flatnonzero(depth >= 1 - SCREEN_MARGIN):
             x, y = vertices[start + local]
@@ -529,6 +530,9 @@ __all__ = [
     "Placement",
     "arrangement_lines",
     "container_vertices",
+    "exact_intersection",
+    "float_family",
+    "loose_membership",
     "maximum_depth",
     "scaled_to_unit_depth",
     "verify_ceiling",

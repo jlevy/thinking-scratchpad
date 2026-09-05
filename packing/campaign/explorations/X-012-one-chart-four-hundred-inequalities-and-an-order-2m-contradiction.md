@@ -1164,7 +1164,7 @@ Paper proofs, with every exact quantity replayed by an independent sympy impleme
   1968). The packet does not depend on it: Theorem 11 is proved in full.
 - The prior-art scoping of §7.1 (the [CW96] Theorem 4.3.1 shape match, the disk-jamming
   sign requirement, Donev et al.
-  2007) is the coordinator’s survey finding, adopted as governing; this lane did not
+  2007\) is the coordinator’s survey finding, adopted as governing; this lane did not
   read those primary texts.
 
 ### 8.4 Verified only outside the repository instrument

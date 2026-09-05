@@ -46,6 +46,25 @@ class SpanReduction:
 
 
 @dataclass(frozen=True, slots=True)
+class MassGrid:
+    """The dense scaled-mass grid the integer sweep fills, before it takes a minimum.
+
+    ``grid[i, j]`` is the mass of event cell ``(i, j)`` multiplied by ``scale``, so
+    every entry is an exact integer and a comparison against a rational threshold is
+    decided in integers. Only the cells named by ``reduction.spans`` are reachable;
+    the rest of the array is the prefix sum's scaffolding and means nothing on its own.
+
+    This exists so that a readout of the grid -- how many reachable cells sit within a
+    margin of one, say -- is the same array the decision was taken on rather than a
+    second implementation of it.
+    """
+
+    reduction: SpanReduction
+    grid: np.ndarray
+    scale: int
+
+
+@dataclass(frozen=True, slots=True)
 class Reduction:
     u_events: tuple[Fraction, ...]
     v_events: tuple[Fraction, ...]
@@ -263,24 +282,20 @@ def minimum_covered_mass(
     return minimum_covered_mass_fraction(atoms, direction, outer_side, square_side)
 
 
-def minimum_covered_mass_integer(
+def scaled_mass_grid(
     atoms: tuple[Atom, ...],
     direction: Direction,
     outer_side: Fraction,
     square_side: Fraction,
     scale: int,
-) -> tuple[Fraction, tuple[Fraction, Fraction]]:
-    """The optimized sweep in ``int64`` on the common weight scale. Exact.
+) -> MassGrid:
+    """Fill the dense integer mass grid one direction's sweep decides on.
 
-    The difference array holds signed sums of scaled weights, so no entry can
-    exceed the scaled total in magnitude. This public entry point checks the
-    nonnegativity, integrality, and overflow preconditions itself; callers do not
-    have to arrive through ``minimum_covered_mass`` for the result to be sound.
-    The two prefix sums are what ``minimum_covered_mass_fraction`` does one
-    cell at a time. The minimum is taken column by column over each reachable
-    span, first occurrence winning, which is the order the reference walks its
-    cells in, so the witness is the same cell and not merely a cell of the same
-    mass.
+    This is the first half of ``minimum_covered_mass_integer``, factored out because
+    the grid it fills answers more than one question: the sweep takes its minimum, and
+    a census reads the whole distribution off the same array. It checks the
+    nonnegativity, integrality and overflow preconditions itself, so a reader of the
+    grid inherits them rather than restating them.
     """
 
     require_nonnegative_atom_weights(atoms)
@@ -318,6 +333,31 @@ def minimum_covered_mass_integer(
     np.add.at(grid, (right, top), weights)
     np.cumsum(grid, axis=1, out=grid)
     np.cumsum(grid, axis=0, out=grid)
+    return MassGrid(reduction, grid, scale)
+
+
+def minimum_covered_mass_integer(
+    atoms: tuple[Atom, ...],
+    direction: Direction,
+    outer_side: Fraction,
+    square_side: Fraction,
+    scale: int,
+) -> tuple[Fraction, tuple[Fraction, Fraction]]:
+    """The optimized sweep in ``int64`` on the common weight scale. Exact.
+
+    The difference array holds signed sums of scaled weights, so no entry can
+    exceed the scaled total in magnitude. This public entry point checks the
+    nonnegativity, integrality, and overflow preconditions itself; callers do not
+    have to arrive through ``minimum_covered_mass`` for the result to be sound.
+    The two prefix sums are what ``minimum_covered_mass_fraction`` does one
+    cell at a time. The minimum is taken column by column over each reachable
+    span, first occurrence winning, which is the order the reference walks its
+    cells in, so the witness is the same cell and not merely a cell of the same
+    mass.
+    """
+
+    filled = scaled_mass_grid(atoms, direction, outer_side, square_side, scale)
+    reduction, grid = filled.reduction, filled.grid
 
     best: int | None = None
     witness_cell: tuple[int, int] | None = None

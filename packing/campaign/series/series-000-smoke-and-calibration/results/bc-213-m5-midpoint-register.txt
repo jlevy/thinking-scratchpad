@@ -1,0 +1,167 @@
+# BC-213 -- m = 5 bisection, remaining rung L = 973/200 = 4.865, n = 20.
+# Lane A of agenda-022. Format follows bc-197-ladder-register.txt: one YAML list
+# entry per run, plus one `- lp:` line per LP round mirrored live from the
+# driver's own round log, so a crash loses at most one round.
+#
+# Decision rule (from the cell): refutation is early -- an optimum crossing
+# twenty with placements still violated refutes the rung on that construction.
+# Confirmation is convergence only. Kill: any single round over 25 minutes.
+# The soundness alarm does not apply below 4.885618.
+#
+# construction g  = uniform grids at BC-191's density rule (devtools.colgen_checkpoint)
+# construction gs = those grids unioned with the retained 97/20 certificate's
+#                   1680 atoms carried by --seed-map scale, i.e. by 973/970
+#                   (devtools.run_fractional_colgen)
+
+# --- construction g: uniform grids at BC-191 density rule, (34, 46, 56); 806 orbits, 6216 sites
+#     started 2026-09-05T17:00:24Z; devtools.colgen_checkpoint ---
+# live lines, one per 4-round chunk, as the driver wrote them:
+- {run: g, side: 973/200, lp: 4, objective: 18.234813, added: 440, rows: 1562, least_covered: 0.328110, sep_s: 1.24, lp_s: 0.39, elapsed_s: 32}
+- {run: g, side: 973/200, lp: 8, objective: 19.369808, added: 332, rows: 2945, least_covered: 0.675800, sep_s: 1.23, lp_s: 0.73, elapsed_s: 40}
+- {run: g, side: 973/200, lp: 12, objective: 19.846171, added: 299, rows: 4243, least_covered: 0.771400, sep_s: 3.52, lp_s: 1.68, elapsed_s: 56}
+- {run: g, side: 973/200, lp: 16, objective: 20.001502, added: 293, rows: 5519, least_covered: 0.890041, sep_s: 7.42, lp_s: 3.05, elapsed_s: 88}
+- {run: g, side: 973/200, lp: 20, objective: 20.055684, added: 251, rows: 6662, least_covered: 0.945562, sep_s: 14.80, lp_s: 4.55, elapsed_s: 144}
+- {run: g, side: 973/200, lp: 24, objective: 20.095294, added: 298, rows: 7655, least_covered: 0.941036, sep_s: 29.52, lp_s: 5.18, elapsed_s: 272}
+
+# every round, read back from the checkpoint, with the violated-placement count
+# the chunk log does not carry:
+- {run: g, side: 973/200, lp: 1, objective: 15.072691, violated: 543, added: 497, rows: 497, support: 0, sep_s: 17.267, lp_s: 0.13, round_s: 17.397, cum_round_s: 17.397}
+- {run: g, side: 973/200, lp: 2, objective: 17.308882, violated: 543, added: 285, rows: 782, support: 364, sep_s: 1.2, lp_s: 0.2, round_s: 1.4, cum_round_s: 18.797}
+- {run: g, side: 973/200, lp: 3, objective: 17.590320, violated: 543, added: 340, rows: 1122, support: 372, sep_s: 1.191, lp_s: 0.236, round_s: 1.427, cum_round_s: 20.224}
+- {run: g, side: 973/200, lp: 4, objective: 18.234813, violated: 543, added: 440, rows: 1562, support: 384, sep_s: 1.237, lp_s: 0.386, round_s: 1.623, cum_round_s: 21.847}
+#   g chunk warm solve: rows=1562 objective=18.234813 lp_s=0.337
+- {run: g, side: 973/200, lp: 5, objective: 18.574431, violated: 543, added: 331, rows: 1893, support: 412, sep_s: 1.45, lp_s: 0.53, round_s: 1.98, cum_round_s: 23.827}
+- {run: g, side: 973/200, lp: 6, objective: 18.690098, violated: 543, added: 325, rows: 2218, support: 320, sep_s: 0.932, lp_s: 0.518, round_s: 1.45, cum_round_s: 25.277}
+- {run: g, side: 973/200, lp: 7, objective: 19.110675, violated: 543, added: 395, rows: 2613, support: 276, sep_s: 0.734, lp_s: 0.765, round_s: 1.499, cum_round_s: 26.776}
+- {run: g, side: 973/200, lp: 8, objective: 19.369808, violated: 543, added: 332, rows: 2945, support: 368, sep_s: 1.232, lp_s: 0.733, round_s: 1.965, cum_round_s: 28.741}
+#   g chunk warm solve: rows=2945 objective=19.369808 lp_s=0.746
+- {run: g, side: 973/200, lp: 9, objective: 19.477766, violated: 543, added: 319, rows: 3264, support: 496, sep_s: 2.233, lp_s: 0.972, round_s: 3.205, cum_round_s: 31.946}
+- {run: g, side: 973/200, lp: 10, objective: 19.572212, violated: 543, added: 311, rows: 3575, support: 424, sep_s: 1.546, lp_s: 1.646, round_s: 3.192, cum_round_s: 35.138}
+- {run: g, side: 973/200, lp: 11, objective: 19.706947, violated: 543, added: 369, rows: 3944, support: 512, sep_s: 2.281, lp_s: 1.653, round_s: 3.934, cum_round_s: 39.072}
+- {run: g, side: 973/200, lp: 12, objective: 19.846171, violated: 543, added: 299, rows: 4243, support: 556, sep_s: 3.521, lp_s: 1.683, round_s: 5.204, cum_round_s: 44.276}
+#   g chunk warm solve: rows=4243 objective=19.846171 lp_s=1.617
+- {run: g, side: 973/200, lp: 13, objective: 19.942036, violated: 543, added: 308, rows: 4551, support: 436, sep_s: 1.57, lp_s: 1.874, round_s: 3.443, cum_round_s: 47.719}
+- {run: g, side: 973/200, lp: 14, objective: 19.960962, violated: 543, added: 348, rows: 4899, support: 536, sep_s: 2.854, lp_s: 2.339, round_s: 5.193, cum_round_s: 52.912}
+- {run: g, side: 973/200, lp: 15, objective: 19.988862, violated: 543, added: 327, rows: 5226, support: 724, sep_s: 7.864, lp_s: 2.719, round_s: 10.583, cum_round_s: 63.495}
+- {run: g, side: 973/200, lp: 16, objective: 20.001502, violated: 543, added: 293, rows: 5519, support: 712, sep_s: 7.42, lp_s: 3.048, round_s: 10.468, cum_round_s: 73.963}
+#   g chunk warm solve: rows=5519 objective=20.001502 lp_s=3.243
+- {run: g, side: 973/200, lp: 17, objective: 20.021782, violated: 543, added: 317, rows: 5836, support: 780, sep_s: 9.478, lp_s: 3.543, round_s: 13.021, cum_round_s: 86.984}
+- {run: g, side: 973/200, lp: 18, objective: 20.032070, violated: 543, added: 299, rows: 6135, support: 744, sep_s: 8.693, lp_s: 3.039, round_s: 11.732, cum_round_s: 98.716}
+- {run: g, side: 973/200, lp: 19, objective: 20.040743, violated: 543, added: 276, rows: 6411, support: 812, sep_s: 9.335, lp_s: 2.701, round_s: 12.036, cum_round_s: 110.752}
+- {run: g, side: 973/200, lp: 20, objective: 20.055684, violated: 495, added: 251, rows: 6662, support: 916, sep_s: 14.799, lp_s: 4.551, round_s: 19.349, cum_round_s: 130.101}
+#   g chunk warm solve: rows=6662 objective=20.055684 lp_s=4.373
+- {run: g, side: 973/200, lp: 21, objective: 20.065129, violated: 471, added: 260, rows: 6922, support: 876, sep_s: 14.505, lp_s: 6.071, round_s: 20.576, cum_round_s: 150.677}
+- {run: g, side: 973/200, lp: 22, objective: 20.080269, violated: 459, added: 199, rows: 7121, support: 936, sep_s: 21.87, lp_s: 6.734, round_s: 28.604, cum_round_s: 179.281}
+- {run: g, side: 973/200, lp: 23, objective: 20.092466, violated: 465, added: 236, rows: 7357, support: 996, sep_s: 30.454, lp_s: 5.992, round_s: 36.446, cum_round_s: 215.727}
+- {run: g, side: 973/200, lp: 24, objective: 20.095294, violated: 525, added: 298, rows: 7655, support: 1016, sep_s: 29.523, lp_s: 5.179, round_s: 34.702, cum_round_s: 250.429}
+# g: objective=20.095293762717077 least_covered=0.9410357708310335 lp_rounds_done=24 sites=6216 orbits=806 rows=7655 cum_round_s=250.429
+- run: bc213-g
+  n: 20
+  side: 973/200
+  construction: grids
+  objective: 20.095294
+  site_set: grids (34, 46, 56)
+  sites: 6216
+  orbits: 806
+  rows: 7655
+  rounds: 24
+  converged: False
+  stop_reason: refuted by the lane on crossing at lp 16; the process ran on to lp 24 (see note)
+  crossed_at_round: 16
+  objective_at_crossing: 20.001502
+  violated_at_crossing: 543
+  least_covered_at_crossing: 0.890041
+  least_covered_mass: 0.941036
+  violated_final: 525
+  total_mass: None
+  frozen: None
+  round_seconds_sum: 250.429
+  chunk_overhead: 5 warm solves
+  verdict: refuted early on this construction -- the rung walls on uniform grids
+
+# --- construction gs: those grids unioned with the retained 97/20 certificate 1680 atoms
+#     carried by --seed-map scale, i.e. by 973/970; started 2026-09-05T17:03:04Z
+#     devtools.run_fractional_colgen, one line per LP round straight off --row-log ---
+#   gs raw:    lp    rows  added violated  support     objective    sep_s     lp_s
+- {run: gs, side: 973/200, lp: 0, objective: 14.920940, violated: 543, added: 521, rows: 521, support: 0, sep_s: 21.86, lp_s: 0.27, elapsed_s: 25}
+- {run: gs, side: 973/200, lp: 1, objective: 15.720948, violated: 543, added: 418, rows: 939, support: 440, sep_s: 2.34, lp_s: 0.25, elapsed_s: 33}
+- {run: gs, side: 973/200, lp: 2, objective: 17.564088, violated: 543, added: 411, rows: 1350, support: 336, sep_s: 1.42, lp_s: 0.39, elapsed_s: 33}
+- {run: gs, side: 973/200, lp: 3, objective: 17.973591, violated: 543, added: 345, rows: 1695, support: 344, sep_s: 1.34, lp_s: 0.56, elapsed_s: 33}
+- {run: gs, side: 973/200, lp: 4, objective: 18.409904, violated: 543, added: 391, rows: 2086, support: 384, sep_s: 1.69, lp_s: 0.70, elapsed_s: 33}
+- {run: gs, side: 973/200, lp: 5, objective: 19.162821, violated: 543, added: 307, rows: 2393, support: 492, sep_s: 3.98, lp_s: 1.66, elapsed_s: 41}
+- {run: gs, side: 973/200, lp: 6, objective: 19.391589, violated: 543, added: 363, rows: 2756, support: 448, sep_s: 2.46, lp_s: 1.49, elapsed_s: 49}
+- {run: gs, side: 973/200, lp: 7, objective: 19.495912, violated: 543, added: 361, rows: 3117, support: 448, sep_s: 2.59, lp_s: 1.90, elapsed_s: 49}
+- {run: gs, side: 973/200, lp: 8, objective: 19.696598, violated: 543, added: 340, rows: 3457, support: 504, sep_s: 3.75, lp_s: 1.78, elapsed_s: 57}
+- {run: gs, side: 973/200, lp: 9, objective: 19.720642, violated: 543, added: 393, rows: 3850, support: 540, sep_s: 5.35, lp_s: 2.63, elapsed_s: 65}
+- {run: gs, side: 973/200, lp: 10, objective: 19.764563, violated: 543, added: 395, rows: 4245, support: 584, sep_s: 6.95, lp_s: 3.12, elapsed_s: 73}
+- {run: gs, side: 973/200, lp: 11, objective: 19.788173, violated: 543, added: 312, rows: 4557, support: 656, sep_s: 9.34, lp_s: 2.47, elapsed_s: 89}
+- {run: gs, side: 973/200, lp: 12, objective: 19.856426, violated: 543, added: 384, rows: 4941, support: 688, sep_s: 11.26, lp_s: 3.47, elapsed_s: 97}
+- {run: gs, side: 973/200, lp: 13, objective: 19.887632, violated: 543, added: 383, rows: 5324, support: 772, sep_s: 11.54, lp_s: 5.59, elapsed_s: 121}
+- {run: gs, side: 973/200, lp: 14, objective: 19.900578, violated: 543, added: 370, rows: 5694, support: 760, sep_s: 11.70, lp_s: 4.83, elapsed_s: 137}
+- {run: gs, side: 973/200, lp: 15, objective: 19.929500, violated: 543, added: 327, rows: 6021, support: 876, sep_s: 15.48, lp_s: 5.40, elapsed_s: 153}
+- {run: gs, side: 973/200, lp: 16, objective: 19.933685, violated: 543, added: 313, rows: 6334, support: 1004, sep_s: 23.24, lp_s: 6.07, elapsed_s: 185}
+- {run: gs, side: 973/200, lp: 17, objective: 19.948306, violated: 543, added: 317, rows: 6651, support: 1064, sep_s: 30.52, lp_s: 7.46, elapsed_s: 225}
+- {run: gs, side: 973/200, lp: 18, objective: 19.959844, violated: 543, added: 347, rows: 6998, support: 1020, sep_s: 21.37, lp_s: 6.97, elapsed_s: 249}
+- {run: gs, side: 973/200, lp: 19, objective: 19.966924, violated: 543, added: 329, rows: 7327, support: 1048, sep_s: 21.45, lp_s: 6.87, elapsed_s: 281}
+- {run: gs, side: 973/200, lp: 20, objective: 19.970931, violated: 543, added: 287, rows: 7614, support: 1036, sep_s: 20.18, lp_s: 8.31, elapsed_s: 305}
+- {run: gs, side: 973/200, lp: 21, objective: 19.975499, violated: 543, added: 338, rows: 7952, support: 1116, sep_s: 26.01, lp_s: 6.77, elapsed_s: 337}
+- {run: gs, side: 973/200, lp: 22, objective: 19.979344, violated: 543, added: 299, rows: 8251, support: 1260, sep_s: 36.15, lp_s: 10.66, elapsed_s: 386}
+- {run: gs, side: 973/200, lp: 23, objective: 19.982159, violated: 543, added: 295, rows: 8546, support: 1404, sep_s: 41.32, lp_s: 9.92, elapsed_s: 442}
+- {run: gs, side: 973/200, lp: 24, objective: 19.983740, violated: 486, added: 241, rows: 8787, support: 1308, sep_s: 33.82, lp_s: 10.20, elapsed_s: 482}
+- {run: gs, side: 973/200, lp: 25, objective: 19.984974, violated: 432, added: 228, rows: 9015, support: 1316, sep_s: 38.46, lp_s: 9.48, elapsed_s: 530}
+- {run: gs, side: 973/200, lp: 26, objective: 19.987221, violated: 462, added: 229, rows: 9244, support: 1296, sep_s: 36.16, lp_s: 9.80, elapsed_s: 578}
+- {run: gs, side: 973/200, lp: 27, objective: 19.988736, violated: 459, added: 243, rows: 9487, support: 1368, sep_s: 38.98, lp_s: 11.91, elapsed_s: 626}
+- {run: gs, side: 973/200, lp: 28, objective: 19.991315, violated: 435, added: 225, rows: 9712, support: 1540, sep_s: 49.46, lp_s: 11.80, elapsed_s: 690}
+- {run: gs, side: 973/200, lp: 29, objective: 19.996458, violated: 426, added: 234, rows: 9946, support: 1528, sep_s: 50.67, lp_s: 13.50, elapsed_s: 754}
+- {run: gs, side: 973/200, lp: 30, objective: 19.997545, violated: 480, added: 254, rows: 10200, support: 1540, sep_s: 52.51, lp_s: 11.98, elapsed_s: 818}
+- {run: gs, side: 973/200, lp: 31, objective: 19.998396, violated: 363, added: 167, rows: 10367, support: 1456, sep_s: 45.99, lp_s: 13.57, elapsed_s: 874}
+- {run: gs, side: 973/200, lp: 32, objective: 19.999167, violated: 381, added: 159, rows: 10526, support: 1596, sep_s: 56.01, lp_s: 11.80, elapsed_s: 946}
+- {run: gs, side: 973/200, lp: 33, objective: 19.999837, violated: 279, added: 139, rows: 10665, support: 1572, sep_s: 55.86, lp_s: 12.14, elapsed_s: 1010}
+- {run: gs, side: 973/200, lp: 34, objective: 20.000223, violated: 213, added: 102, rows: 10767, support: 1528, sep_s: 51.04, lp_s: 14.64, elapsed_s: 1075}
+
+- run: bc213-gs
+  n: 20
+  side: 973/200
+  construction: grids + seeded
+  objective: 20.000223
+  site_set: grids (34, 46, 56) + 1680 atoms of certificate.json (scale, 973/970)
+  sites: not reported -- the driver prints the site count in its column log and no
+    column round completed before the crossing
+  rows: 10767
+  rounds: 35
+  round_index_base: 0
+  converged: False
+  stop_reason: stopped by the lane on crossing (obj passed twenty at lp 34 with 213 placements still violated)
+  crossed_at_round: 34
+  objective_at_crossing: 20.000223
+  violated_at_crossing: 213
+  objective_last_below_twenty: 19.999837
+  violated_last_below_twenty: 279
+  round_before_crossing: 33
+  total_mass: None
+  frozen: None
+  seconds: 1090
+  round_seconds_sum: 1072.6
+  separation_seconds: 842.2
+  lp_seconds: 230.4
+  longest_round_seconds: 67.8
+  verdict: refuted early on this construction too -- the rung walls on the seeded set
+  note: >-
+    The margin is 2.23 parts in a hundred thousand above twenty, against the four parts
+    in ten thousand by which the uniform grid crossed at 97/20. The violated count was
+    falling steeply into the crossing -- 480, 363, 381, 279, 213 -- so the row loop was
+    close to running out of violated placements, and the optimum walked up to twenty
+    from below rather than jumping it: 19.996458, 19.997545, 19.998396, 19.999167,
+    19.999837, 20.000223. The rule the cell pre-registered does not read margins, and
+    the restricted optimum only rises as rows are added, so the crossing settles the
+    construction. No column round had completed, so the site set was still the one the
+    run opened with.
+
+# --- BC-213 decision -------------------------------------------------------------
+# Both constructions refuted early. The rung at 973/200 = 4.865 walls for n = 20.
+# Bracket left: [97/20, 973/200] = [4.85, 4.865], width 0.015, inside the 0.02 H-062
+# registered. The lower endpoint is the retained certificate (T-021); the upper is
+# this wall. H-062 is resolved.
+# Nothing was frozen and nothing was handed to devtools.decide_certificate: neither
+# construction converged, and the cell freezes only on convergence.
+# The soundness alarm does not apply -- 4.865 is below 4.885618.

@@ -83,7 +83,7 @@ agenda:
     purpose: tool_validation
     owner_focus: efficiency
     instances: [12, 17, 18, 20]
-    state: ready
+    state: complete
     priority: 0
     question: >-
       Row generation is between 79 and 94 per cent of every round, the site grids do not
@@ -124,6 +124,49 @@ agenda:
     bead: think-ji0r
     workflows: [efficiency-loop]
     depends_on: []
+    artifacts:
+    - packing/devtools/bench_colgen.py
+    - packing/tests/test_bench_colgen.py
+    - packing/src/sqpack/fractional/colgen.py
+    outcomes:
+    - scope: >-
+        Row generation, site density and the rationalisation scale, measured on one
+        core at four sides (3.96, 4.59, 4.80, 5.52) inside ten-minute runs.
+      classification: achieved
+      result: >-
+        Round composition: solve_lp builds a fresh HiGHS linprog every round and scipy
+        exposes no basis, so no warm start exists; separation is 79 to 94 per cent of
+        a round only while the row set is small (at 16168 rows the LP is 67 per cent);
+        separation fits 1.19e-5 * support^1.95 and the LP 1.20e-6 * rows^1.62; cost
+        per LP round against the side fits 0.0189 * L^3.657 (2.953, 4.569, 6.241 s at
+        3.96, 4.59, 4.80, confirmed at 5.52), pricing is 1.6 per cent of a run, and
+        round 0's 14.6 to 42.5 s sawtooth is event_grid's live[::N//600] stride.
+        Site density: five-rung ladders at 99/25 (n = 12) and 24/5 (n = 20) put the
+        interior optimum at the same density, so the rule is count = round((L - 2
+        inset) d / B) + 1 with d = (8.5, 11.5, 14.25) sites per B-square, exposed as
+        site_counts_for_side -- (26, 35, 44) at 399/100, (33, 45, 55) at 24/5,
+        (40, 53, 66) at 138/25; the inherited (23, 31, 39) is the band's lower edge,
+        reaching 20.168732 at 24/5 where the optimum reaches 19.339779. Scale: the
+        loss is atoms/(2 scale) + 1e-6 total, the verification cost is flat in the
+        scale (2.86/2.89/2.83 s and 8.97/8.25/8.24 s across a 20x range) because the
+        sweep's grid comes from atom coordinates, the largest scaled total sits 5.1e9
+        under 2**60, so DEFAULT_SCALE is raised from 200,000 to 4,000,000, returning
+        0.005040 of the 0.005314 lost at n = 12's 99/25. Core budget: verify(workers=
+        None) takes up to four processes per certificate and never consults PACK_JOBS,
+        which is where agenda 017's load 10.6 came from; three lanes on three cores
+        with the fourth for the gate and every in-lane verify at workers=1. Rejected,
+        each with its measurement: an LP warm start at n = 12 (LP 11.8 of 62.0 s; the
+        top lead at n >= 17 where the LP is 162.4 of 242.1 s), rows_per_direction 1, 2
+        or 6 (identical optimum, 3 cheapest), raising max_rounds (never bound), densities
+        at or above 9.7 per B-square (123.1 s unconverged at n = 12), scales 1,000,000
+        and 20,000,000, and the 600-site stride (about 12 s of 60.8 s, but it changes
+        which rows round 0 generates and the equivalence question did not fit).
+      evidence:
+      - packing/devtools/bench_colgen.py (rounds, density, scale, summarise, costmodel)
+      - packing/tests/test_bench_colgen.py (7 tests, including the guard that a timed solve_rows decides identically to an untimed one)
+      - session-086 Lane C delegation, 3258 s platform-measured, 55 of 120 budgeted minutes
+      disposition: retire-success
+      follow_up: null
     next_evidence: >-
       The cost per round as a function of the container side, which is the input BC-194's
       cost model needs and which nobody has yet measured across sides.

@@ -49,16 +49,22 @@ def test_committed_file_matches_the_renderer() -> None:
 
 
 def test_retained_certificates_are_found_by_globbing_the_case_packages() -> None:
-    """Four packages exist today; the n = 20 package keys to n = 19, not n = 20."""
+    """Four packages exist today, each keyed by the least size its own mass certifies.
+
+    The key is computed, never read off the package name, and the n = 20 package is
+    the case that shows why: while its retained rung was the 24/5 one, mass
+    18.922620 keyed it to n = 19; T-021's 97/20 rung has mass 19.848723 and keys it
+    to n = 20. That the four keys agree with their package names today is a fact
+    about the current corpus, not a property of the glob.
+    """
     retained = retained_certificates()
-    assert {row["package"] for row in retained} == {
-        "n11_fractional_certificate",
-        "n12_fractional_certificate",
-        "n17_fractional_certificate",
-        "n20_fractional_certificate",
-    }
     keyed_n = {row["package"]: row["n"] for row in retained}
-    assert keyed_n["n20_fractional_certificate"] == 19
+    assert keyed_n == {
+        "n11_fractional_certificate": 11,
+        "n12_fractional_certificate": 12,
+        "n17_fractional_certificate": 17,
+        "n20_fractional_certificate": 20,
+    }
 
 
 def test_retained_certificate_mass_is_recomputed_from_its_atoms(
@@ -77,18 +83,32 @@ def test_retained_certificate_mass_is_recomputed_from_its_atoms(
 
 
 def test_reported_rows_quote_the_mass_their_own_artifact_recomputes() -> None:
-    """The evidence column is a retention claim: every artifact it names must resolve."""
-    rows = {row["side"]: row["evidence"] for row in reported_covering_values()}
-    assert set(rows) == {"3.82", "3.95", "3.96", "4.58", "4.59", "4.68", "4.80"}
-    for side, artifact in (
-        ("3.95", "n12_fractional_certificate/certificate-79-20.json"),
-        ("4.80", "n20_fractional_certificate/certificate.json"),
-    ):
-        _, mass = load_certificate(CASES / artifact)
-        assert f"feasible mass {float(mass):.6f}" in rows[side]
-    # The two sides with no artifact say so rather than borrowing a neighbour's figure.
-    assert "nothing frozen here" in rows["3.82"]
-    assert "nothing frozen here" in rows["4.68"]
+    """The evidence column is a retention claim: every artifact it names must resolve.
+
+    Checked row by row against the register rather than against a list of sides
+    written here. The list-of-sides form of this control passed for months and then
+    missed the thing it existed to catch: when T-021 landed, a register row still
+    named the n = 20 package's moving `certificate.json` pointer, so the 24/5 row
+    quoted the 97/20 rung's mass. Deriving the expectation from the same register the
+    renderer reads is what makes the round trip a check rather than a restatement.
+    """
+    register = covering_value_register()
+    reported = reported_covering_values()
+    assert len(reported) == len(register)
+
+    frozen = 0
+    for row, source in zip(reported, register, strict=True):
+        artifact = source["frozen_artifact"]
+        if artifact is None:
+            # A side with no artifact says so rather than borrowing a neighbour's figure.
+            assert "nothing frozen here" in row["evidence"]
+            assert row["mass"] is None
+            continue
+        frozen += 1
+        _, mass = load_certificate(REPO / artifact)
+        assert row["mass"] == mass
+        assert f"feasible mass {float(mass):.6f}" in row["evidence"]
+    assert frozen, "no register row names a frozen artifact; the corpus changed shape"
 
 
 def test_covering_value_register_validates_against_its_schema() -> None:
@@ -245,11 +265,18 @@ def test_an_empty_tilt_inventory_is_refused() -> None:
         packing_side_cap(4.0, [], NET)
 
 
-def test_three_packing_limited_ratios_sit_inside_a_tight_band() -> None:
-    """n = 11, 17 and 19 are the packing-limited rows; the renderer says within 0.001."""
+def test_the_packing_limited_ratios_sit_inside_a_tight_band() -> None:
+    """The packing-limited rows land within 0.001 of each other, however many there are.
+
+    n = 11 and n = 17 are the two today. It was three until T-021: the n = 20 package
+    keyed to n = 19, where the best packing bound it, and the 97/20 rung moved it to
+    n = 20, where the ceiling 4.9885 sits below the best packing 5.0000 and so binds
+    instead. The band is the regularity worth guarding; which cases sit inside it is
+    a fact about the corpus and is read from it.
+    """
     measured = measured_attainment(cases())
     packing_limited = {row["n"]: row for row in measured if row["binds"] == "packing"}
-    assert set(packing_limited) == {11, 17, 19}
+    assert set(packing_limited) == {11, 17}
     ratios = [row["ratio"] for row in packing_limited.values()]
     assert max(ratios) - min(ratios) <= BAND
     # Each ratio is close to the ~0.982 the record has settled on -- checked loosely,

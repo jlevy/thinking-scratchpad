@@ -1,0 +1,221 @@
+2026-09-05T17:54:11Z
+
+=== BC-198 class-program register ===
+built: src/sqpack/fractional/classcert.py, devtools/run_class_program.py
+net           angle_limit 207107/500000 steps 180 directions 181
+net           arc 0 to 45.000043 deg
+net           spacing at the axis-parallel end 0.263696 deg
+net           B 9977/10000 D 207107/90000000 B(1+D) 0.999996 < 1: True
+
+== control one: the nine-point bound ==
+side          L = 3877/1000 = 3.877000
+tilt limit    4B/L = 19954/19385 = 1.029353, theta_0 = 1.707473 deg
+class         leading six cells: Theta_0 holds 6 of 181 cells, cells 0..5
+class         leading six cells: Theta_0 spans 0.000000 to 1.450253 deg (cell bounds, exact tangents 0 and 6834531000000/269957106690551)
+class         leading six cells: Theta_1 holds 175 cells
+tilt limit    leading 5 cells inside theta_0: True (upper bound 1.186592 deg)
+tilt limit    leading 6 cells inside theta_0: True (upper bound 1.450253 deg)
+tilt limit    leading 7 cells inside theta_0: False (upper bound 1.713899 deg)
+exact  nine   9 unit atoms on the pitch-L/4 grid
+exact  nine   total mass M = 9 = 9.000000
+exact  nine   required n0 w0 + n1 w1 = 11 = 11.000000
+exact  nine   margin M - n0 w0 - n1 w1 = -2 = -2.000000
+exact  nine   [hold] Condition 1 atoms carry the declared symmetry: 9 atoms closed under D4 about the centre
+exact  nine   [hold] Condition 2' mass below n0 w0 + n1 w1: total 9 against 11 * 1 + 0 * 0 = 11
+exact  nine   [hold] Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+exact  nine   [hold] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 207107/90000000, B(1 + D) = 899996306539/900000000000
+exact  nine   [hold] Condition 5' class 0 carries w0: least cell mass 1 at direction 0 over 6 cells, against w0 = 1
+exact  nine   [hold] Condition 5' class 1 carries w1: class holds no square in this composition; 175 cells unswept
+exact  nine   composition (11, 0) refuted: True
+exact  nine   sweep over 6 directions: 0.000 s
+exact  nine   9 pairwise disjoint axis-parallel B-squares fit, so the class optimum at w0 = 1 is at least 9
+float  nine   site grid 9 x 9 inset L/4, 81 sites, 15 orbits
+float  nine   stopped: converged: every placement carries its class threshold
+float  nine   rounds 5 rows 17 w0 0.090909091 w1 0.000000000
+float  nine   M 0.818181818 required 1.000000000 margin -0.181818182
+float  nine   M rescaled to w0 = 1: 9.000000
+float  nine   seconds 0.022 total, 0.008 in 4 LP solves, 0.012 in separation
+float  nine   per LP solve: mean 0.0021 s, max 0.0030 s
+exact  lp     9 atoms rationalised at 1/4096
+exact  lp     total mass M = 36873/4096 = 9.002197
+exact  lp     required n0 w0 + n1 w1 = 11 = 11.000000
+exact  lp     margin M - n0 w0 - n1 w1 = -8183/4096 = -1.997803
+exact  lp     [hold] Condition 1 atoms carry the declared symmetry: 9 atoms closed under D4 about the centre
+exact  lp     [hold] Condition 2' mass below n0 w0 + n1 w1: total 36873/4096 against 11 * 1 + 0 * 0 = 11
+exact  lp     [hold] Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+exact  lp     [hold] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 207107/90000000, B(1 + D) = 899996306539/900000000000
+exact  lp     [hold] Condition 5' class 0 carries w0: least cell mass 4097/4096 at direction 0 over 6 cells, against w0 = 1
+exact  lp     [hold] Condition 5' class 1 carries w1: class holds no square in this composition; 175 cells unswept
+exact  lp     composition (11, 0) refuted: True
+
+== control two: side scan, grid 39 inset 1/10, class = two end cells, composition (11, 0) ==
+side 3877084/1000000 (Trump U)  grid 23: 16.000000  grid 31: 11.636364  grid 39: 11.600000  grid 47: 11.600000  grid 63: 11.600000  grid 79: 11.428571  grid 95: 11.600000  -> not refuted
+side 387/100    grid 39: 11.600000  not refuted
+side 3795/1000  grid 39: 11.600000  not refuted
+side 3785/1000  grid 39: 11.600000  not refuted
+side 3775/1000  grid 39: 11.600000  not refuted
+side 3765/1000  grid 39: 11.000000  not refuted (margin >= 0)
+side 3760/1000  grid 39: 11.000000  not refuted, exact margin +13/1024
+side 3755/1000  grid 39: 10.000000  REFUTED, exact margin -255/256
+side 375/100    grid 39: 10.000000  REFUTED
+
+== control two: Stromquist's two-direction class ==
+side          L = 969271/250000 = 3.877084, threshold 3.877084, at or above: True
+class         two end cells: Theta_0 holds 2 of 181 cells, cells 0..180
+class         two end cells: Theta_0 spans 0.000000 to 45.000000 deg (cell bounds, exact tangents 0 and 1)
+class         two end cells: Theta_1 holds 179 cells
+class         end cell half-width at the axis end 0.131848 deg; the 45-degree cell runs 44.887412 to 45 deg
+float  strom  site grid 39 x 39 inset 1/10, 1521 sites, 210 orbits
+float  strom  stopped: converged: every placement carries its class threshold
+float  strom  rounds 27 rows 88 w0 0.090909091 w1 0.000000000
+float  strom  M 1.054545455 required 1.000000000 margin +0.054545455
+float  strom  M rescaled to w0 = 1: 11.600000
+float  strom  seconds 0.413 total, 0.099 in 26 LP solves, 0.311 in separation
+float  strom  per LP solve: mean 0.0038 s, max 0.0054 s
+exact  strom  72 atoms rationalised at 1/4096
+exact  strom  total mass M = 11885/1024 = 11.606445
+exact  strom  required n0 w0 + n1 w1 = 11 = 11.000000
+exact  strom  margin M - n0 w0 - n1 w1 = 621/1024 = 0.606445
+exact  strom  [hold] Condition 1 atoms carry the declared symmetry: 72 atoms closed under D4 about the centre
+exact  strom  [FAIL] Condition 2' mass below n0 w0 + n1 w1: total 11885/1024 against 11 * 1 + 0 * 0 = 11
+exact  strom  [hold] Condition 3 net reaches pi/4: final half-tangent 207107/500000, t^2 + 2t - 1 = 309449/250000000000
+exact  strom  [hold] Condition 4 containment B(1 + D) < 1: B = 9977/10000, D = 207107/90000000, B(1 + D) = 899996306539/900000000000
+exact  strom  [hold] Condition 5' class 0 carries w0: least cell mass 2049/2048 at direction 0 over 2 cells, against w0 = 1
+exact  strom  [hold] Condition 5' class 1 carries w1: class holds no square in this composition; 179 cells unswept
+exact  strom  composition (11, 0) refuted: False
+exact  strom  sweep over 2 directions: 0.012 s
+
+== price: one class LP with both classes active ==
+price         side 969271/250000, Theta_0 the leading 19 cells (to 4.875441 deg), composition (9, 2), all 181 directions separated
+price         site grid 23 x 23, 529 sites, 78 orbits, round cap 6
+float  price  stopped: round limit 6 reached
+float  price  rounds 6 rows 613 w0 0.090909091 w1 0.090909091
+float  price  M 1.454545455 required 1.000000000 margin +0.454545455
+float  price  M rescaled to w0 = 1: 16.000000
+float  price  seconds 7.317 total, 0.055 in 6 LP solves, 7.256 in separation
+float  price  per LP solve: mean 0.0092 s, max 0.0117 s
+price         round 0 separation 7.029 s lp 0.007 s rows 327 (+327) M 0.555556
+price         round 1 separation 0.023 s lp 0.007 s rows 342 (+15) M 1.100000
+price         round 2 separation 0.054 s lp 0.010 s rows 425 (+83) M 1.272727
+price         round 3 separation 0.071 s lp 0.009 s rows 502 (+77) M 1.272727
+price         round 4 separation 0.034 s lp 0.011 s rows 578 (+76) M 1.363636
+price         round 5 separation 0.044 s lp 0.012 s rows 613 (+35) M 1.454545
+
+== control two: the exact structural ceiling ==
+ceiling       L/B = 969271/249425 = 3.886021850 against 2 + (4/3) sqrt 2 = 3.885618083: above the class value: eleven disjoint cores fit, so no measure of mass below eleven can cover this class
+ceiling       B (2 + (4/3) sqrt 2) = 3.876681 is the largest side at which this shrink leaves the class program anything to prove
+U - B(2 + (4/3)sqrt2) = 3.877084 - 3.876681 = 0.000403 : the shrink costs more side than Stromquist's headroom above U (3.885618 - 3.877084 = 0.008534 against 0.008937)
+
+== control two: five independent site sets at U = 3877084/1000000, class = two end cells, composition (11, 0) ==
+inset 1/10 count 39: 210 orbits, M/w0 = 11.600000 converged
+inset 1/20 count 39: 210 orbits, M/w0 = 11.600000 converged
+inset 1/5  count 39: 210 orbits, M/w0 = 16.000000 converged
+inset 1/20 count 63: 528 orbits, M/w0 = 11.600000 converged
+inset 1/4  count 47: 300 orbits, M/w0 = 11.600000 converged
+inset 3/100 count 55: 406 orbits, M/w0 = 11.636364 converged
+no site set reaches below 11; the best is 11.600000 = 58/5 against the 11 a refutation needs
+price         side 969271/250000, Theta_0 the leading 19 cells (to 4.875441 deg), composition (9, 2), all 181 directions separated
+price         site grid 23 x 23, 529 sites, 78 orbits, round cap 60
+float  price  stopped: converged: every placement carries its class threshold
+float  price  rounds 14 rows 1191 w0 0.090909091 w1 0.090909091
+float  price  M rescaled to w0 = 1: 16.000000
+float  price  seconds 8.570 total, 0.188 in 13 LP solves, 8.380 in separation
+float  price  per LP solve: mean 0.0144 s, max 0.0223 s
+price         site grid 39 x 39, 1521 sites, 210 orbits, round cap 60
+float  price  stopped: converged: every placement carries its class threshold
+float  price  rounds 18 rows 1554 w0 0.093382808 w1 0.079777365
+float  price  M rescaled to w0 = 1: 11.483444
+float  price  seconds 27.658 total, 0.840 in 17 LP solves, 26.811 in separation
+float  price  per LP solve: mean 0.0494 s, max 0.0822 s
+
+== what conditioning buys, same site set (grid 39 inset 1/10, side U = 3877084/1000000) ==
+one threshold  (all 181 cells one class, n = 11):  14 rounds, 2238 rows, M/w0 = 11.904815, margin +0.082256, 28.98 s
+two thresholds (Theta_0 the leading 19 cells, composition (9, 2)): 18 rounds, 1554 rows,
+               w0 = 0.093382808, w1 = 0.079777365, M/w0 = 11.483444, margin +0.072368, 27.66 s
+conditioning improves the margin by 0.009888, about 12 per cent of what is left, and the
+LP does separate the two thresholds (w0 > w1) once the site set is fine enough; at grid 23
+it left them equal at 1/11 and the program degenerated to the one-threshold form.
+Neither margin is negative: nothing is refuted at n = 11 and side U.
+
+== price of one class LP at n = 11 ==
+one LP solve, 78 orbits + 2 thresholds, up to 1191 rows:   mean 14.4 ms, max 22.3 ms
+one LP solve, 210 orbits + 2 thresholds, up to 1554 rows:  mean 49.4 ms, max 82.2 ms
+one whole class program, all 181 directions, both classes active, to convergence:
+  grid 23 (529 sites, 78 orbits):   14 rounds, 1191 rows, 8.57 s  (0.19 s LP, 8.38 s separation,
+                                     7.03 s of it in round 0)
+  grid 39 (1521 sites, 210 orbits): 18 rounds, 1554 rows, 27.66 s (0.84 s LP, 26.81 s separation)
+one class program on a two-cell class (control two, grid 39): 26 rounds, 0.31 s
+one class program on a six-cell class (control one, 9 sites):  5 rounds, 0.02 s
+Twelve compositions at grid 39 therefore price at about 5.5 minutes of one core, and the
+LP itself is under 2 per cent of that: separation, not the LP, is what a composition sweep buys.
+
+== verdicts ==
+control one  nine-point bound at 3877/1000, class = leading six cells, composition (11, 0):
+             PASSES. float proposal M/w0 = 9.000000 (converged, grid 9 inset L/4 holding the
+             nine points); exact confirmation on the nine unit atoms M = 9, least cell mass
+             exactly 1 over the six directions, margin -2, refuted. Exact lower bound from
+             nine disjoint axis-parallel B-squares: the optimum is at least 9, so it is
+             exactly 9 and the instrument is not defective.
+control two  Stromquist two-end-cell class, composition (11, 0) at U = 3877084/1000000:
+             REFUSES. float proposal M/w0 = 11.600000 on five independent site sets (best
+             11.600000, worst 16.000000); exact confirmation of the grid-39 point after
+             rationalising at 1/4096: 72 atoms, total mass 11885/1024 = 11.606445, least
+             cell mass 2049/2048 over the two directions, margin +621/1024 = +0.606445,
+             Condition 2' fails, not refuted. Float 11.600000 against exact 11.606445: the
+             gap is the rationaliser's round-up and the two agree on the verdict. The program refutes only at 3755/1000
+             (M/w0 = 10.000000, exact margin -255/256) and not at 3760/1000 (M/w0 = 11.000000,
+             exact margin +13/1024), so its reach on this class is 0.122 below Trump's value.
+             The refusal is structural, not instrumental: L/B = 969271/249425 = 3.886021850
+             exceeds 2 + (4/3) sqrt 2 = 3.885618083, decided exactly against the surd, so
+             eleven pairwise disjoint B-squares of the class fit inside the container at U and
+             no measure of mass below eleven can cover them.
+
+== what this program cannot decide ==
+1. It cannot decide any composition at a side at or above B (2 + (4/3) sqrt 2) = 3.876681 for
+   a class containing both ends of the arc, whatever the site set. The shrink costs 0.008937
+   of side and Stromquist's headroom above Trump's value is 0.008534.
+2. It cannot recover Stromquist's Theorem 3. That theorem adds a box step -- twelve marked
+   points, three of them forced into one box -- which is a conditional certificate (X-014
+   Lemma 2) and needs a non-convex admissible centre domain. This program has no admissible
+   domain hook at all; sweep.centre_domain, the float mirror in generate.py and the four
+   half-planes interval.DirectionSearch propagates are untouched here by design.
+3. It cannot certify anything. It refutes one composition of one net at one side. It is not a
+   five-condition Certificate, devtools.decide_certificate does not decide it, and no class
+   certificate is retained by this cell.
+4. It cannot separate a site-set artefact from a covering wall on one site set. The 16.000000
+   at grid 23 and at inset 1/5 is the known round-number signature; five site sets were run
+   at U for that reason.
+5. It cannot decide that a composition survives. The program is one-sided: a converged
+   optimum below n0 w0 + n1 w1 on any site set refutes, because restricting the sites can
+   only raise the optimum, but an optimum at or above it says only that this site set
+   failed. The 19-cell class at Trump's side reads 9.543210 on one site set and 11.000000
+   on two others, and the refutation is the sound reading of the three.
+6. It says nothing about the compositions between the two controls. Only (11, 0) was decided,
+   on two classes and eight near-axis widths, plus (9, 2) priced but not decided.
+
+== how wide the near-axis class can be and still close (11, 0) at U = 3877084/1000000 ==
+Composition (11, 0), Theta_0 the leading k cells. A converged optimum on any site set is an
+upper bound on the covering value, so M/w0 below 11 refutes; above 11 says only what that
+site set says.
+grid 39 inset 1/10:  k=6 9.000000 R | k=10 10.000000 R | k=13 10.000000 R | k=16 11.000000 - |
+                     k=19 11.000000 - | k=25 11.000000 - | k=31 11.333333 - | k=41 11.333333 -
+grid 63 inset 1/10:  k=13 10.000000 R | k=16 10.000000 R | k=19 10.000000 R
+grid 63 inset 1/20:  k=13 11.000000 - | k=16 11.000000 - | k=19 11.000000 -
+grid 79 inset 1/10:  k=13  9.000000 R | k=16  9.000000 R | k=19  9.543210 R
+grid 95 inset 1/10:  k=19 11.000000 -
+The 11.000000 readings are the round-number artefact the agenda names, not a wall: the same
+class at the same side drops to 9.543210 one site set over. Grid alignment matters more than
+grid count -- 79 beats 95.
+
+== X-014's step-1 design point, decided exactly ==
+Theta_0 = the leading 19 cells (to 4.875441 deg), composition (11, 0), side U = 3877084/1000000,
+site grid 79 x 79 inset 1/10.
+float:  28 rounds, 833 rows, M/w0 = 9.543210, 4.6 s
+exact:  85 atoms rationalised at 1/4096, M = 39123/4096 = 9.551514,
+        least cell mass 4099/4096 at direction 0 over the 19 cells,
+        margin M - 11 w0 = -5933/4096 = -1.448486, every condition holds, refuted = True
+Float 9.543210 against exact 9.551514: they agree, the gap being the rationaliser's round-up.
+So conditioning on direction buys something measurable: the composition with no tilted square
+is closed at Trump's own side for a near-axis class of half-width 4.875 degrees, which is the
+class width X-014's branching step 1 proposes. Nothing is retained; the object is a measured
+class program, not a certificate the gate decides.

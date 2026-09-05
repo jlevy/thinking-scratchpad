@@ -150,27 +150,42 @@ def test_experiment_scope_claims_preserve_h024_prerequisite() -> None:
     assert check_experiment_scope_claims(promoted)
 
 
-def _covering_prose(sides: list[str], count: str, recomputable: str) -> str:
-    listed = ", ".join(f"`{side}`" for side in sides[:-1]) + f" and `{sides[-1]}`"
+def _quoted(sides: list[str]) -> str:
+    if len(sides) == 1:
+        return f"`{sides[0]}`"
+    return ", ".join(f"`{side}`" for side in sides[:-1]) + f" and `{sides[-1]}`"
+
+
+def _covering_prose(sides: list[str], count: str, recomputable: list[str]) -> str:
+    one = len(recomputable) == 1
+    verb = "is" if one else "are"
+    tail = "it recomputes is a feasible mass" if one else "they recompute are feasible masses"
     return (
         f"{count} values have been reported for the restricted program, at sides "
-        f"{listed}. Exactly one is recomputable from a tracked artifact, at side "
-        f"`{recomputable}`, and what it recomputes is a feasible mass."
+        f"{_quoted(sides)}. {spell(len(recomputable)).capitalize()} of them {verb} "
+        f"recomputable from a tracked artifact, at sides {_quoted(recomputable)}, "
+        f"and what {tail}."
     )
 
 
 def test_covering_value_reports_are_held_to_the_reach_tables_own_rows() -> None:
     """The synopsis said "only four restricted optima have ever been measured" and named
-    four, while the generated reach table listed seven reports and showed exactly one
-    recomputable from a tracked artifact -- and that one a feasible mass, not an optimum.
+    four, while the generated reach table listed seven reports and showed one recomputable
+    from a tracked artifact -- and that one a feasible mass, not an optimum.
 
-    Both halves are derived from `REPORTED_COVERING_VALUES` here rather than written down,
-    so the control moves with the table when a covering value is next reported.
+    Both halves are derived from the register here rather than written down, so the
+    control moves with the table when a covering value is next reported. It has moved
+    twice already: seven sides became fourteen, and the one recomputable row became two
+    when `T-021` retained a certificate at the side its own converged optimum reported.
+    Neither number is pinned here -- pinning them is what made this control need three
+    repairs -- so the premise is only that at least one row recomputes, which is what
+    gives the misattribution check below something to be wrong about.
     """
     sides, recomputable = reported_covering_sides()
-    assert len(recomputable) == 1, "premise: one row's report is its artifact's own mass"
+    assert recomputable, "premise: some row's report is its artifact's own mass"
+    assert set(recomputable) <= set(sides)
 
-    current = _covering_prose(sides, spell(len(sides)), recomputable[0])
+    current = _covering_prose(sides, spell(len(sides)), recomputable)
     assert check_covering_value_reports(current) == []
 
     # The defect as it stood: a subset, described as measured optima.
@@ -186,19 +201,28 @@ def test_covering_value_reports_are_held_to_the_reach_tables_own_rows() -> None:
 
     # A side the table reports nothing at.
     invented = check_covering_value_reports(
-        _covering_prose([*sides[:-1], "4.90"], spell(len(sides)), recomputable[0])
+        _covering_prose([*sides[:-1], "4.90"], spell(len(sides)), recomputable)
     )
     assert any("4.90" in problem for problem in invented)
 
-    # The recomputable claim is checked against which row actually recomputes.
+    # The recomputable claim is checked against which rows actually recompute.
     other = next(side for side in sides if side not in recomputable)
     misattributed = check_covering_value_reports(
-        _covering_prose(sides, spell(len(sides)), other)
+        _covering_prose(sides, spell(len(sides)), [other])
     )
     assert len(misattributed) == 1
     assert "recomputable" in misattributed[0]
     assert other in misattributed[0]
-    assert recomputable[0] in misattributed[0]
+    assert all(side in misattributed[0] for side in recomputable)
+
+    # Naming a real recomputable side but leaving another one out is the same defect:
+    # the claim is about which rows recompute, not about naming one that does.
+    if len(recomputable) > 1:
+        partial = check_covering_value_reports(
+            _covering_prose(sides, spell(len(sides)), recomputable[:1])
+        )
+        assert len(partial) == 1
+        assert "recomputable" in partial[0]
 
 
 #: `n-011.md`'s front matter, as `check_case_interval` reads it.

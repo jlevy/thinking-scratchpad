@@ -341,70 +341,13 @@ on.
 It is not the next thing, because a reassessment of what to search is queued in front
 of it.
 
-For the next supervised exact-research goal, take **`BC-191` of Agenda 019 under
-`think-ji0r`**: the `efficiency-loop` measurement of row generation’s cost against the
-container side, now that Agenda 020 has taken the retention gate off the critical path
-(session-085). The fresh `n = 17` continuation this paragraph used to name was
-discharged by Agenda 016’s closeout as the marker of where that chain stopped, and is
-not the next entry. The continuation starts from the terminal evidence retained by
-[session 078](../../../../packing/campaign/agent-sessions/session-078-agenda015-ten-hour-coordinator.md),
-the coordinator of the completed
-[agenda-015](../../../../packing/campaign/agendas/agenda-015-ten-hour-earned-routes-and-guard-repairs.md).
-That exact ten-hour wall ran from `05:03Z` through `15:03Z` on 2026-09-02; its BC-146
-publication phase stopped at the wall, and later publication remediation is recorded
-separately rather than extending the session.
-
-The retained exp-056 chain has 170 of 181 verified agreeing rows through ordinal 169,
-with progress ordinal 170 at `independent_started` and no canonical result.
-The new round must use a fresh preregistration and fresh result, checkpoint and progress
-paths, then replay all 170 retained rows before continuing ordinals 170 through 180.
-Exp-056 never resumes.
-H-052 remains unresolved, and even a complete agreeing round requires the separate
-adoption gate before any packing-bound or frontier change.
-
-**Do not take a next slice from an agenda directly.**
-[`agenda-map.md`](../../../../packing/campaign/agenda-map.md) is generated from every
-agenda and is the queue, because an agenda read on its own was found advertising four
-commitments as takeable that a later agenda had already discharged.
-This plan’s own pointer was stale in the same way until 2026-08-30. The middle layers
-behind it are built: a pose is a centre, an angle and a chirality; an edge-edge contact
-pins collinearity; the contact system reaches full rank at both retained sizes; and the
-margin rule recovers Trump’s published polynomial at `n = 11` while returning nothing at
-`n = 29` through degree twenty.
-Sessions 035 through 037 are terminal and closed agenda-005 block A together with
-`BC-045`, so precision is manufactured in-repository, the `n = 29` contact structure is
-frozen with its 89 incidences, and the interval route is built, calibrated and run: it
-certifies `s(29) <= 5.93383346267692918974379895098` at a declared relaxation of
-`1e-20`, retained `unresolved` with `needs_review: true` and promoting nothing.
-None of those remains a prerequisite.
-The witness contract already names `interval-certified` among the methods that may carry
-`verified`, and the checker now exists, but no witness branch has been written: so
-`exact_verify` still raises `checker-not-built` and the certificate above is retained as
-a result rather than emitted as a witness.
-Uniqueness is the load-bearing verdict: check that the operator’s image lies in the
-*interior* of the box, because containment alone does not give it, and a box holding two
-roots does not identify which pose was certified.
-Prove the operator refuses on the two-root and no-root controls before pointing it at
-anything, and do not treat a refinement as an algebraic claim.
-The measured W5 inventory and the row-jet inventory reuse remain scheduled after that
-driver; BC-016 stays blocked on its retained-pose, glued-row, tie-label, and
-receipt-checker prerequisites.
-The first-failure pipeline cell is complete, and the active two-session
-[balanced ten-hour agenda](../../../../packing/campaign/agendas/agenda-003-balanced-ten-hour-research-program.md)
-retains its actual clocks and full five-hour midpoint review.
-The completed target-free path retains 11,013 exact size-five signed-contact orbits with
-independent Burnside and differential controls.
-Those records contain no packing geometry or feasibility result, and the retained
-`n = 1..100` corpus remains calibration-only.
-
-CG-010 now retains one literal target-free structural fixed-angle cell with total wall
-decisions, an exhaustive contact/non-edge pair partition, one frozen oriented axis per
-pair, joint canonicalization, typed caps, and a derived work price.
-It executes zero LP solves and makes no geometry or feasibility claim.
-The existing local prefilter still accepts only one fitted-angle class and rejects mixed
-classes before solving; numerical row compilation and full-cell realization remain
-unbuilt. Do not use target geometry, emit an H-044 verdict, or start the `n = 11`
-enumeration run.
+For the next supervised exact-research goal, take `BC-213` in
+[Agenda 022](../../../../packing/campaign/agendas/agenda-022-the-conditional-route.md),
+bead `think-wufn`: the remaining rung of the `m = 5` bisection at `973/200`, which
+settles `H-062` either way and which
+[Agenda 021](../../../../packing/campaign/agendas/agenda-021-three-numbers-and-a-wall.md)’s
+closeout selected on 2026-09-05 after four rungs bracketed the covering wall to `0.025`
+against the `0.02` that hypothesis registered.
 
 ## The numeric runner launch gate
 

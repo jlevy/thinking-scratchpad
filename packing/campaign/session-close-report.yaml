@@ -7,19 +7,19 @@ softschema:
   schema: schemas/session-close-report.schema.yaml
   envelope: null
   status: enforced
-count: 85
+count: 87
 generated_by: >-
   uv run --frozen --all-extras --group dev python -m devtools.close_session --render
 totals:
-  sessions_measured: 41
+  sessions_measured: 43
   sessions_unmeasured: 44
   attributed:
-    rollups: 114
-    turns: 28689
-    tool_calls: 16232
-    tool_errors: 327
-    one_off_code: 2712
-    wall_hours: 151.73
+    rollups: 115
+    turns: 29742
+    tool_calls: 16800
+    tool_errors: 349
+    one_off_code: 2808
+    wall_hours: 170.08
   unattributed:
     rollups: 10
     turns: 1460
@@ -28,12 +28,12 @@ totals:
     one_off_code: 173
     wall_hours: 6.87
   measured:
-    rollups: 124
-    turns: 30149
-    tool_calls: 17110
-    tool_errors: 359
-    one_off_code: 2885
-    wall_hours: 158.6
+    rollups: 125
+    turns: 31202
+    tool_calls: 17678
+    tool_errors: 381
+    one_off_code: 2981
+    wall_hours: 176.95
 codex_receipts:
   attributed: 16
   unattributed: 0
@@ -1332,4 +1332,32 @@ sessions:
   tool_errors: 120
   one_off_code: 736
   wall_hours: 61.79
+  codex_receipts: []
+- id: session-086
+  title: "The Agenda 021 overnight pass and the agenda 022 continuation"
+  status: stopped
+  primary_bead: think-db1k
+  phases: 2
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/f37f604c-3212-50e9-b7f7-4b00b94bfcc0.yaml
+  turns: 1053
+  tool_calls: 568
+  tool_errors: 22
+  one_off_code: 96
+  wall_hours: 18.35
+  codex_receipts: []
+- id: session-087
+  title: "The agenda 022 continuation and the PR 83 gate"
+  status: in_progress
+  primary_bead: think-wufn
+  phases: 2
+  measured: true
+  rollups:
+  - packing/campaign/resource-usage/f37f604c-3212-50e9-b7f7-4b00b94bfcc0.yaml
+  turns: 1053
+  tool_calls: 568
+  tool_errors: 22
+  one_off_code: 96
+  wall_hours: 18.35
   codex_receipts: []

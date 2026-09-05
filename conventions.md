@@ -161,6 +161,16 @@ artifacts.** [checked] Put a rule in a checker when it needs a tailored diagnost
 reads another artifact, or merits a negative control.
 Keep required keys, types, enums, and other record-local constraints in the schema.
 
+**A case package’s `certificate.json` is a pointer, not a name.** [checked] It holds the
+rung currently in force, and it moves when a better one lands; a rung that has been
+displaced keeps its own `certificate-<side>.json` and never moves again.
+So a record citing a rung as evidence cites the immutable filename.
+Citing the pointer says “whatever is best today”, which is a different claim and becomes
+a false one the moment the ladder climbs—`D-458`, where a superseded row quoted its own
+successor’s atoms. The check is a round trip: every frozen artifact a register row names
+must recompute to that row’s own side, which is the one comparison a moving pointer
+cannot survive.
+
 ### Workflow, Focus, Phase, and Slice
 
 **Workflow names purpose and output; focus names the primary quality emphasis.**
@@ -453,8 +463,8 @@ own only where kpress has none.
 No attribute sugar (`{.class}`, `[text]{.class}`) and no `:::` containers: the div and
 span pass-through is the one kpress guarantees without configuration, it survives its
 sanitized mode, and GitHub renders the same blocks as plain HTML. The explainer template
-([`explainer-article.md`](packing/devtools/templates/explainer-article.md)) is the worked
-example.
+([`explainer-article.md`](packing/devtools/templates/explainer-article.md)) is the
+worked example.
 
 **Relative links must resolve.** [checked] The campaign’s checker walks every relative
 Markdown link. This project has needed that twice.

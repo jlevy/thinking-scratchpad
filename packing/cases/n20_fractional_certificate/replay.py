@@ -1,11 +1,14 @@
 """Load the retained n = 20 certificate and hand it to the exact verifier.
 
-One certificate is retained, at container side 24/5. Its atoms carry three
-registered cases rather than one: only Condition 2 mentions n among the five conditions,
-so a set of total mass 946131/50000 certifies its side for every integer above
-that mass, which is 19 and upward. At n = 19 and n = 20 the side improves the
-register directly; at n = 21 it improves Nagamochi's closed form as well; from
-n = 22 on the register already holds 5, so the certificate is true there and
+Three certificates are retained. The top, ``certificate.json``, sits at container
+side 97/20 with total mass 19848723/1000000; ``certificate-193-40.json`` is the
+lower rung the same ladder froze at 193/40, and ``certificate-24-5.json`` is the
+24/5 certificate that was the top until 2026-09-05. Their atoms carry more than one
+registered case each: only Condition 2 mentions n among the five conditions, so a set
+of total mass M certifies its side for every integer strictly above M. The top rung's
+mass lies in [19, 20), so it certifies n = 20 and n = 21 and says nothing about
+n = 19, where the 24/5 rung's mass of 946131/50000 still gives the register its
+bound; from n = 22 on the register already holds 5, so every rung is true there and
 weaker.
 
 The JSON carries exact rationals as strings, so a replay reconstructs the same
@@ -24,6 +27,12 @@ from sqpack.fractional.certificate import Certificate
 from sqpack.fractional.model import Atom
 
 CERTIFICATE_PATH = Path(__file__).with_name("certificate.json")
+#: The rung that was the top until 2026-09-05, and the only one of the three whose
+#: mass reaches below nineteen. It is what keeps n = 19 at 24/5 now that the pointer
+#: above has moved to a heavier set, so it is named rather than globbed for.
+RUNG_24_5_PATH = Path(__file__).with_name("certificate-24-5.json")
+#: The lower rung the same ladder froze at 193/40, retained as the ladder's evidence.
+RUNG_193_40_PATH = Path(__file__).with_name("certificate-193-40.json")
 
 
 def _from_record(record: dict) -> Certificate:

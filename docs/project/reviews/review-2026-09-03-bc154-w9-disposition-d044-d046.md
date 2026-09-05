@@ -1138,7 +1138,7 @@ Ordered by whether the record currently says something untrue.
    `assert 67889012 < 67108864` where the retained `suite.log` says `67864698`. The
    conclusion holds under either; cite the one that matches the log it points at.
 7. **The process-incident paragraph** — two corrections, both in the worse direction:
-   `a9c5fdcc`, the commit titled “fix: restore ...”, is the commit that shipped
+   `a9c5fdcc`, the commit titled “fix: restore …”, is the commit that shipped
    `if False:`; and the suite catches that state in 8.23 seconds, so the lesson is that
    the suite was not run before committing, not that static tools cannot see dead
    branches.

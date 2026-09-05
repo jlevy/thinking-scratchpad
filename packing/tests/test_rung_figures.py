@@ -427,27 +427,71 @@ def test_a_result_that_has_lost_its_live_pointer_is_refused() -> None:
 
 def test_a_result_declaring_two_live_pointers_is_refused() -> None:
     """A second live basename is ambiguous, not a race the first declaration wins."""
-    probe = copy.deepcopy(_result("T-020"))
+    probe = copy.deepcopy(_result("T-021"))
+    probe["artifacts"] = [
+        artifact
+        for artifact in probe["artifacts"]
+        if artifact.endswith(("/certificate.json", "-193-40.json"))
+    ]
     probe["artifacts"].append("packing/cases/n17_fractional_certificate/certificate.json")
 
     retained, _, resolved = resolve_certificates(probe)
     assert retained is None
-    assert len(resolved) == 2
+    assert len(resolved) == 3
 
     problems, checked = check_result(probe)
-    assert checked == 2
+    assert checked == 3
     pointer = [problem for problem in problems if "live certificate.json pointers" in problem]
     assert len(pointer) == 1
-    assert pointer[0].startswith("T-020: declares 2 live certificate.json pointers")
+    assert pointer[0].startswith("T-021: declares 2 live certificate.json pointers")
     assert "exactly one is required" in pointer[0]
 
 
-def test_every_certificate_bearing_result_has_its_live_pointer() -> None:
-    """The premise the two refusals above edit away from, read off the live register."""
+def _declared_pointers() -> frozenset[str]:
+    """Every live `certificate.json` the register declares, as the checker computes it."""
     document = safe_load(RESULTS.read_text(encoding="utf-8"))
+    return frozenset(
+        artifact
+        for result in document["results"]
+        for artifact in result.get("artifacts", [])
+        if isinstance(artifact, str) and artifact.endswith("/certificate.json")
+    )
+
+
+def test_every_certificate_bearing_result_has_its_live_pointer() -> None:
+    """The premise the two refusals above edit away from, read off the live register.
+
+    A result that produced a rung the register has since superseded satisfies it through
+    its successor, which is the exception the next test pins.
+    """
+    document = safe_load(RESULTS.read_text(encoding="utf-8"))
+    pointers = _declared_pointers()
     for result in document["results"]:
         _, _, resolved = resolve_certificates(result)
-        assert retained_pointer_problems(result["id"], resolved) == []
+        assert retained_pointer_problems(result["id"], resolved, pointers) == []
+
+
+def test_a_superseded_result_may_name_only_the_rung_it_produced() -> None:
+    """When the pointer moves, the earlier result keeps its own artifact and no other.
+
+    T-021 took `certificate.json` at n = 20 on 2026-09-05 and T-020's 24/5 rung was
+    renamed beside it. Forcing T-020 to declare the successor's file would make every
+    unqualified figure in its prose resolve against a certificate it did not produce --
+    the failure this module exists to catch. The pointer must still have an owner: a
+    historical-only result whose successor nobody declares is refused as before.
+    """
+    superseded = copy.deepcopy(_result("T-020"))
+    assert [a for a in superseded["artifacts"] if a.endswith("/certificate.json")] == []
+    _, _, resolved = resolve_certificates(superseded)
+    assert resolved, "premise: T-020 still resolves the rung it produced"
+
+    successor = "packing/cases/n20_fractional_certificate/certificate.json"
+    assert successor in _declared_pointers(), "premise: T-021 declares the moved pointer"
+    assert retained_pointer_problems("T-020", resolved, frozenset({successor})) == []
+
+    orphaned = retained_pointer_problems("T-020", resolved, frozenset())
+    assert len(orphaned) == 1
+    assert orphaned[0].startswith("T-020: no live certificate.json")
 
 
 def test_resolve_certificates_reads_real_repository_relative_artifacts() -> None:
@@ -546,10 +590,18 @@ def _front_matter(path: Path) -> dict:
 
 
 def _retained_certificates() -> dict[str, CertificateFigures]:
-    """Every moving top-rung pointer the case packages carry, by repository-relative path."""
+    """Every certificate the case packages retain, by repository-relative path.
+
+    Both the moving top-rung pointers and the historical rungs beside them: a rung a
+    later result superseded is still retained, still replayable by name, and still the
+    artifact whichever record quoted its figures was quoting. Reading only the pointers
+    made a durable record go stale the moment the pointer moved -- agenda-020's measured
+    "2260 atoms" is the 24/5 rung's, and that rung did not change when T-021 took
+    `certificate.json` at n = 20 on 2026-09-05.
+    """
     return {
         (relative := path.relative_to(REPO).as_posix()): _figures(relative)
-        for path in sorted(CASES.glob("n*_fractional_certificate/certificate.json"))
+        for path in sorted(CASES.glob("n*_fractional_certificate/certificate*.json"))
     }
 
 

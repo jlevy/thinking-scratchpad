@@ -156,11 +156,19 @@ controls:
   run: uv run --frozen --quiet python -m devtools.check_synopsis
   expect: "H-021 shows 13 rounds, ledger counts 14"
 
+# `expect` deliberately stops before the count. This control encoded the live round
+# total twice -- once in `replace`, once in `expect` -- and the two rot differently: a
+# stale `replace` fails loudly, because its search string no longer matches and the
+# mutation cannot be applied, while a stale `expect` degrades quietly into "failed, but
+# not with the expected message", which reads as a broken control rather than a moved
+# corpus. That is what happened: the count went 59 -> 64, `replace` was updated and
+# `expect` was not. One place tracking the corpus is enough, and it should be the one
+# that announces itself.
 - name: synopsis - narrative round aggregate lagging the ledger
   file: ../SYNOPSIS.md
-  replace: ["There are 59 terminal rounds", "There are 45 terminal rounds"]
+  replace: ["There are 64 terminal rounds", "There are 45 terminal rounds"]
   run: uv run --frozen --quiet python -m devtools.check_synopsis
-  expect: "terminal-round aggregate is not 59 rounds"
+  expect: "terminal-round aggregate is not"
 
 - name: synopsis - numerical result promoted past a formal prerequisite
   file: ../SYNOPSIS.md
@@ -1273,6 +1281,7 @@ controls:
 
 - name: synopsis handoff - W10 selected entry is replaced by a deferred candidate
   file: ../SYNOPSIS.md
-  replace: ["**Selected next entry:** `think-ji0r`", "**Selected next entry:** `think-cyko`"]
+  replace: ["**Selected next entry:** `think-wufn`", "**Selected next entry:** `think-cyko`"]
   run: python3 -m devtools.check_synopsis
-  expect: "exactly one canonical Selected next entry marker for think-ji0r"
+  expect: "exactly one canonical Selected next entry marker for think-wufn"
+

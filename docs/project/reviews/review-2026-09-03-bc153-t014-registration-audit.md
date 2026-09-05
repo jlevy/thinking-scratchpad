@@ -142,7 +142,7 @@ uniqueness, or method novelty.
   T-014’s `significance.rationale` reproduces the review’s own S3 framing near-verbatim
   ("the closing principle is the classical second-order sufficient optimality condition
   and the induction has the shape of Connelly-Whiteley 1996 Theorem 4.3.1, neither
-  claimed as new; what is new is the exact accounting..."), matching review §4’s “Score
+  claimed as new; what is new is the exact accounting …"), matching review §4’s “Score
   S3 (a case result), not S4.” The “first” qualifier’s review-mandated caveat ("relative
   to the literature searched … Connelly 2008 was not read in print and Kingbird’s method
   is unknown") is carried into `evidence.yaml`’s `novelty_basis.gaps`. Not dropped.
@@ -268,7 +268,7 @@ or `SYNOPSIS.md`.
 
 | # | Review’s gap (§5) | Where it lands in the registered record |
 | --- | --- | --- |
-| 1 | BCR Prop. 8.1.13 unread in print | `evidence.yaml` limitations: “the printed BCR page remains unread here; see proof.assumptions for the two independent derivations...” — present, non-blocking framing preserved |
+| 1 | BCR Prop. 8.1.13 unread in print | `evidence.yaml` limitations: “the printed BCR page remains unread here; see proof.assumptions for the two independent derivations …” — present, non-blocking framing preserved |
 | 2 | SOSC numbering from memory (non-acceptance route only) | `evidence.yaml` limitations: “The second-order-sufficiency theorem numbering in X-012 section 8.3 is from memory and is on the non-acceptance route only.” — present verbatim in substance |
 | 3 | Prior-art scoping unverified, carried outside the claim | `evidence.yaml` `novelty_basis.gaps`: “The prior-art scoping beyond the three sources above comes from BC-152’s coordinator survey, is unverified against the primary texts, and is carried outside the claim.” — present; also X-012 §7.4/§8.5 carries it outside the claim, confirmed by direct read |
 | 4 | Instrument binds the restricted second jet only | Present in `exp-058` (cited artifact); **not echoed** in `evidence.yaml`/`n-005.md` — see Finding 2 |

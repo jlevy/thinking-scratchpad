@@ -221,6 +221,29 @@ passed on both architectures; the workflow test rejects its return.
 Never accept a rebuilt golden to make the probe green, and do not add a second CI-only
 implementation of either check.
 
+### A pull request with no checks at all is a mergeability question
+
+Zero check runs on a pull request does not mean CI has not started yet.
+It also means GitHub could not build the pull request’s merge ref, which happens the
+moment the branch conflicts with its base — and a `pull_request` workflow has nothing to
+check out, so no run is created and no check appears.
+The two look identical from the API, and the second one does not heal by waiting.
+
+So when a push produces no check run within a couple of minutes, ask whether the branch
+still merges before pushing again:
+
+```bash
+git fetch origin main && git merge-tree --write-tree HEAD origin/main >/dev/null \
+  && echo "merges cleanly" || echo "CONFLICTS: no run will be created"
+```
+
+Measured on 2026-09-05 (`D-459`): five pushes over twenty-five minutes produced no run
+and no check on `PR 83` while other branches in the same repository ran normally
+throughout, because `main` had moved under it.
+Resolving the conflict restored CI on the next push.
+The failure mode is quiet in the dangerous direction — an absent check reads as pending
+rather than as red — so the absence is what to investigate, not the wait.
+
 ### Every pull request carries what it cost
 
 Open or update a pull request and the description leads with the branch’s cost, then

@@ -65,7 +65,7 @@ decided on, and `VERIFIED s(11) >= {{L_FRAC}}`; the exit status is 0 only after 
 line. Any other outcome prints `REFUSED` with its reason and exits 1. Measured
 2026-09-05, single-threaded with an empty environment: 47.5 s under CPython 3.14 on one
 four-core machine, and 67.0 s under CPython 3.14.7 and 64.8 s under CPython 3.12.3 on a
-slower one, where the file's previous bytes took 66.7 s.
+slower one, where the file’s previous bytes took 66.7 s.
 [`minimal_verify.py`](minimal_verify.py) imports nothing from this repository and holds
 the only copy of the digest; `sha256sum {{CERT_NAME}}` is the other way to get it.
 

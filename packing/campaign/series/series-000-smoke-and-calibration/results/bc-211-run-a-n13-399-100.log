@@ -1,0 +1,30 @@
+warning: The `UV_NATIVE_TLS` environment variable is deprecated and will be removed in a future release. Use `UV_SYSTEM_CERTS` instead.
+{
+ "n": 13,
+ "outer_side": "399/100",
+ "square_side": "9977/10000",
+ "grid_counts": [
+  23,
+  31,
+  38
+ ],
+ "inset": "1/2",
+ "angle_limit": "207107/500000",
+ "direction_steps": 180,
+ "scale": 200000,
+ "column_rounds": 8,
+ "max_rounds": 60,
+ "rows_per_direction": 3
+}
+round 0: rows=17004 orbits=400 sites=2921 lp_rounds=60 objective=16.000000000 depth=nan cost=nan least_covered=0.929161281 seconds=463.0 | round limit 60 reached
+round    rows  orbits   sites lp_rounds     objective least_covered      depth   seconds  note
+----------------------------------------------------------------------------------------------
+    0   17004     400    2921        60     16.000000      0.929161        nan     463.0  round limit 60 reached
+stopped: round limit 60 reached
+objective: 15.999999999999924
+least covered mass: 0.9291612808003891
+total mass: None = None
+least cell mass: None
+atoms: 0
+frozen: None
+seconds: 463.0

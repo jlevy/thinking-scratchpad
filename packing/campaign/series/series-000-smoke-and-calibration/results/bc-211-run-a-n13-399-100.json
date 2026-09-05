@@ -1,0 +1,47 @@
+{
+ "settings": {
+  "n": 13,
+  "outer_side": "399/100",
+  "square_side": "9977/10000",
+  "grid_counts": [
+   23,
+   31,
+   38
+  ],
+  "inset": "1/2",
+  "angle_limit": "207107/500000",
+  "direction_steps": 180,
+  "scale": 200000,
+  "column_rounds": 8,
+  "max_rounds": 60,
+  "rows_per_direction": 3
+ },
+ "seconds": 463.04234907299906,
+ "stopped": "round limit 60 reached",
+ "converged": false,
+ "objective": 15.999999999999924,
+ "least_covered": 0.9291612808003891,
+ "rounds": [
+  {
+   "index": 0,
+   "rows": 17004,
+   "orbits": 400,
+   "sites": 2921,
+   "lp_rounds": 60,
+   "objective": 15.999999999999924,
+   "least_covered": 0.9291612808003891,
+   "averaged_depth": NaN,
+   "reduced_cost": NaN,
+   "added": 0,
+   "seconds": 463.00140014799945,
+   "note": "round limit 60 reached"
+  }
+ ],
+ "total_mass": null,
+ "total_mass_float": null,
+ "atoms": 0,
+ "ceiling_proved": null,
+ "ceiling_detail": null,
+ "frozen": null,
+ "least_cell_mass": null
+}

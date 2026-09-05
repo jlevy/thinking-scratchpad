@@ -40,6 +40,8 @@ from __future__ import annotations
 
 import logging
 import math
+import time
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import combinations
@@ -144,6 +146,66 @@ def site_set_from_grids(
     for count in counts:
         points.update(build_site_grid(outer_side, count, inset).positions())
     return site_set_from_points(outer_side, points)
+
+
+#: Site spacing the generator wants, in sites per ``B``-square width.
+#:
+#: ``generate_adaptive``'s ``grid_counts`` default ``(23, 31, 39)`` was tuned at
+#: ``n = 12``'s side ``99/25``, and the counts ``(29, 39, 49)`` that finished a
+#: column round at ``n = 20``'s ``24/5`` in ``376 s``, where ``(23, 31, 39)`` had
+#: not finished it in ``3300 s``, are the *same density* at the larger side --
+#: ``7.35, 9.98, 12.58`` sites per ``B`` against ``7.42, 10.11, 12.81``. So the
+#: quantity that transfers across sides is the density, not the count, and
+#: holding it is what ``site_counts_for_side`` does.
+#:
+#: The values here are measured rather than inherited. A five-rung ladder in the
+#: production three-grid shape, run at two sides on one core (``BC-191``,
+#: ``bench_colgen density``), puts an interior optimum at the same density both
+#: times. At ``99/25``, deadline ``110 s``: densities ``5.73/7.75/9.78`` and
+#: ``6.40/8.76/11.12`` did not converge and sat on the ``16.000000`` artefact;
+#: ``7.42/10.11/12.47`` converged in ``60.8 s`` at ``12.312896``;
+#: ``8.43/11.46/14.16`` converged in ``60.8 s`` at ``12.217676``; and
+#: ``9.78/13.15/16.52`` did not converge in ``123.1 s``. At ``24/5``, deadline
+#: ``140 s``, the objective reached ran ``25.000000`` (artefact), ``20.225314``,
+#: ``20.168732``, ``19.339779``, ``19.871826`` over densities ``5.78/7.88/9.98``
+#: to ``9.71/12.60/15.75``. Both sides put the minimum at ``8.5/11.5/14.25``,
+#: which is where the two mechanisms cross: rounds to converge fall with density
+#: (42, 33, 21, 23, 19 at ``99/25``) while seconds per round rise with it
+#: (2.74, 3.45, 2.90, 2.64, 6.48), because separation is quadratic in the LP
+#: support and a denser site set carries a larger one.
+#:
+#: The historically tuned grids are the *lower* edge of that band, not its
+#: middle: at ``24/5`` the tuned density reached ``20.168732`` where the measured
+#: optimum reached ``19.339779`` in comparable wall time.
+SITE_DENSITIES: tuple[Fraction, ...] = (Fraction(17, 2), Fraction(23, 2), Fraction(57, 4))
+
+
+def site_counts_for_side(
+    outer_side: Fraction,
+    square_side: Fraction,
+    *,
+    densities: tuple[Fraction, ...] = SITE_DENSITIES,
+    inset: Fraction = Fraction(1, 2),
+) -> tuple[int, ...]:
+    """Grid counts holding the site spacing fixed relative to the ``B``-square.
+
+    ``build_site_grid`` spreads ``count`` coordinates over ``span = L - 2 inset``,
+    so its spacing is ``span / (count - 1)`` and grows with the container while
+    the ``B``-square that has to cover the sites does not. A placement's covered
+    mass is therefore read on a coarser and coarser net as the side rises, and
+    the row generator pays for it: it is the one measured ``8.8x`` in the record.
+
+    Fixing ``density = B / spacing`` instead inverts to
+    ``count = round(span * density / B) + 1``, which is what this returns, one
+    count per density. Counts below two are impossible for a grid and are
+    clamped; a container smaller than the inset allows is the caller's error and
+    ``build_site_grid`` raises on it.
+    """
+
+    span = outer_side - 2 * inset
+    if span <= 0:
+        raise ValueError("the inset leaves no room for sites")
+    return tuple(max(2, round(span * density / square_side) + 1) for density in densities)
 
 
 @dataclass(frozen=True, slots=True)
@@ -303,6 +365,32 @@ class Rows:
 
 
 @dataclass(slots=True)
+class RoundTiming:
+    """Wall-clock split of one row-generation round, for the benchmark harness.
+
+    ``solve_rows`` appends one of these per round when a caller hands it a list.
+    The split is the whole point: BC-191's baseline says row generation is 79 to
+    94 per cent of a round, and the only way to keep that honest as the sides
+    grow is to have the loop time itself rather than have a harness re-implement
+    it. ``index`` is ``-1`` for the warm solve on rows carried in from an
+    earlier site set, which does no separation at all.
+    """
+
+    index: int
+    separation_seconds: float
+    lp_seconds: float
+    rows_held: int
+    rows_added: int
+    violated: int
+    objective: float
+    support: int = 0
+
+    @property
+    def seconds(self) -> float:
+        return self.separation_seconds + self.lp_seconds
+
+
+@dataclass(slots=True)
 class LpSolution:
     """One row-generation run to convergence, and the dual it ended on."""
 
@@ -312,6 +400,13 @@ class LpSolution:
     rounds: int = 0
     rows: int = 0
     stopped: str = ""
+    # The least mass any surveyed placement carries at the weights the loop
+    # ended on, over every direction and not only the violated ones. A
+    # converged loop leaves it at or above 1, and that number is the evidence
+    # that the loop stopped for want of a violated placement rather than on a
+    # budget -- the distinction a candidate has to show, and one the record
+    # could not report before because ``least`` only ever saw violations.
+    least_covered: float = float("inf")
 
     @property
     def converged(self) -> bool:
@@ -340,6 +435,36 @@ def solve_lp(sites: SiteSet, rows: Rows) -> tuple[np.ndarray, np.ndarray, float]
     return np.asarray(result.x, dtype=float), duals, float(result.fun)
 
 
+def _record(
+    timings: list[RoundTiming] | None,
+    index: int,
+    separation_seconds: float,
+    lp_seconds: float,
+    *,
+    rows_held: int,
+    rows_added: int,
+    violated: int,
+    support: int,
+    objective: float,
+) -> None:
+    """Append one round's split, when a caller asked for the split."""
+
+    if timings is None:
+        return
+    timings.append(
+        RoundTiming(
+            index=index,
+            separation_seconds=separation_seconds,
+            lp_seconds=lp_seconds,
+            rows_held=rows_held,
+            rows_added=rows_added,
+            violated=violated,
+            objective=objective,
+            support=support,
+        )
+    )
+
+
 def solve_rows(
     sites: SiteSet,
     square_side: Fraction,
@@ -349,11 +474,22 @@ def solve_rows(
     max_rounds: int = 60,
     rows_per_direction: int = 3,
     tolerance: float = 1e-9,
+    timings: list[RoundTiming] | None = None,
+    deadline: float | None = None,
 ) -> LpSolution:
     """Row-generate on a fixed site set until no placement is short of mass 1.
 
     ``rows`` is carried in and mutated: rows survive a change of site set, so a
     later call starts from every placement the earlier ones found.
+
+    Pass ``timings`` to have each round append its own separation/LP split. The
+    list is the only thing it touches, so a timed run and an untimed one take
+    the same decisions on the same numbers.
+
+    ``deadline`` is a ``time.perf_counter`` value past which no further round
+    starts. It is a wall and not a convergence criterion: the solution it
+    returns is not ``converged``, so nothing downstream can mistake a run that
+    ran out of clock for one that ran out of violated placements.
     """
 
     points = sites.points()
@@ -376,14 +512,36 @@ def solve_rows(
     # start from their optimum rather than from zero and spend the first
     # separation pass on placements the previous site set never violated.
     if len(rows) > 0:
+        started = time.perf_counter()
         warm = solve_lp(sites, rows)
+        elapsed = time.perf_counter() - started
         if warm is not None:
             weights, duals, objective = warm
             solution.weights, solution.duals, solution.objective = weights, duals, objective
+        if timings is not None:
+            timings.append(
+                RoundTiming(
+                    index=-1,
+                    separation_seconds=0.0,
+                    lp_seconds=elapsed,
+                    rows_held=len(rows),
+                    rows_added=0,
+                    violated=0,
+                    objective=solution.objective,
+                    support=int(np.count_nonzero(weights)),
+                )
+            )
 
     for round_index in range(max_rounds):
+        if deadline is not None and time.perf_counter() >= deadline:
+            solution.stopped = f"deadline reached after {round_index} rounds"
+            return solution
         solution.rounds = round_index + 1
+        separation_started = time.perf_counter()
         site_weights = weights[membership]
+        # The separation grid is built from the sites that carry weight, so the
+        # support -- not the site count -- is what makes a round expensive.
+        support = int(np.count_nonzero(site_weights))
         # Count violations, not newly held rows. A row set carried in from an
         # earlier site set already holds most of what the oracle finds, so
         # counting additions would read "nothing new" as "nothing violated"
@@ -395,10 +553,16 @@ def solve_rows(
         violated = 0
         added = 0
         least = float("inf")
+        least_covered = float("inf")
         for index, direction in enumerate(directions):
             for mass, cu, cv, covers in placement_cells(
                 points, site_weights, direction, outer, side, keep=rows_per_direction
             ):
+                # Cells arrive in ascending mass, so the first at a direction is
+                # that direction's least covered placement whether or not it is
+                # violated. Reading it before the break is the only way the
+                # converged round reports a number at all.
+                least_covered = min(least_covered, mass)
                 if mass >= 1 - tolerance:
                     break
                 row = np.zeros(columns)
@@ -410,6 +574,9 @@ def solve_rows(
                 least = min(least, mass)
                 added += rows.add(index, (cu, cv), row)
         solution.rows = len(rows)
+        solution.least_covered = least_covered
+        separation_seconds = time.perf_counter() - separation_started
+
         if violated == 0 or (added == 0 and least >= 1 - LP_FEASIBILITY):
             # Nothing violated, or every violation is a row already held and
             # missed by no more than the solver's feasibility tolerance, which
@@ -417,21 +584,67 @@ def solve_rows(
             # return the same point, and the loop would spend its rounds on it.
             solution.objective = float(sizes @ weights)
             solution.stopped = "converged: every placement covers mass 1"
+            _record(
+                timings,
+                round_index,
+                separation_seconds,
+                0.0,
+                rows_held=len(rows),
+                rows_added=added,
+                violated=violated,
+                support=support,
+                objective=solution.objective,
+            )
             return solution
         if added == 0:
             solution.stopped = (
                 f"a held row is violated by {1 - least:.3e}: the solver's point is off"
             )
+            _record(
+                timings,
+                round_index,
+                separation_seconds,
+                0.0,
+                rows_held=len(rows),
+                rows_added=added,
+                violated=violated,
+                support=support,
+                objective=solution.objective,
+            )
             return solution
 
+        lp_started = time.perf_counter()
         solved = solve_lp(sites, rows)
+        lp_seconds = time.perf_counter() - lp_started
         if solved is None:
             solution.stopped = "linear program refused the generated rows"
+            _record(
+                timings,
+                round_index,
+                separation_seconds,
+                lp_seconds,
+                rows_held=len(rows),
+                rows_added=added,
+                violated=violated,
+                support=support,
+                objective=solution.objective,
+            )
             return solution
         weights, duals, objective = solved
         solution.weights = weights
         solution.duals = duals
         solution.objective = objective
+        _record(
+            timings,
+            round_index,
+            separation_seconds,
+            lp_seconds,
+            rows_held=len(rows),
+            rows_added=added,
+            violated=violated,
+            support=support,
+            objective=objective,
+        )
     solution.stopped = f"round limit {max_rounds} reached"
     return solution
 
@@ -748,11 +961,41 @@ def check_ceiling(
     )
 
 
+#: Denominator the rationaliser rounds weights up to.
+#:
+#: Raised from ``200_000`` on the measurement in ``BC-191``. The rounding loss is
+#: ``atoms / (2 * scale) + bump * total`` -- the average round-up is half a
+#: quantum, and the bump is a floor the scale cannot get under. Measured on one
+#: LP point at each of two atom counts, four scales each: at 137 atoms the loss
+#: ran ``4.45e-4``, ``8.9e-5``, ``3.2e-5``, ``1.5e-5`` for scales ``2e5``,
+#: ``1e6``, ``4e6``, ``2e7``; at 333 atoms ``7.87e-4``, ``1.77e-4``, ``4.9e-5``,
+#: ``2.2e-5``. The model reproduces the record's own figure -- ``0.005255``
+#: predicted against ``0.005314`` measured at the ``n = 12`` rung's 2097 atoms
+#: and scale ``200_000``, where the margin that survived was ``0.001040``.
+#:
+#: The finer scale is free to verify. The exact sweep builds its grid from atom
+#: *coordinates*; the scale enters only as the magnitude of the ``int64``
+#: weights. Measured: 2.860 / 2.888 / 2.829 s at 137 atoms and 8.974 / 8.247 /
+#: 8.242 s at 333 atoms over scales ``1e6`` to ``2e7``, and the largest scaled
+#: total seen was ``225_099_903`` against ``sweep._INTEGER_MASS_LIMIT = 2**60``,
+#: a headroom factor of ``5.1e9``.
+#:
+#: It is also safe independently of the measurement. A held row sits at least
+#: ``1 - LP_FEASIBILITY`` (``1e-7``); the bump lifts it to at least
+#: ``1 + 9e-7 > 1`` whatever the scale, and rounding up only adds. All eight
+#: rationalisations above were accepted by the exact verifier.
+#:
+#: ``2e7`` was rejected, not on verification cost -- that was flat -- but because
+#: the win over ``4e6`` is ``2.1e-4`` at 2097 atoms against a bump floor of
+#: ``1.2e-5``, for five times the stored numerator.
+DEFAULT_SCALE = 4_000_000
+
+
 def rationalise_sites(
     sites: SiteSet,
     weights: np.ndarray,
     *,
-    scale: int,
+    scale: int = DEFAULT_SCALE,
     bump: Fraction = Fraction(1000001, 1000000),
 ) -> tuple[Atom, ...]:
     """Bump, round up to a multiple of ``1/scale``, and drop the empty orbits.
@@ -789,6 +1032,8 @@ class ColumnRound:
     cost: float
     added: int
     note: str
+    seconds: float = float("nan")
+    least_covered: float = float("inf")
 
 
 @dataclass(slots=True)
@@ -801,6 +1046,7 @@ class AdaptiveLog:
     accepted: bool = False
     failures: tuple[str, ...] = ()
     least_cell_mass: Fraction | None = None
+    least_covered: float = float("inf")
 
 
 logger = logging.getLogger(__name__)
@@ -825,7 +1071,7 @@ def generate_adaptive(
     inset: Fraction = Fraction(1, 2),
     angle_limit: Fraction,
     direction_steps: int,
-    scale: int = 200_000,
+    scale: int = DEFAULT_SCALE,
     max_rounds: int = 60,
     column_rounds: int = 8,
     columns_per_round: int = 1,
@@ -834,6 +1080,9 @@ def generate_adaptive(
     settle: float = 0.0,
     log_path: Path | None = None,
     decide: bool = False,
+    seed_points: Iterable[tuple[Fraction, Fraction]] = (),
+    timings: list[RoundTiming] | None = None,
+    deadline: float | None = None,
 ) -> tuple[Certificate | None, AdaptiveLog]:
     """Row- and column-generate; decide the result exactly only when asked.
 
@@ -851,16 +1100,33 @@ def generate_adaptive(
     by both routes, so that what is retained is what was decided (D-433, D-441). An
     in-memory decision is convenient for a small exploratory call and proves nothing
     about any file; nothing may be retained on its word.
+
+    ``seed_points`` are extra sites -- a retained certificate's atoms carried
+    to this side, say -- unioned with the grids and closed under D4, so a
+    second site-set construction can be run through the same loop. A point
+    outside the container is refused. ``timings`` is handed to every
+    `solve_rows` call, so a caller that wants the per-LP-round split while
+    the run is still going gets it; the list is the only thing it touches.
+    ``deadline`` is a ``time.perf_counter`` value handed to `solve_rows`: past
+    it no row round starts, the loop returns unconverged, and the log carries
+    what was reached -- a wall, never a convergence criterion.
     """
 
     half_tangents = net_half_tangents(angle_limit, direction_steps)
     sites = site_set_from_grids(outer_side, grid_counts, inset)
+    extra = set(seed_points)
+    if extra:
+        for x, y in extra:
+            if not (0 <= x <= outer_side and 0 <= y <= outer_side):
+                raise ValueError(f"seed site ({x}, {y}) lies outside the container")
+        sites = site_set_from_points(outer_side, set(sites.positions()) | extra)
     rows = Rows()
     log = AdaptiveLog()
     handle = log_path.open("a") if log_path is not None else None
     solution = LpSolution(np.zeros(len(sites.orbits)), np.zeros(0))
     try:
         for index in range(column_rounds):
+            started = time.perf_counter()
             solution = solve_rows(
                 sites,
                 square_side,
@@ -868,7 +1134,10 @@ def generate_adaptive(
                 rows,
                 max_rounds=max_rounds,
                 rows_per_direction=rows_per_direction,
+                timings=timings,
+                deadline=deadline,
             )
+            seconds = time.perf_counter() - started
             note = solution.stopped
             depth = float("nan")
             cost = float("nan")
@@ -901,6 +1170,8 @@ def generate_adaptive(
                     cost=cost,
                     added=len(found),
                     note=note,
+                    seconds=seconds,
+                    least_covered=solution.least_covered,
                 )
             )
             _write(
@@ -908,7 +1179,8 @@ def generate_adaptive(
                 f"round {index}: rows={len(rows)} orbits={len(sites.orbits)} "
                 f"sites={sites.size} lp_rounds={solution.rounds} "
                 f"objective={solution.objective:.9f} depth={depth:.9f} "
-                f"cost={cost:.9f} | {note}",
+                f"cost={cost:.9f} least_covered={solution.least_covered:.9f} "
+                f"seconds={seconds:.1f} | {note}",
             )
             # Stop before extending on the last round: the weights that get
             # rationalised below are the ones the LP just returned, and a site
@@ -926,6 +1198,7 @@ def generate_adaptive(
 
         log.objective = solution.objective
         log.stopped = solution.stopped
+        log.least_covered = solution.least_covered
         if solution.converged:
             weighted = dual_squares(
                 rows,
@@ -1005,11 +1278,14 @@ def orbit_column(
 
 
 __all__ = [
+    "DEFAULT_SCALE",
+    "SITE_DENSITIES",
     "AdaptiveLog",
     "Candidate",
     "CeilingResult",
     "ColumnRound",
     "LpSolution",
+    "RoundTiming",
     "Rows",
     "SiteSet",
     "Square",
@@ -1023,6 +1299,7 @@ __all__ = [
     "rank_candidates",
     "rationalise_sites",
     "reduced_cost",
+    "site_counts_for_side",
     "site_set_from_grids",
     "site_set_from_points",
     "solve_lp",

@@ -988,13 +988,13 @@ results:
       - E-n020-fractional-certificate
       - E-fractional-interval-decision
     artifacts:
-      - packing/cases/n20_fractional_certificate/certificate.json
+      - packing/cases/n20_fractional_certificate/certificate-24-5.json
       - packing/src/sqpack/fractional/colgen.py
     controls:
       - packing/tests/test_fractional_certificate.py
     next_rung: >-
-      The retained certificate's total is 946131/50000 = 18.922620, leaving 0.077380
-      below nineteen, and that margin is where a further rung has to be found. It is a
+      This result's 24/5 rung has total 18.922620, leaving 0.077380 below nineteen,
+      and that margin is where a further rung had to be found. It is a
       wide margin by this register's standards -- n = 17's top rung has 0.066920 and
       n = 12's has 0.001040 -- which says the side was not pushed to where the covering
       value stops it, only to where the run was stopped.
@@ -1014,7 +1014,96 @@ results:
       than a rung to expect; a run between 4.80 and 4.9885 that succeeds moves n = 20 and
       n = 21 and stops at n = 19. The quantity to read is the restricted optimum a
       converged run reaches, never an extrapolated rate, and the cost was the exhaustive
-      tier: this certificate's exact sweep took 5378 s at 2260 atoms, against 173 s for
+      tier: the 24/5 rung's exact sweep took 5378 s at its own 2260-atom set, against 173 s for
       the interval route on the same bytes. The same evening the sweep was rewritten to
       decide in integers on the weights' common scale, in parallel over directions, and
       returns the same least covered mass in 38.7 s on the same box.
+      The margin was found and taken the following day: T-021 certifies 97/20 = 4.85 at
+      n = 20 and n = 21 from a site set seeded with this certificate's own atoms, and
+      supersedes this result at both sizes. What this result still holds alone is
+      n = 19, whose bound stays 24/5 because T-021's atoms are too heavy for it; the
+      rung itself is retained at cases/n20_fractional_certificate/certificate-24-5.json
+      and replays by name. This result stays true as stated at all three of its sizes.
+
+  - id: T-021
+    claim: >-
+      s(20) >= 97/20 and s(21) >= 97/20, from a first-party weighted fractional
+      unavoidable-set certificate at container side 97/20 = 4.85. Both sizes held 24/5
+      = 4.80 from T-020 earlier the same week, and nothing else specific to either has
+      ever been proved; the movement is +0.05 at each. The certificate does not reach
+      n = 19: its total mass is 19848723/1000000 = 19.848723, above nineteen, so
+      Condition 2 gives it n = 20 and upward and T-020's 24/5 rung, retained beside it,
+      still carries n = 19.
+      The two sizes take no monotonicity step, for the reason T-020 gives: only
+      Condition 2 mentions n among the five conditions, so an atom set of mass M
+      certifies its side for every integer strictly above M. From n = 22 on the register
+      already holds 5, so the certificate is true there and weaker.
+      Where the rung came from is worth the record. A pre-registered bisection of
+      [24/5, 9977/2000] ran four rungs unattended. The uniform grid walled at this side
+      -- its restricted optimum crossed twenty at round 31 of 32 and stood at 20.000439
+      with placements still violated -- while a second site set, the 24/5 certificate's
+      own 2260 atoms scaled by 97/96 and unioned with the grids, converged below twenty
+      at the same side. The certificate is the second construction's; the first
+      construction's crossing is why H-062 asks for two.
+    scope:
+      n_values:
+        - 20
+        - 21
+    verification: V4
+    confirmation: C4
+    significance:
+      score: 3
+      rationale: >-
+        Scored at S3 by the calibration note T-020 wrote for exactly this case: "Further
+        sizes from the same generator, absent a new technique or a case that changes
+        character, belong at S3." This is the same generator at the same two sizes,
+        one rung higher, and neither size changes character at 4.85.
+        What it adds beyond a rung is a measurement rather than a theorem, and the
+        measurement is registered as such: the m = 5 covering wall is bracketed to
+        [97/20, 39/8] -- a certificate at 4.85, crossings above twenty on both
+        constructions at 4.875 -- which is the first bracket this project has put around
+        a covering wall, and it sits far below the method's ceiling of 4.9885 rather
+        than at it. That bears on planning, not on the strength of this claim.
+      scored: '2026-09-05'
+      by: BC-197 (repository; no independent evaluator, see composition)
+    novelty: apparently-novel
+    composition: >-
+      Primary at both sizes: one certificate, one accepted verdict, the bound being the
+      container side directly, with no monotonicity or composition step between the
+      artifact and the claim.
+      C4 is earned by two evidence entries whose method values differ, the exact
+      event-cell sweep and the interval branch and bound, both run in this repository on
+      the frozen bytes. As with T-020 there is no independent evaluator and no review
+      artifact, so C5 -- review-ready, a mapped review -- is as far away here as there.
+    produced_by:
+      hypothesis: H-062
+      agenda_cell: BC-197
+      session: session-086
+      experiment: exp-061
+    evidence:
+      - E-n020-fractional-certificate-97-20
+      - E-fractional-interval-decision
+    artifacts:
+      - packing/cases/n20_fractional_certificate/certificate.json
+      - packing/cases/n20_fractional_certificate/certificate-193-40.json
+      - packing/devtools/colgen_checkpoint.py
+      - packing/src/sqpack/fractional/colgen.py
+    controls:
+      - packing/tests/test_fractional_certificate.py
+    next_rung: >-
+      The margin is 0.151277 below twenty, wider than T-020's 0.077380 was, so the side
+      was not pushed to where the covering value stops it either. What is new is that
+      the stopping side is now bracketed rather than guessed: 39/8 = 4.875 walls on both
+      constructions and 97/20 certifies, so the m = 5 covering wall lies in an interval
+      of width 0.025, and 979/200 = 4.895 and 997/200 = 4.985 wall as well. H-062 asked
+      for 0.02 and the four decided rungs give 0.025, so the hypothesis is unresolved
+      rather than accepted; the round is exp-061 and the remaining rung is the midpoint
+      by the same rule.
+      One reading of the 4.985 wall does not survive inspection and is recorded here so
+      nobody repeats it. Just below the ceiling the twenty-five axis-parallel B-squares
+      of a 5 x 5 arrangement overlap only in strips of width 5B - L = 0.0035, and the
+      restricted dual is checked at sites only, so a site set with no site in those
+      strips makes twenty-five unit weights dual-feasible and the restricted optimum
+      exactly 25.000000 whatever the covering value is. No uniform inset-1/2 grid at any
+      count the lane could afford puts a site in every strip. The exactly round value
+      this register has learned to distrust has, at m = 5, a mechanism.

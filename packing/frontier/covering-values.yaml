@@ -51,6 +51,54 @@ values:
     notes: >-
       Seeded from the retained 381/100 certificate's own 1121 atoms. Result narrative
       only: no run log or checkpoint was retained and nothing was frozen at this side.
+  - n: 11
+    side: '191/50'
+    side_decimal: '3.82'
+    objective: '11.055617'
+    site_set: vertex-seeded
+    sites: 12761
+    rows: 9868
+    rounds: 9
+    converged: true
+    stop_reason: >-
+      The row loop converged at cutting-plane iteration 5 (11.055617 on 12,761 sites
+      after the arrangement vertices of the dual family were added as site orbits) and
+      held that value through iteration 8; the cutting-plane loop itself stopped on its
+      36-minute wall with the exact depth-scaled total at 9.907906.
+    least_covered_mass: '1'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-060-h-064-n11-fractional-packing-floor.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-summary-191-50.json
+    notes: >-
+      BC-200 of agenda 021 (exp-060). Sites are the grid at BC-191's density plus the
+      violating arrangement vertices the cutting-plane loop added, which is why this
+      site set's optimum sits above the two earlier site sets' exactly eleven: the
+      quantity is a restricted optimum on that set, an upper bound on the covering
+      value. The run log and the resumable state are retained beside the summary.
+  - n: 11
+    side: '77/20'
+    side_decimal: '3.85'
+    objective: '11.227631'
+    site_set: vertex-seeded
+    sites: 22625
+    rows: 14215
+    rounds: 3
+    converged: false
+    stop_reason: >-
+      The row loop had not converged at any of the three cutting-plane iterations (the
+      objective descended 11.429225, 11.254796, 11.227631 with placements still
+      violated) when the 30-minute wall stopped the loop; the exact depth-scaled total
+      stood at 9.049861.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-060-h-064-n11-fractional-packing-floor.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-200-summary-77-20.json
+    notes: >-
+      BC-200 of agenda 021 (exp-060), warm-started from the 191/50 state. An
+      unconverged row loop's value is an upper bound on nothing in particular: rows
+      only raise it. Retained as a measurement of where the loop stood.
   - n: 12
     side: '79/20'
     side_decimal: '3.95'
@@ -206,6 +254,193 @@ values:
       to 27516 over the run. Both readings stay open, a covering value at or above
       eighteen or an optimum on a degenerate vertex, which the collapse of pricing from
       90 s to 1--3 s suggests. No raw run was retained and nothing was frozen.
+  - n: 21
+    side: '997/200'
+    side_decimal: '4.985'
+    objective: '25.000000'
+    site_set: grid
+    sites: 6785
+    rows: 8692
+    rounds: 24
+    converged: false
+    stop_reason: >-
+      Stopped by the ladder inside the row loop at its refutation budget, unconverged;
+      the objective had crossed twenty-one at round 4 (21.179460) and then stood at
+      exactly 25.000000 from round 12 through round 24 with least covered mass 0.841490.
+    least_covered_mass: '0.841490'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-ladder-register.txt
+    notes: >-
+      BC-197 of agenda 021 (exp-061). The exactly round value is an artefact with a
+      mechanism at this side: with 5B - L = 0.0035 the twenty-five axis-parallel
+      B-squares overlap only in strips of that width, the restricted dual is checked at
+      sites only, and no uniform inset-1/2 grid the lane could afford puts a site in
+      every strip, so twenty-five unit weights are dual-feasible whatever the covering
+      value is. A second construction, the 24/5 atoms scaled, reached 24.315238 unconverged.
+  - n: 20
+    side: '979/200'
+    side_decimal: '4.895'
+    objective: '20.111615'
+    site_set: grid
+    sites: 6501
+    rows: 3270
+    rounds: 8
+    converged: false
+    stop_reason: >-
+      Stopped by the ladder on the crossing: the objective crossed twenty at LP round 8
+      with least covered mass 0.729083 and placements still violated, and rows only
+      raise a restricted optimum, so the rung walls without convergence.
+    least_covered_mass: '0.729083'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-ladder-register.txt
+    notes: >-
+      BC-197 of agenda 021 (exp-061). The seeded construction crossed at round 7
+      (20.006183) and reached 20.070683 at round 9, so both of H-062's constructions
+      wall here.
+  - n: 20
+    side: '97/20'
+    side_decimal: '4.85'
+    objective: '20.000439'
+    site_set: grid
+    sites: 6029
+    rows: 9803
+    rounds: 32
+    converged: false
+    stop_reason: >-
+      Stopped by the ladder on the crossing: 19.999366 at round 30, 20.000166 at 31 and
+      20.000439 at 32, least covered mass 0.984497 with 192 placements still violated.
+    least_covered_mass: '0.984497'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-r2t.json
+    notes: >-
+      BC-197 of agenda 021 (exp-061). The grid construction crosses twenty by four parts
+      in ten thousand here; the seeded construction at the same side converged below
+      twenty and its certificate is retained as T-021, which is why the cell's own rule
+      asks for two constructions before a crossing is read as a wall.
+  - n: 20
+    side: '97/20'
+    side_decimal: '4.85'
+    objective: '19.848723'
+    site_set: certificate-seeded
+    sites: 8289
+    rows: null
+    rounds: null
+    converged: true
+    stop_reason: >-
+      The row loop converged -- every placement covers mass one -- on the grids unioned
+      with the 24/5 certificate's 2260 atoms scaled by 97/96, after the 600-second run
+      at the same site set had been time-limited at 19.844457 and a 2400-second rerun
+      carried it to convergence in 1616.5 s.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n20_fractional_certificate/certificate.json
+    recorded_in:
+      - packing/frontier/results.yaml
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-r2t.json
+    notes: >-
+      BC-197 of agenda 021 (exp-061). Rationalised at scale 4,000,000 to
+      19848723/1000000 over 1680 atoms and retained as T-021's certificate, which the
+      gate accepted on both routes at 200001/200000.
+  - n: 20
+    side: '193/40'
+    side_decimal: '4.825'
+    objective: '19.862092'
+    site_set: grid
+    sites: 6029
+    rows: 11083
+    rounds: 54
+    converged: true
+    stop_reason: >-
+      The row loop converged at LP round 54 -- every placement covers mass one, least
+      covered mass 1.000000 -- with the optimum reached at round 41 and rounds 41 to 54
+      clearing the last violations; 949.4 s of round time, 1008.6 s wall.
+    least_covered_mass: '1'
+    frozen_artifact: packing/cases/n20_fractional_certificate/certificate-193-40.json
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-r3.json
+    notes: >-
+      BC-197 of agenda 021 (exp-061). Rationalised to 9931121/500000 over 1076 atoms
+      (rounding loss 1.5e-4) and retained as the lower rung beside T-021's; the gate
+      accepted it on both routes at 1000003/1000000.
+  - n: 20
+    side: '39/8'
+    side_decimal: '4.875'
+    objective: '20.016349'
+    site_set: grid
+    sites: 6216
+    rows: 4259
+    rounds: 12
+    converged: false
+    stop_reason: >-
+      Stopped by the ladder on the crossing at LP round 12, least covered mass 0.863635
+      with placements still violated.
+    least_covered_mass: '0.863635'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-061-h-062-m5-covering-wall.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-197-ladder-register.txt
+    notes: >-
+      BC-197 of agenda 021 (exp-061). The seeded construction walled here too, so this
+      is the bracket's upper end: the m = 5 covering wall lies in [97/20, 39/8].
+  - n: 20
+    side: '973/200'
+    side_decimal: '4.865'
+    objective: '20.001502'
+    site_set: grid
+    sites: 6216
+    rows: 5519
+    rounds: 16
+    converged: false
+    stop_reason: >-
+      Stopped by the cell on the crossing at LP round 16, least covered mass 0.890041
+      with 543 placements still violated, after 74.0 s of round time.
+    least_covered_mass: '0.890041'
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-213-m5-midpoint-register.txt
+    notes: >-
+      BC-213 of agenda 022 (exp-062). Grid counts (34, 46, 56), 806 orbits. Rows only
+      raise a restricted optimum, so this site set's converged optimum is at least
+      20.001502; the value was not computed and the criterion does not ask for it. The
+      run continued to round 24 at 20.095294 because a kill on the uv wrapper did not
+      reach its python child, and those rounds are kept rather than trimmed.
+  - n: 20
+    side: '973/200'
+    side_decimal: '4.865'
+    objective: '20.000223'
+    site_set: certificate-seeded
+    sites: 6216
+    rows: 10767
+    rounds: 34
+    converged: false
+    stop_reason: >-
+      Stopped by the cell on the crossing at LP round 34 with 213 placements still
+      violated, after 1072.6 s of round time.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-213-m5-midpoint-register.txt
+    notes: >-
+      BC-213 of agenda 022 (exp-062). The grids above unioned with T-021's 1680 atoms
+      scaled by 973/970. Both constructions walling here closes H-062's bracket to
+      [97/20, 973/200], width 0.015 against the registered 0.02, and 0.1235 below the
+      ceiling 9977/2000 -- so at m = 5 the covering value binds and the ceiling never
+      does. This is the closest crossing in the register: it cleared twenty by 2.23
+      parts in a hundred thousand, against four parts in ten thousand for the grid at
+      97/20, on a walk of 19.996458, 19.997545, 19.998396, 19.999167, 19.999837,
+      20.000223 with the violated count collapsing at 480, 363, 381, 279, 213. The
+      pre-registered rule does not read margins and was applied as written; a denser
+      site set is where any doubt about this rung would go, since adding sites lowers a
+      restricted optimum.
   - n: 20
     side: '24/5'
     side_decimal: '4.80'
@@ -219,7 +454,7 @@ values:
       Halted at round 9 on projected cost: four more rounds would have cost about
       3.75 h to buy margin nothing needed. The side above it was never attempted.
     least_covered_mass: null
-    frozen_artifact: packing/cases/n20_fractional_certificate/certificate.json
+    frozen_artifact: packing/cases/n20_fractional_certificate/certificate-24-5.json
     recorded_in:
       - packing/frontier/results.yaml
       - packing/campaign/explorations/X-013-where-the-certificate-should-go-next.md
@@ -227,4 +462,195 @@ values:
       A single resumed column-generation run; the record names no site set and retains
       no site or row count. The reported objective has no raw run, and it is not the
       artifact's mass, 946131/50000 = 18.922620, which certifies n = 19 upward and is
-      why the reach table keys this package to n = 19.
+      what keeps n = 19 standing at 24/5 after T-021 raised n = 20 and n = 21 to 97/20.
+      The artifact named here is the immutable 24/5 rung, not the package's moving
+      certificate.json pointer, which now holds the heavier 97/20 rung.
+  - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.364038'
+    site_set: grid
+    sites: null
+    rows: null
+    rounds: 26
+    converged: true
+    stop_reason: >-
+      Converged at LP round 26 -- the row loop stopped for want of a violated placement --
+      at 12.364038 over 625 atoms, 117.4 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. Above twelve on a converged loop, so this site set carries no
+      certificate at 3.97; adding sites can only lower it, so the side is not barred.
+      Rationalised at scale 4,000,000 to 12364129/1000000, loss 0.000091. Frozen as a
+      refuted set and kept outside the case package.
+  - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.016263'
+    site_set: certificate-seeded
+    sites: null
+    rows: null
+    rounds: 8
+    converged: false
+    stop_reason: >-
+      Crossed twelve at LP round 8 with placements still violated; the loop reached
+      12.095824 by round 14 before the cell stopped it. 213 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. The grids unioned with T-017's 2097 atoms scaled to the side.
+      Rows only raise a restricted optimum, so this site set's converged optimum is at
+      least 12.016263.
+  - n: 12
+    side: '398/100'
+    side_decimal: '3.98'
+    objective: '16.000000'
+    site_set: grid
+    sites: null
+    rows: null
+    rounds: 16
+    converged: false
+    stop_reason: >-
+      Locked at exactly 16.000000 from LP round 5 and held it to round 16; 128 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. The round value is the site set's artefact and not the
+      covering value, one order below BC-197's 25.000000 at m = 5: with
+      delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits
+      sixteen dual-feasible unit weights whatever the covering value is. The auto grid
+      places 43 to 44 sites per axis where those windows need hundreds to thousands.
+  - n: 12
+    side: '3985/1000'
+    side_decimal: '3.985'
+    objective: '16.000000'
+    site_set: grid
+    sites: null
+    rows: null
+    rounds: 12
+    converged: false
+    stop_reason: >-
+      Locked at exactly 16.000000 from LP round 6 and held it to round 12; 55 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. The round value is the site set's artefact and not the
+      covering value, one order below BC-197's 25.000000 at m = 5: with
+      delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits
+      sixteen dual-feasible unit weights whatever the covering value is. The auto grid
+      places 43 to 44 sites per axis where those windows need hundreds to thousands.
+  - n: 12
+    side: '399/100'
+    side_decimal: '3.99'
+    objective: '16.000000'
+    site_set: grid
+    sites: null
+    rows: null
+    rounds: 12
+    converged: false
+    stop_reason: >-
+      Locked at exactly 16.000000 from LP round 7 and held it to round 12; 60 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. The round value is the site set's artefact and not the
+      covering value, one order below BC-197's 25.000000 at m = 5: with
+      delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits
+      sixteen dual-feasible unit weights whatever the covering value is. The auto grid
+      places 43 to 44 sites per axis where those windows need hundreds to thousands.
+  - n: 12
+    side: '398/100'
+    side_decimal: '3.98'
+    objective: '12.130682'
+    site_set: certificate-seeded
+    sites: null
+    rows: null
+    rounds: 5
+    converged: false
+    stop_reason: >-
+      Crossed twelve at LP round 5 with placements still violated; the loop reached
+      12.376525 by round 13 before the cell stopped it. 165 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. Crossings arrive strictly earlier as the side rises -- rounds
+      8, 5, 3, 3 across the four sides -- so the margin non-monotonicity this ladder
+      shows below 99/25 does not reappear above it.
+  - n: 12
+    side: '3985/1000'
+    side_decimal: '3.985'
+    objective: '12.104043'
+    site_set: certificate-seeded
+    sites: null
+    rows: null
+    rounds: 3
+    converged: false
+    stop_reason: >-
+      Crossed twelve at LP round 3 with placements still violated; the loop reached
+      12.414845 by round 13 before the cell stopped it. 115 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. Crossings arrive strictly earlier as the side rises -- rounds
+      8, 5, 3, 3 across the four sides -- so the margin non-monotonicity this ladder
+      shows below 99/25 does not reappear above it.
+  - n: 12
+    side: '399/100'
+    side_decimal: '3.99'
+    objective: '12.056180'
+    site_set: certificate-seeded
+    sites: null
+    rows: null
+    rounds: 3
+    converged: false
+    stop_reason: >-
+      Crossed twelve at LP round 3 with placements still violated; the loop reached
+      12.398218 by round 8 before the cell stopped it. 150 s.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022. Crossings arrive strictly earlier as the side rises -- rounds
+      8, 5, 3, 3 across the four sides -- so the margin non-monotonicity this ladder
+      shows below 99/25 does not reappear above it.
+  - n: 12
+    side: '397/100'
+    side_decimal: '3.97'
+    objective: '12.248227'
+    site_set: cutting-plane
+    sites: null
+    rows: null
+    rounds: null
+    converged: true
+    stop_reason: >-
+      The row LP converged at 12.248227 under devtools.run_fractional_cutting, the
+      instrument BC-200 used, with an exact depth-scaled floor beneath it.
+    least_covered_mass: null
+    frozen_artifact: null
+    recorded_in:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    notes: >-
+      BC-206 of agenda 022, unregistered follow-up at a pre-registered side. This row is
+      the one that says where the ladder ends: with an exact floor of 10.845594 under a
+      converged 12.248227, the covering value at 3.97 is bracketed rather than guessed,
+      and against the retained 11.998960 at 3.96 the upper end gives a slope of at least
+      24.9 per unit side. The retained rung's 0.001040 of margin is spent within 0.000042
+      of side, so the ladder ends at about 3.96004 and the 0.0308 of runway T-017 recorded
+      under the ceiling 4B = 3.9908 is not runway. Twelve lies inside the bracket, so 3.97
+      is undecided rather than barred.

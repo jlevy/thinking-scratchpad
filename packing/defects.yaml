@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 457
+count: 460
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -14782,3 +14782,153 @@ defects:
     touches every retained case rendering and is carried separately (think-igdg).
   status: fixed
   recorded_in: packing/devtools/build_known_best_atlas.py
+- id: D-458
+  title: A frozen-artifact path named a moving pointer, so a superseded rung quoted its successor's mass
+  date: '2026-09-05'
+  layer: record
+  class: bookkeeping
+  detected_by: gate
+  latent_for: >-
+    from the moment T-021's 97/20 rung was promoted on 2026-09-05 until the fast tier ran
+    on the same branch a few hours later -- long enough to render one internally
+    contradictory document and to reach CI, not long enough to reach main.
+  severity: medium
+  what: >-
+    The covering-value register's row for n = 20 at 24/5 named its frozen artifact as
+    packing/cases/n20_fractional_certificate/certificate.json. That path is the moving
+    top-rung pointer by this project's own naming convention, not an immutable rung, so
+    when T-021 promoted the 97/20 certificate into it the 24/5 row silently began
+    pointing at a different set of atoms. CERTIFICATE-REACH.md, which recomputes each
+    row's mass from the artifact the row names, then rendered the 4.80 row as a
+    1,680-atom certificate of mass 19.848723 in the same cell whose own note said the
+    artifact's mass was 946131/50000 = 18.922620.
+    Three more statements went stale in the same promotion without being wrong about any
+    object: the renderer's prose hardcoded "three points" and named n = 11, n = 17 and
+    n = 19 as the packing-limited rows, when the n = 20 package's move from n = 19 to
+    n = 20 had turned that into two points and put the ceiling in the binding position;
+    retained_certificates' docstring worked its keying example from the mass the pointer
+    used to hold; and six tests across two files pinned the pointer's old side, mass,
+    atom count and least size certified.
+  consequence: >-
+    No bound is wrong, no certificate is unsound and no verdict changes: every artifact
+    named exists and every mass quoted is the true mass of the file quoted. What breaks
+    is the join between a row and its evidence. A reader auditing the 24/5 rung -- the
+    one that still carries n = 19 -- would have been handed the atoms of the rung that
+    displaced it, and the reach table's regularity section would have kept advertising a
+    three-point band that the corpus no longer contains. It is D-443's neighbour: a
+    figure that stays exact while the object under it moves.
+  fix: >-
+    Fixed on 2026-09-05. The 24/5 row names certificate-24-5.json, the immutable rung,
+    and its note says which of the two it means and why n = 19 stays at 24/5. The n = 20
+    package names its historical rungs as module constants (RUNG_24_5_PATH,
+    RUNG_193_40_PATH), as the n = 11 package already did, so a test can say which rung it
+    is about. render_certificate_reach derives the count word, the case list, the band
+    width and the per-run stop reasons from the corpus instead of writing them down, and
+    STOP_REASONS is keyed by case so a row that leaves the packing-limited set drops its
+    sentence rather than stranding it.
+  regression: >-
+    packing/tests/test_certificate_reach.py and packing/tests/test_fractional_certificate.py.
+    test_every_frozen_artifact_in_the_register_recomputes_its_mass is what caught this: it
+    compares each frozen artifact's own outer_side against the side of the row that names
+    it, which is the one comparison a moving pointer cannot survive. It already existed
+    and it worked. What did not work was the row beside it,
+    test_reported_rows_quote_the_mass_their_own_artifact_recomputes, which checked two
+    hand-listed sides against two hand-listed paths and so restated the bug rather than
+    catching it; it now walks every register row and checks each against the artifact
+    that row names. The three n = 20 tests are rewritten to say which rung they are about
+    and to check the 24/5 rung beside the top one, and the band test reads its case set
+    from the corpus rather than pinning it.
+  recurrence_of: D-443
+  status: fixed
+  recorded_in: packing/frontier/covering-values.yaml
+- id: D-459
+  title: A conflicted branch produced no CI at all, and no checks reads as pending rather than red
+  date: '2026-09-05'
+  layer: tooling
+  class: robustness
+  detected_by: inspection
+  latent_for: >-
+    twenty-five minutes and five pushes, from the moment main moved under the branch until
+    someone asked why a repository whose other branches were running normally had produced
+    no run for this one.
+  severity: low
+  what: >-
+    PR 83's branch went un-mergeable when main advanced, and GitHub stopped creating
+    workflow runs for it entirely rather than creating one that failed. A pull_request
+    workflow checks out the pull request's merge ref; with a conflict that ref cannot be
+    built, so no run is created, no check appears, and the API reports the pull request as
+    having zero check runs.
+    Five pushes landed into that silence. Each was read as "CI has not started yet",
+    which is what zero check runs also means, and the two are indistinguishable from
+    outside. The branch was in fact carrying validated work the whole time; nothing about
+    it was wrong except that nobody could see a gate result for it.
+  consequence: >-
+    No false claim entered the record, and the cost was twenty-five minutes and five
+    uninformative pushes. The danger is the direction the failure leans: an absent check
+    reads as pending, not as red, so a branch can sit un-gated while looking merely slow,
+    and a reviewer glancing at a green-looking pull request page sees nothing objecting.
+    A conflicted branch that nobody notices is also a branch whose merge gets harder the
+    longer it waits.
+  fix: >-
+    Fixed on 2026-09-05 by merging main into the branch and resolving the two conflicts;
+    CI created a run on the very next push. The durable half is the diagnostic rule, which
+    is written into development.md beside the pull-request section: zero check runs is a
+    mergeability question, not a waiting question, and `git merge-tree --write-tree HEAD
+    origin/main` answers it in one command before another push is spent.
+  regression: >-
+    None automated, and the reason is worth stating rather than leaving as an omission:
+    this repository's gate validates the repository, not GitHub's view of a pull request,
+    and adding a checker that reaches out to the API would make an external service a
+    dependency of a local command. The control is the rule in development.md and the habit
+    of reading an absent check as a question rather than as a wait.
+  status: fixed
+  recorded_in: development.md
+- id: D-460
+  title: A research cell with no hypothesis cannot produce a round, and BC-206 was written that way
+  date: '2026-09-05'
+  layer: record
+  class: bookkeeping
+  detected_by: gate
+  latent_for: >-
+    from the moment agenda-022 was drafted until its BC-206 finished and the round it had
+    produced would not validate -- about a day of drafting and a hundred minutes of
+    compute, none of it wasted, but none of it registrable as a round either.
+  severity: low
+  what: >-
+    Agenda-022's BC-206 declares `purpose: research` and carries no `hypotheses`. The
+    experiment contract requires at least one -- `hypotheses: []` is refused as empty --
+    so the cell as written could not produce a registrable round no matter what it found,
+    and the mismatch surfaced only when the experiment record was written after the work
+    was done.
+    Nothing in the agenda schema objects to a research cell without a hypothesis, and
+    nothing in the ledger's cell checks connects the two contracts, so a cell can be
+    drafted, budgeted, dispatched and completed before anything notices that its output
+    has nowhere to go.
+  consequence: >-
+    No measurement was lost and no claim is wrong. BC-206's nine covering-value rows and
+    its run register carry everything the cell produced, and recording them as data rather
+    than as a round is the more accurate description anyway: nothing was pre-registered,
+    so nothing was tested. What the register loses is the round count and the effort
+    attribution, which is how this campaign prices its own work -- a hundred minutes and
+    thirteen run blocks that the ledger's round total does not see.
+    The failure is quiet in the direction that matters least, but it is quiet: a cell
+    that cannot produce a round looks exactly like one that can until its round is
+    written.
+  fix: >-
+    BC-206's outcome records the measurements in full and says plainly that no round is
+    registered and why. The measurements are in packing/frontier/covering-values.yaml as
+    nine rows keyed by side and site set, and the per-round detail is in the run register.
+    The durable half belongs to the agenda contract rather than to this cell: a research
+    cell should either declare a hypothesis or declare that it is a measurement without
+    one, and the ledger should refuse the first shape rather than letting it through to
+    the experiment record. That is not built here.
+  regression: >-
+    None yet, and the gap is named rather than left implicit. The check to build is in the
+    ledger's per-cell rules, where `purpose: research` with an empty `hypotheses` would be
+    refused at draft time -- the point being to fail when the agenda is written, not when
+    the work is finished. Filed against the agenda schema and the ledger's cell checks;
+    until it exists, a research cell without a hypothesis is caught only by the experiment
+    schema at the end.
+  bead: think-c0qm
+  status: contained
+  recorded_in: packing/campaign/agendas/agenda-022-the-conditional-route.md

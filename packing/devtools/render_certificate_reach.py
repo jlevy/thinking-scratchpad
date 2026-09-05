@@ -31,12 +31,16 @@ to the case's lower bound. It is an upper bound on the prize and not a forecast:
 a search actually reaches is set by the covering value at that side, which is lower.
 
 A second join adds what the record now shows about that gap between prize and
-reach: the three packing-limited certificates land within 0.001 of the same fraction
-of their cases' best known packings. The fourth retained certificate is
-ceiling-limited and is excluded from that comparison. The regularity is measured
-from three points, not proved, and the document says so plainly where it appears --
-see `measured_attainment` and `predicted_reach` for where the two figures it
-produces, `ratio` and `predicted`, come from.
+reach: the packing-limited certificates land within 0.001 of the same fraction of
+their cases' best known packings. Ceiling-limited certificates are excluded from that
+comparison, because their ratio measures the method's own ceiling rather than a
+packing. How many rows are on each side is read from the corpus and never written
+down here -- a retained rung that gains enough side moves from one side to the other,
+which is what happened when `T-021` raised the n = 20 package to 97/20 and turned a
+three-point regularity into a two-point one. The regularity is measured, not proved,
+and the document says so plainly where it appears -- see `measured_attainment` and
+`predicted_reach` for where the two figures it produces, `ratio` and `predicted`,
+come from.
 
 Usage:
     uv run --frozen python -m devtools.render_certificate_reach
@@ -49,6 +53,7 @@ import argparse
 import json
 import math
 import pathlib
+import textwrap
 from fractions import Fraction
 from itertools import pairwise
 
@@ -340,11 +345,14 @@ def retained_certificates() -> list[dict]:
     that filename, rather than importing each package's Python, finds exactly the
     rungs the register currently holds.
 
-    The row is keyed by ``least_size_certified``, not by the JSON's own ``n`` field:
-    the package named ``n20_fractional_certificate`` carries a certificate recorded
-    at ``n = 20``, but its mass of 946131/50000 = 18.922620 certifies every integer
-    above that, so the case it moves first -- and the one this document keys it to
-    -- is ``n = 19``.
+    The row is keyed by ``least_size_certified``, not by the JSON's own ``n`` field.
+    Condition 2 of the certificate mentions only ``n``, so a certificate of mass ``M``
+    certifies every integer above ``M``, and the case it moves first is the least of
+    them -- which need not be the ``n`` the package is named for. The n = 20 package
+    is the worked example in both directions: while its retained rung was the 24/5
+    one, mass 946131/50000 = 18.922620, this document keyed it to ``n = 19``; the
+    97/20 rung that replaced it has mass 19848723/1000000 = 19.848723 and keys it to
+    ``n = 20``. Nothing here depends on which of those is current.
     """
     rows = []
     for path in sorted(CASES.glob("n*_fractional_certificate/certificate.json")):
@@ -395,6 +403,37 @@ def measured_attainment(rows: list[dict]) -> list[dict]:
             }
         )
     return sorted(out, key=lambda r: r["n"])
+
+
+#: How each packing-limited run stopped, keyed by the case it certifies. The section
+#: below names only the cases actually in the corpus, so a rung that moves a package
+#: from one side of the join to the other drops its sentence rather than stranding it.
+#: A case absent from this map is reported as having no stop reason recorded, which is
+#: itself the honest statement -- see `D-443`.
+STOP_REASONS = {
+    11: "n = 11 ran its covering search to a converged optimum.",
+    17: (
+        "n = 17 has no stop reason recorded for its own build at all -- the stop "
+        "narrated in its `next_rung` belongs to an adjacent probe at n = 18, not to "
+        "the certificate this row measures."
+    ),
+    19: (
+        "n = 19 was halted at round 9 on projected cost, four rounds short of where "
+        "it would have stopped on its own."
+    ),
+}
+
+_COUNT_WORDS = ("no", "one", "two", "three", "four", "five", "six", "seven", "eight")
+
+
+def _wrap_sentences(text: str, width: int = 72) -> list[str]:
+    """Prose assembled from the corpus, wrapped to the width the document is written at."""
+    return textwrap.wrap(text, width=width) or [""]
+
+
+def count_word(count: int) -> str:
+    """``3`` as ``"three"``, for prose that must agree with a number the corpus sets."""
+    return _COUNT_WORDS[count] if count < len(_COUNT_WORDS) else str(count)
 
 
 def mean_packing_ratio(measured: list[dict]) -> float:
@@ -577,29 +616,33 @@ def render(rows: list[dict]) -> str:
             f"| {r['n']} | {r['package']} | {r['lower']:.4f} | {r['best_packing']:.4f} | "
             f"{r['ceiling']:.4f} | {r['binds']} | {r['ratio']:.5f} |"
         )
+    limited = [r for r in measured if r["binds"] == "packing"]
+    word = count_word(len(limited))
+    named = ", ".join(f"n = {r['n']}" for r in limited)
+    spread = max(r["ratio"] for r in limited) - min(r["ratio"] for r in limited)
+    stops = " ".join(
+        STOP_REASONS.get(r["n"], f"n = {r['n']} has no stop reason recorded.") for r in limited
+    )
     out += [
         "",
-        "## What three points would predict, if the ratio held",
+        f"## What {word} points would predict, if the ratio held",
         "",
-        "**This is an extrapolation from three points, not a measurement.** The three",
-        "packing-limited rows above -- n = 11, n = 17, n = 19 -- land inside a band",
-        "0.001 wide, and their mean is the `ratio` this section's numbers all come",
-        f"from: `{ratio:.5f}`. That the three numbers are exact rationals decided by",
-        "an exact verifier does not make their mean a rate. No rung in this register",
+        f"**This is an extrapolation from {word} points, not a measurement.** The {word}",
+        f"packing-limited rows above -- {named} -- land inside a band",
+        f"{spread:.5f} wide, and their mean is the `ratio` this section's numbers all",
+        f"come from: `{ratio:.5f}`. That the {word} numbers are exact rationals decided",
+        "by an exact verifier does not make their mean a rate. No rung in this register",
         "has ever been claimed from a fitted curve, and this one is not the exception:",
         "it is offered here as a place to look, not as a result.",
         "",
         "The ratio is also not purely about how good a covering value the method can",
         "reach -- it is an observation about where searches were stopped as much as",
-        "about where they could go. The three runs behind it stopped for three",
-        "different reasons, and only one of them is a statement about the method.",
-        "n = 11 ran its covering search to a converged optimum. n = 19 was halted at",
-        "round 9 on projected cost, four rounds short of where it would have stopped",
-        "on its own. n = 17 has no stop reason recorded for its own build at all --",
-        "the stop narrated in its `next_rung` belongs to an adjacent probe at",
-        "n = 18, not to the certificate this row measures. A ratio built from three",
-        "runs, one of which is known to have gone as far as it could, is not a rate",
-        "to spend a rung's confidence on (`D-443`).",
+        f"about where they could go. The {word} runs behind it did not stop for the",
+        "same reason, and not every reason is a statement about the method.",
+        *_wrap_sentences(stops),
+        f"A ratio built from {word} runs, at least one of which is not known to have",
+        "gone as far as it could, is not a rate to spend a rung's confidence on",
+        "(`D-443`).",
         "",
         "`predicted` below is `min(ratio * best_packing, limit)` and `predicted",
         "gain` is `predicted - lower`, clamped at zero. Read them as where to look",

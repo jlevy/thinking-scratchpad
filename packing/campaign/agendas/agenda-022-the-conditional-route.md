@@ -9,7 +9,7 @@ agenda:
   id: agenda-022
   title: "The Conditional Route — Boxed Certificates, the n = 13 Calibration, and the Class Theorems"
   updated: '2026-09-05'
-  status: paused
+  status: active
   objective: >-
     Block two, and every cell in it is contingent. Agenda-021 measures four numbers and
     its closeout, BC-203, carries three doubling-down rules written before that block
@@ -46,6 +46,90 @@ agenda:
     exactly as strict as it is now, and a conditional certificate is a different object
     that the gate must decide as one.
   items:
+  - id: BC-213
+    purpose: research
+    owner_focus: correctness
+    instances: [20, 21]
+    state: complete
+    priority: 0
+    question: >-
+      Does the remaining rung of the m = 5 bisection, 973/200 = 4.865, certify or wall --
+      and so bring the covering-wall bracket inside the 0.02 H-062 registered?
+    hypotheses: [H-062]
+    budget: >-
+      60 elapsed minutes, Opus at maximum thinking, research-loop. Added by agenda-021's
+      closeout as its selected next entry, and the only cell here that no doubling-down
+      rule gates.
+      The side is the schedule's own: the midpoint of the bracket agenda-021 left,
+      [97/20, 39/8], rounded to the nearest 1/200 with ties away from 24/5, which is
+      973/200. Either outcome settles H-062. A certificate leaves [973/200, 39/8], width
+      0.010; a wall on both constructions leaves [97/20, 973/200], width 0.015; both sit
+      inside the registered 0.02.
+      Two constructions as H-062 requires, in the order BC-197 measured: the uniform
+      grids at BC-191's density rule first, and -- since at 97/20 the grid walled at the
+      very side the seeded set certified -- the grids unioned with the 97/20
+      certificate's own 1680 atoms scaled by 973/970, which is now the nearer seed. The
+      cost is measured rather than modelled: a converged rung at 193/40 took 54 LP rounds
+      and 1008.6 s of wall, and the seeded convergence at 97/20 took 1616.5 s, so a rung
+      here is half an hour of run inside a one-hour cell.
+      Refutation is early and confirmation is convergence, exactly as BC-197 ran it: an
+      optimum crossing twenty with placements still violated refutes the rung on that
+      construction, and a converged optimum below twenty is frozen, rationalised at the
+      default scale and handed to the gate. The soundness alarm does not apply below
+      4.885618. Kill: a round costing more than 25 minutes.
+    entry: >-
+      Agenda-021's BC-197 is terminal with the bracket [97/20, 39/8] and both its
+      certificates retained; the drivers, the density rule and the default scale are on
+      main behind this block's own branch.
+    exit: >-
+      The rung decided on both constructions, the bracket it leaves, and H-062 resolved
+      or the reason it still is not; a frozen and gated candidate if it certifies.
+    bead: think-wufn
+    workflows: [research-loop]
+    depends_on: []
+    artifacts:
+    - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-213-m5-midpoint-register.txt
+    parallel_group: agenda022-lane-a
+    program: grid-frontier-exact-values
+
+    outcomes:
+    - scope: >-
+        The remaining pre-registered rung of H-062's m = 5 bisection, at 973/200 = 4.865,
+        decided on both declared constructions.
+      classification: achieved
+      result: >-
+        Both constructions wall. The uniform grids at BC-191's density rule -- counts
+        (34, 46, 56), 806 orbits, 6216 sites -- crossed twenty at LP round 16 with
+        20.001502 and 543 placements still violated, least covered mass 0.890041. Those
+        grids unioned with T-021's 1680 atoms scaled by 973/970 crossed at LP round 34
+        with 20.000223 and 213 violated. Each fell to the pre-registered
+        early-refutation clause; neither converged, so nothing was frozen and
+        cases/n20_fractional_certificate/ is untouched.
+        The bracket left is [97/20, 973/200], width 0.015 against the 0.02 H-062
+        registered, its lower end T-021's retained certificate and its upper end this
+        wall, 0.1235 below the ceiling 9977/2000. H-062 is accepted on its own
+        threshold -- the first covering wall this project has pinned to the width its
+        hypothesis asked for, and a direct statement that at m = 5 the covering value
+        binds and the ceiling never does.
+        Two things the record carries rather than smooths over. The seeded crossing
+        cleared twenty by 2.23 parts in a hundred thousand, eighteen times tighter than
+        the grid's crossing at the rung below, on a loop whose violated count was
+        collapsing into it; the rule does not read margins and was applied as written,
+        but that rung is where a denser site set would be worth spending. And the
+        acceptance clause asks for a converged optimum at or above twenty, which neither
+        run produced: the clause is met because rows only raise a restricted optimum, so
+        each site set's converged optimum is bounded below by the crossing, and the
+        criterion asks for the bound and not the value.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/experiments/exp-062-h-062-m5-midpoint-rung.md
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-213-m5-midpoint-register.txt
+      disposition: retire-success
+      follow_up: null
+    next_evidence: >-
+      Whether the first covering wall this project has bracketed can be pinned to the
+      width its hypothesis asked for, which is what tells the reach table's ranking how
+      much of a case's runway the covering value actually leaves.
   - id: BC-204
     purpose: tool_validation
     owner_focus: correctness
@@ -104,6 +188,11 @@ agenda:
     bead: think-gku0
     workflows: [pipeline-improvement, factual-review]
     depends_on: [BC-203]
+    blocked_on: >-
+      BC-203's first doubling-down rule, which did not fire: the m = 5 wall is bracketed
+      to [97/20, 39/8], far from the 0.02 of five the rule asks for, so the ladder still
+      has room at m = 5 and the endgame did not take two of block two's leads. The
+      domain generalisation opens when a rule or the operator gives it a lane.
     parallel_group: agenda022-lane-a
     program: grid-frontier-exact-values
     next_evidence: >-
@@ -156,6 +245,8 @@ agenda:
     bead: think-9kuy
     workflows: [research-loop]
     depends_on: [BC-203]
+    blocked_on: >-
+      BC-204 or BC-212, whichever opens first; neither has, for the reasons each records.
     parallel_group: agenda022-lane-a
     program: grid-frontier-exact-values
     next_evidence: >-
@@ -213,6 +304,11 @@ agenda:
     bead: think-e65r
     workflows: [pipeline-improvement, factual-review]
     depends_on: [BC-203]
+    blocked_on: >-
+      BC-203's fourth doubling-down rule, which did not fire: BC-211 never converged at
+      399/100, so the n = 13 covering value is unmeasured and the B = 1 route stays shut
+      until a converged optimum below thirteen says the m = 4 endgame is one certificate
+      away. BC-213's rung does not bear on it either way.
     parallel_group: agenda022-lane-a
     program: grid-frontier-exact-values
     next_evidence: >-
@@ -222,7 +318,7 @@ agenda:
     purpose: research
     owner_focus: correctness
     instances: [12, 21]
-    state: blocked
+    state: complete
     priority: 1
     question: >-
       How far above 99/25 does the n = 12 ladder climb before its restricted optimum
@@ -263,6 +359,66 @@ agenda:
     depends_on: [BC-203]
     parallel_group: agenda022-lane-c
     program: grid-frontier-exact-values
+    artifacts:
+    - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+    outcomes:
+    - scope: >-
+        The four pre-registered sides of the n = 12 ladder above 99/25, on two
+        constructions each, and how far the ladder reaches below 4B.
+      classification: achieved
+      result: >-
+        The ladder does not climb. All eight pre-registered runs refute and nothing was
+        frozen as a candidate: at 397/100 the grid converged at round 26 to 12.364038 and
+        the seeded set crossed twelve at round 8; at 398/100, 3985/1000 and 399/100 the
+        grid locked at exactly 16.000000 from rounds 5, 6 and 7 while the seeded sets
+        crossed at rounds 5, 3 and 3. Each refutes a site set rather than a side.
+        The cell's own warning about margin non-monotonicity did not materialise -- the
+        crossings arrive strictly earlier as the side rises, 8, 5, 3, 3 -- so whatever
+        reopens the margin below 99/25 does not operate above it.
+        The 16.000000 is BC-197's 25.000000 one order down and has the same mechanism:
+        with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB]
+        admits sixteen dual-feasible unit weights whatever the covering value is, and the
+        auto grid places 43 to 44 sites per axis where those windows need 191, 369, 687
+        and 4988. The register now carries that artefact signature at two orders, which
+        makes it a property of the construction rather than a coincidence at one size.
+        Five unregistered follow-up runs at 397/100 answer the question the cell was for.
+        A widened column step converged the column loop at 12.314708 over 830 orbits,
+        reproduced from a different start to eleven figures; run_fractional_cutting
+        converged its row LP at 12.248227 and returned an exact floor of 10.845594. So
+        10.845594 <= nu*(3.97) <= 12.248227, and against the retained 11.998960 at 3.96
+        the upper end gives a slope of at least 24.9 per unit side. The retained rung's
+        0.001040 of margin is spent within 0.000042 of side: the ladder ends at about
+        3.96004, and the 0.0308 of runway T-017 recorded under 4B = 3.9908 is not runway.
+        The covering value binds and the ceiling never gets the chance, which is the same
+        shape BC-197 found at m = 5 and the second time this project has measured that
+        difference. Two cases is not a rate and is not offered as one; it is enough to say
+        a runway figure computed from the ceiling is an upper bound on an upper bound.
+        Twelve lies inside the bracket at 3.97, so that side is undecided rather than
+        barred, and every refutation here is of a site set.
+        Rationalisation never fired the kill: three freezes lost 0.000091, 0.000088 and
+        0.000083 at scale 4,000,000, about 0.58 of the atoms-over-scale bound each. At
+        2097 atoms that scale bounds the loss at 0.000524 against 0.001040 of margin,
+        where the old 200,000 bounded it at 0.010485 -- ten times the margin, and it would
+        have fired on every rung.
+        Three instrument findings are in the register. `kill` on a uv wrapper does not
+        reach its python child, which let a converged run write a freeze into the case
+        package before it was moved out; the ceiling instrument is split so that
+        run_fractional_colgen calls check_ceiling without taking --support-cap while
+        colgen_checkpoint takes --support-cap and never calls check_ceiling, which is why
+        one run reported a floor of 8.50 under an LP holding 12.31 with nothing saying the
+        dual had been truncated; and the column loop's stopping rule halted at 12.314708
+        where the cutting loop with more sites reached a converged 12.248227 below it.
+        No round is registered for this cell and that is a defect in the cell rather than
+        in the work: it declares purpose research with no hypotheses, and the experiment
+        contract requires at least one, so it could not produce a registrable round. The
+        measurements are retained as nine covering-value register rows and the run
+        register instead, which is what they are -- data, not a test of a claim made in
+        advance. Recorded as D-460.
+      evidence:
+      - packing/campaign/series/series-000-smoke-and-calibration/results/bc-206-n12-ladder-register.txt
+      - packing/frontier/covering-values.yaml
+      disposition: retire-success
+      follow_up: null
     next_evidence: >-
       How close to the ceiling the ladder actually reaches at m = 4, which is the only
       direct measurement anywhere of the gap between the covering value and the ceiling.
@@ -317,6 +473,10 @@ agenda:
     bead: think-0mro
     workflows: [research-loop]
     depends_on: [BC-203, BC-208]
+    blocked_on: >-
+      BC-208's class cuts, and a wall at n = 11 for the cover to sit at. BC-200 found no
+      wall: the cutting-plane loop stalled below eleven at both 3.82 and 3.85, so the
+      side this cell would work at is still unmeasured.
     parallel_group: agenda022-lane-b
     program: n11-closure
     next_evidence: >-
@@ -372,6 +532,10 @@ agenda:
     bead: think-7nxe
     workflows: [research-loop]
     depends_on: [BC-203]
+    blocked_on: >-
+      Agenda-021's BC-198, which never opened: the class-certificate program and its two
+      controls are what this cell's twelve LPs run on, and the rate limit that ended
+      that block reached BC-198 before any command did.
     parallel_group: agenda022-lane-b
     program: n11-closure
     next_evidence: >-
@@ -420,6 +584,10 @@ agenda:
     bead: think-4in0
     workflows: [research-loop]
     depends_on: [BC-203, BC-206]
+    blocked_on: >-
+      BC-206, and a priced target. BC-202's run at 138/25 reached 26.464317 on its site
+      set without converging its column loop, so the reach table's next size is not yet
+      costed from a converged point.
     parallel_group: agenda022-lane-c
     program: reach-table-ladder
     next_evidence: >-

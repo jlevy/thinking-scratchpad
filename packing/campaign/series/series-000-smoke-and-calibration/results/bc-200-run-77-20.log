@@ -1,0 +1,6 @@
+iteration 0: sites=16285 orbits=2127 rows=11456 support=50 rows_objective=11.429225 converged=False objective=11.429225 raw_total=11.429225 max_depth=6720335749/4000000000=1.680084 scaled_total=6.802771 vertices=819724 decided=490 violating=139888 seconds rows=207.4 lp=36.2 sep=3.8
+  added 400 orbits, deepest 1.680084 at (0.997802, 0.997802)
+iteration 1: sites=19445 orbits=2527 rows=12931 support=91 rows_objective=11.254796 converged=False objective=11.254796 raw_total=11.254796 max_depth=4974572153/4000000000=1.243643 scaled_total=9.049861 vertices=2419348 decided=421 violating=277844 seconds rows=559.2 lp=99.1 sep=15.7
+  added 400 orbits, deepest 1.243643 at (0.996885, 1.848066)
+iteration 2: sites=22625 orbits=2927 rows=14215 support=91 rows_objective=11.227631 converged=False objective=11.227631 raw_total=11.227631 max_depth=1546229889/1000000000=1.546230 scaled_total=7.261295 vertices=2614648 decided=413 violating=257164 seconds rows=957.6 lp=198.5 sep=17.5
+  added 400 orbits, deepest 1.546230 at (0.997745, 0.997745)

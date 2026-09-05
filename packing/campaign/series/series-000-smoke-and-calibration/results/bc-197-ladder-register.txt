@@ -1,0 +1,114 @@
+- run: r0-leg1
+  n: 21
+  side: 997/200
+  objective: 25.000000
+  site_set: grids (35, 47, 58)
+  sites: 6785
+  rows: 8692
+  rounds: 24
+  converged: False
+  stop_reason: stopped by the lane inside the row loop (checkpoint at the last chunk)
+  least_covered_mass: 0.841490
+  total_mass: None
+  frozen: None
+  seconds: 456.256000
+- run: r0-leg3
+  n: 21
+  side: 997/200
+  objective: 24.315238
+  site_set: grids (35, 47, 58) + 2260 atoms of certificate.json (scale)
+  sites: 9045
+  rows: 10106
+  rounds: 35
+  converged: False
+  stop_reason: deadline reached after 35 rounds
+  least_covered_mass: 0.932327
+  total_mass: None
+  frozen: None
+  seconds: 612.655166
+- run: r0-leg2
+  n: None
+  side: None
+  objective: 21.679155
+  site_set: None
+  sites: None
+  rows: 2177
+  rounds: 5
+  converged: False
+  stop_reason: stopped by the lane on crossing (row log only)
+  least_covered_mass: None
+  total_mass: None
+  frozen: None
+  seconds: None
+  violated: 543
+- run: r1
+  n: 20
+  side: 979/200
+  objective: 20.111615
+  site_set: grids (34, 46, 57)
+  sites: 6501
+  rows: 3270
+  rounds: 8
+  converged: False
+  stop_reason: stopped by the lane inside the row loop (checkpoint at the last chunk)
+  least_covered_mass: 0.729083
+  total_mass: None
+  frozen: None
+  seconds: 29.603000
+- run: r1s
+  n: None
+  side: None
+  objective: 20.070683
+  site_set: None
+  sites: None
+  rows: 4256
+  rounds: 10
+  converged: False
+  stop_reason: stopped by the lane on crossing (row log only)
+  least_covered_mass: None
+  total_mass: None
+  frozen: None
+  seconds: None
+  violated: 543
+- run: r2
+  n: 20
+  side: 97/20
+  objective: 20.000439
+  site_set: grids (34, 45, 56)
+  sites: 6029
+  rows: 9803
+  rounds: 32
+  converged: False
+  stop_reason: stopped by the lane inside the row loop (checkpoint at the last chunk)
+  least_covered_mass: 0.984497
+  total_mass: None
+  frozen: None
+  seconds: 409.760000
+- run: r2s
+  n: 20
+  side: 97/20
+  objective: 19.844457
+  site_set: grids (34, 45, 56) + 2260 atoms of certificate.json (scale)
+  sites: 8289
+  rows: 9743
+  rounds: 28
+  converged: False
+  stop_reason: deadline reached after 28 rounds
+  least_covered_mass: 0.942289
+  total_mass: None
+  frozen: None
+  seconds: 637.496800
+- run: r3
+  n: 20
+  side: 193/40
+  objective: 19.862092
+  site_set: grids (34, 45, 56)
+  sites: 6029
+  rows: 11083
+  rounds: 54
+  converged: True
+  stop_reason: converged: every placement covers mass 1
+  least_covered_mass: 1.000000
+  total_mass: 9931121/500000
+  frozen: /tmp/claude-0/-home-user-squares/f37f604c-3212-50e9-b7f7-4b00b94bfcc0/scratchpad/lanes/laneA/bc197/r3-candidate.json
+  seconds: 1008.635294

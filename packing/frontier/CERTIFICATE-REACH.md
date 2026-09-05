@@ -24,8 +24,8 @@ known packing, otherwise whichever of the two the limit is.
 **`prize` is what the limit allows, not what a search will reach.** The real
 limit is the covering value: a certificate exists at side `L` only where the
 least total mass that covers every admissible `B`-square falls below `n`, and
-that value can bind well below either cap. 10 restricted optima
-have been reported at 7 sides, one per site set, and
+that value can bind well below either cap. 29 restricted optima
+have been reported at 18 sides, one per site set, and
 `frontier/covering-values.yaml` registers each with whether its row loop
 converged; every one is at best an upper bound on the unrestricted covering
 value there. What survives here beside each is a frozen certificate or nothing
@@ -35,6 +35,8 @@ at all:
 | ---: | ---: | --- | ---: | --- | --- | --- |
 | 11 | 3.82 | grid | 11.000000 | yes | The row loop ran to convergence: the objective descended to exactly 11.000000 from 11.6 over twelve rounds and never crossed below it. | nothing frozen here. Result narrative only: no run log or checkpoint was retained, and nothing was frozen at this side, since an objective of exactly eleven admits no certificate. The least covered mass at the stop is not recorded for this set. |
 | 11 | 3.82 | certificate-seeded | 11.000000 | no | Stopped with violated placements remaining: the objective had stood at 11.000000 through twenty-four row rounds while the least covered mass climbed from 0.8490 to 0.9997, and the loop had not exhausted. It did not need to, since adding rows can only raise a restricted optimum already at eleven. | nothing frozen here. Seeded from the retained 381/100 certificate's own 1121 atoms. Result narrative only: no run log or checkpoint was retained and nothing was frozen at this side. |
+| 11 | 3.82 | vertex-seeded | 11.055617 | yes | The row loop converged at cutting-plane iteration 5 (11.055617 on 12,761 sites after the arrangement vertices of the dual family were added as site orbits) and held that value through iteration 8; the cutting-plane loop itself stopped on its 36-minute wall with the exact depth-scaled total at 9.907906. | nothing frozen here. BC-200 of agenda 021 (exp-060). Sites are the grid at BC-191's density plus the violating arrangement vertices the cutting-plane loop added, which is why this site set's optimum sits above the two earlier site sets' exactly eleven: the quantity is a restricted optimum on that set, an upper bound on the covering value. The run log and the resumable state are retained beside the summary. |
+| 11 | 3.85 | vertex-seeded | 11.227631 | no | The row loop had not converged at any of the three cutting-plane iterations (the objective descended 11.429225, 11.254796, 11.227631 with placements still violated) when the 30-minute wall stopped the loop; the exact depth-scaled total stood at 9.049861. | nothing frozen here. BC-200 of agenda 021 (exp-060), warm-started from the 191/50 state. An unconverged row loop's value is an upper bound on nothing in particular: rows only raise it. Retained as a measurement of where the loop stood. |
 | 12 | 3.95 | unrecorded | 11.9706 | yes | Counted by X-013 among the converged points; T-017's own record narrates the ladder and gives no stop reason for this rung. | frozen 969-atom certificate, feasible mass 11.970590. The reported value is the frozen certificate's own mass, 1197059/100000, to four places, not a separately measured optimum. The record names no site set and retains no site, row or round count for the run. |
 | 12 | 3.96 | unrecorded | 11.9936 | yes | Converged toward 11.9936 before rationalisation lifted the mass to the frozen certificate's 149987/12500 = 11.998960, per X-013; T-017's own record gives no stop reason for this rung. | frozen 2,097-atom certificate, feasible mass 11.998960. The reported objective has no raw run, and it is not the artifact's mass: the difference is consistent with the documented rounding-up rule. The record names no site set and retains no site, row or round count. |
 | 17 | 4.58 | unrecorded | 16.9628 | yes | Reported converged by X-013. T-019's own record gives no stop reason for any of its n = 17 builds; the stop its next_rung narrates belongs to the n = 18 probe at 117/25 (D-443). | frozen 1,173-atom certificate, feasible mass 16.965735. The reported objective has no raw run, and it is not the artifact's mass. The record names no site set and retains no site, row or round count. |
@@ -42,22 +44,39 @@ at all:
 | 18 | 4.68 | 538-orbits | 18.000000 | no | Followed by a larger site set at the same side after returning exactly 18.000000; whether its own row loop exhausted is not recorded. | nothing frozen here. 538 orbits under D4; the site count is not recorded, nor rows or rounds. No raw run was retained and nothing was frozen: an objective of exactly eighteen admits no certificate. Across the three site sets the optimum did not move at all. |
 | 18 | 4.68 | 578-orbits | 18.000000 | no | Followed by a larger site set at the same side after returning exactly 18.000000; whether its own row loop exhausted is not recorded. | nothing frozen here. 578 orbits under D4; the site count is not recorded, nor rows or rounds. No raw run was retained and nothing was frozen: an objective of exactly eighteen admits no certificate. |
 | 18 | 4.68 | 618-orbits | 18.000000 | no | Stopped on cost after 157 row-generation rounds and 7056 s, the last round two hours, before the run could separate a covering value at or above eighteen from a site set still short of one. | nothing frozen here. 618 orbits under D4; the site count is not recorded. The row set grew from 15888 to 27516 over the run. Both readings stay open, a covering value at or above eighteen or an optimum on a degenerate vertex, which the collapse of pricing from 90 s to 1--3 s suggests. No raw run was retained and nothing was frozen. |
-| 20 | 4.80 | unrecorded | 18.916941 | no | Halted at round 9 on projected cost: four more rounds would have cost about 3.75 h to buy margin nothing needed. The side above it was never attempted. | frozen 2,260-atom certificate, feasible mass 18.922620. A single resumed column-generation run; the record names no site set and retains no site or row count. The reported objective has no raw run, and it is not the artifact's mass, 946131/50000 = 18.922620, which certifies n = 19 upward and is why the reach table keys this package to n = 19. |
+| 21 | 4.985 | grid | 25.000000 | no | Stopped by the ladder inside the row loop at its refutation budget, unconverged; the objective had crossed twenty-one at round 4 (21.179460) and then stood at exactly 25.000000 from round 12 through round 24 with least covered mass 0.841490. | nothing frozen here. BC-197 of agenda 021 (exp-061). The exactly round value is an artefact with a mechanism at this side: with 5B - L = 0.0035 the twenty-five axis-parallel B-squares overlap only in strips of that width, the restricted dual is checked at sites only, and no uniform inset-1/2 grid the lane could afford puts a site in every strip, so twenty-five unit weights are dual-feasible whatever the covering value is. A second construction, the 24/5 atoms scaled, reached 24.315238 unconverged. |
+| 20 | 4.895 | grid | 20.111615 | no | Stopped by the ladder on the crossing: the objective crossed twenty at LP round 8 with least covered mass 0.729083 and placements still violated, and rows only raise a restricted optimum, so the rung walls without convergence. | nothing frozen here. BC-197 of agenda 021 (exp-061). The seeded construction crossed at round 7 (20.006183) and reached 20.070683 at round 9, so both of H-062's constructions wall here. |
+| 20 | 4.85 | grid | 20.000439 | no | Stopped by the ladder on the crossing: 19.999366 at round 30, 20.000166 at 31 and 20.000439 at 32, least covered mass 0.984497 with 192 placements still violated. | nothing frozen here. BC-197 of agenda 021 (exp-061). The grid construction crosses twenty by four parts in ten thousand here; the seeded construction at the same side converged below twenty and its certificate is retained as T-021, which is why the cell's own rule asks for two constructions before a crossing is read as a wall. |
+| 20 | 4.85 | certificate-seeded | 19.848723 | yes | The row loop converged -- every placement covers mass one -- on the grids unioned with the 24/5 certificate's 2260 atoms scaled by 97/96, after the 600-second run at the same site set had been time-limited at 19.844457 and a 2400-second rerun carried it to convergence in 1616.5 s. | frozen 1,680-atom certificate, feasible mass 19.848723. BC-197 of agenda 021 (exp-061). Rationalised at scale 4,000,000 to 19848723/1000000 over 1680 atoms and retained as T-021's certificate, which the gate accepted on both routes at 200001/200000. |
+| 20 | 4.825 | grid | 19.862092 | yes | The row loop converged at LP round 54 -- every placement covers mass one, least covered mass 1.000000 -- with the optimum reached at round 41 and rounds 41 to 54 clearing the last violations; 949.4 s of round time, 1008.6 s wall. | frozen 1,076-atom certificate, feasible mass 19.862242. BC-197 of agenda 021 (exp-061). Rationalised to 9931121/500000 over 1076 atoms (rounding loss 1.5e-4) and retained as the lower rung beside T-021's; the gate accepted it on both routes at 1000003/1000000. |
+| 20 | 4.875 | grid | 20.016349 | no | Stopped by the ladder on the crossing at LP round 12, least covered mass 0.863635 with placements still violated. | nothing frozen here. BC-197 of agenda 021 (exp-061). The seeded construction walled here too, so this is the bracket's upper end: the m = 5 covering wall lies in [97/20, 39/8]. |
+| 20 | 4.865 | grid | 20.001502 | no | Stopped by the cell on the crossing at LP round 16, least covered mass 0.890041 with 543 placements still violated, after 74.0 s of round time. | nothing frozen here. BC-213 of agenda 022 (exp-062). Grid counts (34, 46, 56), 806 orbits. Rows only raise a restricted optimum, so this site set's converged optimum is at least 20.001502; the value was not computed and the criterion does not ask for it. The run continued to round 24 at 20.095294 because a kill on the uv wrapper did not reach its python child, and those rounds are kept rather than trimmed. |
+| 20 | 4.865 | certificate-seeded | 20.000223 | no | Stopped by the cell on the crossing at LP round 34 with 213 placements still violated, after 1072.6 s of round time. | nothing frozen here. BC-213 of agenda 022 (exp-062). The grids above unioned with T-021's 1680 atoms scaled by 973/970. Both constructions walling here closes H-062's bracket to [97/20, 973/200], width 0.015 against the registered 0.02, and 0.1235 below the ceiling 9977/2000 -- so at m = 5 the covering value binds and the ceiling never does. This is the closest crossing in the register: it cleared twenty by 2.23 parts in a hundred thousand, against four parts in ten thousand for the grid at 97/20, on a walk of 19.996458, 19.997545, 19.998396, 19.999167, 19.999837, 20.000223 with the violated count collapsing at 480, 363, 381, 279, 213. The pre-registered rule does not read margins and was applied as written; a denser site set is where any doubt about this rung would go, since adding sites lowers a restricted optimum. |
+| 20 | 4.80 | unrecorded | 18.916941 | no | Halted at round 9 on projected cost: four more rounds would have cost about 3.75 h to buy margin nothing needed. The side above it was never attempted. | frozen 2,260-atom certificate, feasible mass 18.922620. A single resumed column-generation run; the record names no site set and retains no site or row count. The reported objective has no raw run, and it is not the artifact's mass, 946131/50000 = 18.922620, which certifies n = 19 upward and is what keeps n = 19 standing at 24/5 after T-021 raised n = 20 and n = 21 to 97/20. The artifact named here is the immutable 24/5 rung, not the package's moving certificate.json pointer, which now holds the heavier 97/20 rung. |
+| 12 | 3.97 | grid | 12.364038 | yes | Converged at LP round 26 -- the row loop stopped for want of a violated placement -- at 12.364038 over 625 atoms, 117.4 s. | nothing frozen here. BC-206 of agenda 022. Above twelve on a converged loop, so this site set carries no certificate at 3.97; adding sites can only lower it, so the side is not barred. Rationalised at scale 4,000,000 to 12364129/1000000, loss 0.000091. Frozen as a refuted set and kept outside the case package. |
+| 12 | 3.97 | certificate-seeded | 12.016263 | no | Crossed twelve at LP round 8 with placements still violated; the loop reached 12.095824 by round 14 before the cell stopped it. 213 s. | nothing frozen here. BC-206 of agenda 022. The grids unioned with T-017's 2097 atoms scaled to the side. Rows only raise a restricted optimum, so this site set's converged optimum is at least 12.016263. |
+| 12 | 3.98 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 5 and held it to round 16; 128 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
+| 12 | 3.985 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 6 and held it to round 12; 55 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
+| 12 | 3.99 | grid | 16.000000 | no | Locked at exactly 16.000000 from LP round 7 and held it to round 12; 60 s. | nothing frozen here. BC-206 of agenda 022. The round value is the site set's artefact and not the covering value, one order below BC-197's 25.000000 at m = 5: with delta = 4B - L, a support missing all three windows [L - (4 - k)B, kB] admits sixteen dual-feasible unit weights whatever the covering value is. The auto grid places 43 to 44 sites per axis where those windows need hundreds to thousands. |
+| 12 | 3.98 | certificate-seeded | 12.130682 | no | Crossed twelve at LP round 5 with placements still violated; the loop reached 12.376525 by round 13 before the cell stopped it. 165 s. | nothing frozen here. BC-206 of agenda 022. Crossings arrive strictly earlier as the side rises -- rounds 8, 5, 3, 3 across the four sides -- so the margin non-monotonicity this ladder shows below 99/25 does not reappear above it. |
+| 12 | 3.985 | certificate-seeded | 12.104043 | no | Crossed twelve at LP round 3 with placements still violated; the loop reached 12.414845 by round 13 before the cell stopped it. 115 s. | nothing frozen here. BC-206 of agenda 022. Crossings arrive strictly earlier as the side rises -- rounds 8, 5, 3, 3 across the four sides -- so the margin non-monotonicity this ladder shows below 99/25 does not reappear above it. |
+| 12 | 3.99 | certificate-seeded | 12.056180 | no | Crossed twelve at LP round 3 with placements still violated; the loop reached 12.398218 by round 8 before the cell stopped it. 150 s. | nothing frozen here. BC-206 of agenda 022. Crossings arrive strictly earlier as the side rises -- rounds 8, 5, 3, 3 across the four sides -- so the margin non-monotonicity this ladder shows below 99/25 does not reappear above it. |
+| 12 | 3.97 | cutting-plane | 12.248227 | yes | The row LP converged at 12.248227 under devtools.run_fractional_cutting, the instrument BC-200 used, with an exact depth-scaled floor beneath it. | nothing frozen here. BC-206 of agenda 022, unregistered follow-up at a pre-registered side. This row is the one that says where the ladder ends: with an exact floor of 10.845594 under a converged 12.248227, the covering value at 3.97 is bracketed rather than guessed, and against the retained 11.998960 at 3.96 the upper end gives a slope of at least 24.9 per unit side. The retained rung's 0.001040 of margin is spent within 0.000042 of side, so the ladder ends at about 3.96004 and the 0.0308 of runway T-017 recorded under the ceiling 4B = 3.9908 is not runway. Twelve lies inside the bracket, so 3.97 is undecided rather than barred. |
 
 No covering-search run log or solver checkpoint was retained for any of them, so
 not one of the reported values can be recomputed here. What a frozen certificate
 recomputes is its own feasible mass — a total that covers every admissible
 `B`-square at that side, and so an upper bound on the covering value there,
-rather than the objective a search reported. Only at `3.95` is
-the reported value the artifact's own mass; at `3.96`, `4.58`, `4.59` and `4.80` the
+rather than the objective a search reported. Only at `3.95` and `4.85` is
+the reported value the artifact's own mass; at `3.96`, `4.58`, `4.59`, `4.80` and `4.825` the
 artifact's mass and the reported objective are different numbers.
 
 They are also reports of different kinds rather than one series measured the same
-way, and the `converged` column is where the difference lives: 4 of
-the 10 ran their row loop to convergence, and the rest stopped for the
+way, and the `converged` column is where the difference lives: 9 of
+the 29 ran their row loop to convergence, and the rest stopped for the
 reason beside each — or for none the record kept — and stand as upper bounds on
-their own site sets only. 10 heterogeneous reports across a side band
-0.98 wide do not support a growth trend or a fitted curve, and no rung in
+their own site sets only. 29 heterogeneous reports across a side band
+1.17 wide do not support a growth trend or a fitted curve, and no rung in
 this register has ever been claimed from one. Rank on `prize` to choose where to
 look; measure and retain the run before believing any extrapolation.
 
@@ -123,11 +142,11 @@ lower bound, so nothing was on offer.
 | 94 | 10 | 9.7750 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.2021 |
 | 59 | 8 | 7.7823 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.1993 |
 | 32 | 6 | 5.7958 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.1904 |
-| 20 | 5 | 4.8000 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1885 |
-| 21 | 5 | 4.8000 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1885 |
 | 76 | 9 | 8.8102 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.1691 |
 | 45 | 7 | 6.8310 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.1530 |
 | 95 | 10 | 9.8318 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.1453 |
+| 20 | 5 | 4.8500 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1385 |
+| 21 | 5 | 4.8500 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1385 |
 | 60 | 8 | 7.8557 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.1260 |
 | 77 | 9 | 8.8740 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.1053 |
 | 96 | 10 | 9.8882 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.0888 |
@@ -151,29 +170,29 @@ the other one was never in reach.
 | 11 | n11_fractional_certificate | 3.8100 | 3.8771 | 3.9908 | packing | 0.98270 |
 | 12 | n12_fractional_certificate | 3.9600 | 4.0000 | 3.9908 | ceiling | 0.99228 |
 | 17 | n17_fractional_certificate | 4.5900 | 4.6755 | 4.9885 | packing | 0.98171 |
-| 19 | n20_fractional_certificate | 4.8000 | 4.8856 | 4.9885 | packing | 0.98248 |
+| 20 | n20_fractional_certificate | 4.8500 | 5.0000 | 4.9885 | ceiling | 0.97223 |
 
-## What three points would predict, if the ratio held
+## What two points would predict, if the ratio held
 
-**This is an extrapolation from three points, not a measurement.** The three
-packing-limited rows above -- n = 11, n = 17, n = 19 -- land inside a band
-0.001 wide, and their mean is the `ratio` this section's numbers all come
-from: `0.98229`. That the three numbers are exact rationals decided by
-an exact verifier does not make their mean a rate. No rung in this register
+**This is an extrapolation from two points, not a measurement.** The two
+packing-limited rows above -- n = 11, n = 17 -- land inside a band
+0.00099 wide, and their mean is the `ratio` this section's numbers all
+come from: `0.98220`. That the two numbers are exact rationals decided
+by an exact verifier does not make their mean a rate. No rung in this register
 has ever been claimed from a fitted curve, and this one is not the exception:
 it is offered here as a place to look, not as a result.
 
 The ratio is also not purely about how good a covering value the method can
 reach -- it is an observation about where searches were stopped as much as
-about where they could go. The three runs behind it stopped for three
-different reasons, and only one of them is a statement about the method.
-n = 11 ran its covering search to a converged optimum. n = 19 was halted at
-round 9 on projected cost, four rounds short of where it would have stopped
-on its own. n = 17 has no stop reason recorded for its own build at all --
-the stop narrated in its `next_rung` belongs to an adjacent probe at
-n = 18, not to the certificate this row measures. A ratio built from three
-runs, one of which is known to have gone as far as it could, is not a rate
-to spend a rung's confidence on (`D-443`).
+about where they could go. The two runs behind it did not stop for the
+same reason, and not every reason is a statement about the method.
+n = 11 ran its covering search to a converged optimum. n = 17 has no
+stop reason recorded for its own build at all -- the stop narrated in
+its `next_rung` belongs to an adjacent probe at n = 18, not to the
+certificate this row measures.
+A ratio built from two runs, at least one of which is not known to have
+gone as far as it could, is not a rate to spend a rung's confidence on
+(`D-443`).
 
 `predicted` below is `min(ratio * best_packing, limit)` and `predicted
 gain` is `predicted - lower`, clamped at zero. Read them as where to look
@@ -185,71 +204,71 @@ reaches, not this extrapolation.
 
 | n | m | lower | best packing | ceiling | cap | limit | limited by | prize | predicted | predicted gain |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: |
-| 51 | 8 | 7.1644 | 7.7008 | 7.9816 | — | 7.9816 | packing | +0.5364 | 7.5644 | +0.4000 |
-| 26 | 6 | 5.1231 | 5.6213 | 5.9862 | — | 5.9862 | packing | +0.4982 | 5.5218 | +0.3987 |
-| 39 | 7 | 6.2915 | 6.8107 | 6.9839 | — | 6.9839 | packing | +0.5192 | 6.6901 | +0.3986 |
-| 38 | 7 | 6.1962 | 6.7071 | 6.9839 | — | 6.9839 | packing | +0.5110 | 6.5883 | +0.3922 |
-| 37 | 7 | 6.0990 | 6.5986 | 6.9839 | — | 6.9839 | packing | +0.4996 | 6.4818 | +0.3828 |
-| 68 | 9 | 8.2801 | 8.8034 | 8.9793 | — | 8.9793 | packing | +0.5233 | 8.6475 | +0.3674 |
-| 27 | 6 | 5.2426 | 5.7071 | 5.9862 | — | 5.9862 | packing | +0.4645 | 5.6061 | +0.3634 |
-| 28 | 6 | 5.3589 | 5.8244 | 5.9862 | — | 5.9862 | packing | +0.4655 | 5.7213 | +0.3624 |
-| 66 | 9 | 8.1414 | 8.6569 | 8.9793 | — | 8.9793 | packing | +0.5154 | 8.5036 | +0.3621 |
-| 53 | 8 | 7.3246 | 7.8229 | 7.9816 | — | 7.9816 | packing | +0.4983 | 7.6844 | +0.3598 |
-| 29 | 6 | 5.4721 | 5.9338 | 5.9862 | 5.9308 | 5.9308 | cap | +0.4587 | 5.8288 | +0.3566 |
-| 50 | 8 | 7.0828 | 7.5714 | 7.9816 | — | 7.9816 | packing | +0.4887 | 7.4374 | +0.3546 |
-| 84 | 10 | 9.1854 | 9.7071 | 9.9770 | — | 9.9770 | packing | +0.5218 | 9.5352 | +0.3499 |
-| 86 | 10 | 9.3066 | 9.8229 | 9.9770 | — | 9.9770 | packing | +0.5163 | 9.6489 | +0.3423 |
-| 67 | 9 | 8.2111 | 8.7071 | 8.9793 | — | 8.9793 | packing | +0.4960 | 8.5529 | +0.3418 |
-| 83 | 10 | 9.1240 | 9.6348 | 9.9770 | — | 9.9770 | packing | +0.5108 | 9.4642 | +0.3402 |
-| 41 | 7 | 6.4772 | 6.9267 | 6.9839 | — | 6.9839 | packing | +0.4495 | 6.8040 | +0.3268 |
-| 52 | 8 | 7.2450 | 7.7071 | 7.9816 | — | 7.9816 | packing | +0.4621 | 7.5706 | +0.3256 |
-| 55 | 8 | 7.4807 | 7.9458 | 7.9816 | — | 7.9816 | packing | +0.4650 | 7.8051 | +0.3243 |
-| 85 | 10 | 9.2462 | 9.7426 | 9.9770 | — | 9.9770 | packing | +0.4964 | 9.5701 | +0.3239 |
-| 69 | 9 | 8.3485 | 8.8272 | 8.9793 | — | 8.9793 | packing | +0.4787 | 8.6709 | +0.3224 |
-| 40 | 7 | 6.3852 | 6.8284 | 6.9839 | — | 6.9839 | packing | +0.4433 | 6.7075 | +0.3224 |
-| 65 | 9 | 8.0711 | 8.5355 | 8.9793 | — | 8.9793 | packing | +0.4645 | 8.3844 | +0.3133 |
-| 30 | 6 | 5.5826 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.4036 | 5.8938 | +0.3112 |
-| 42 | 7 | 6.5678 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.4162 | 6.8761 | +0.3083 |
-| 70 | 9 | 8.4162 | 8.8817 | 8.9793 | — | 8.9793 | packing | +0.4655 | 8.7244 | +0.3082 |
-| 54 | 8 | 7.4031 | 7.8467 | 7.9816 | — | 7.9816 | packing | +0.4435 | 7.7077 | +0.3046 |
-| 82 | 10 | 9.0623 | 9.5355 | 9.9770 | — | 9.9770 | packing | +0.4733 | 9.3667 | +0.3044 |
-| 71 | 9 | 8.4833 | 8.9441 | 8.9793 | — | 8.9793 | packing | +0.4608 | 8.7857 | +0.3024 |
-| 56 | 8 | 7.5574 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.4242 | 7.8583 | +0.3009 |
-| 87 | 10 | 9.3666 | 9.8388 | 9.9770 | — | 9.9770 | packing | +0.4722 | 9.6646 | +0.2980 |
-| 72 | 9 | 8.5498 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.4295 | 8.8406 | +0.2908 |
-| 89 | 10 | 9.4853 | 9.9497 | 9.9770 | — | 9.9770 | packing | +0.4645 | 9.7736 | +0.2883 |
-| 88 | 10 | 9.4261 | 9.8882 | 9.9770 | — | 9.9770 | packing | +0.4620 | 9.7131 | +0.2869 |
-| 90 | 10 | 9.5440 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.4330 | 9.8229 | +0.2789 |
-| 57 | 8 | 7.6332 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.3484 | 7.8583 | +0.2251 |
-| 73 | 9 | 8.6158 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.3636 | 8.8406 | +0.2249 |
-| 91 | 10 | 9.6023 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.3747 | 9.8229 | +0.2206 |
-| 43 | 7 | 6.6569 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.3271 | 6.8761 | +0.2192 |
-| 31 | 6 | 5.6904 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.2958 | 5.8938 | +0.2033 |
-| 92 | 10 | 9.6603 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.3168 | 9.8229 | +0.1627 |
-| 74 | 9 | 8.6811 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.2982 | 8.8406 | +0.1595 |
-| 58 | 8 | 7.7082 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.2734 | 7.8583 | +0.1501 |
-| 18 | 5 | 4.5900 | 4.8229 | 4.9885 | 4.8216 | 4.8216 | cap | +0.2316 | 4.7375 | +0.1475 |
-| 44 | 7 | 6.7446 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.2394 | 6.8761 | +0.1315 |
-| 20 | 5 | 4.8000 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1885 | 4.9115 | +0.1115 |
-| 21 | 5 | 4.8000 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1885 | 4.9115 | +0.1115 |
-| 93 | 10 | 9.7178 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.2592 | 9.8229 | +0.1051 |
-| 32 | 6 | 5.7958 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.1904 | 5.8938 | +0.0979 |
-| 75 | 9 | 8.7460 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.2334 | 8.8406 | +0.0947 |
-| 59 | 8 | 7.7823 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.1993 | 7.8583 | +0.0760 |
-| 94 | 10 | 9.7750 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.2021 | 9.8229 | +0.0480 |
-| 45 | 7 | 6.8310 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.1530 | 6.8761 | +0.0451 |
-| 76 | 9 | 8.8102 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.1691 | 8.8406 | +0.0304 |
-| 17 | 5 | 4.5900 | 4.6755 | 4.9885 | 4.6710 | 4.6710 | cap | +0.0810 | 4.5927 | +0.0027 |
-| 60 | 8 | 7.8557 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.1260 | 7.8583 | +0.0027 |
-| 11 | 4 | 3.8100 | 3.8771 | 3.9908 | 3.8690 | 3.8690 | cap | +0.0590 | 3.8084 | +0.0000 |
-| 12 | 4 | 3.9600 | 4.0000 | 3.9908 | 3.9908 | 3.9908 | ceiling | +0.0308 | 3.9292 | +0.0000 |
-| 19 | 5 | 4.8000 | 4.8856 | 4.9885 | — | 4.9885 | packing | +0.0856 | 4.7991 | +0.0000 |
-| 61 | 8 | 7.9282 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.0534 | 7.8583 | +0.0000 |
-| 77 | 9 | 8.8740 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.1053 | 8.8406 | +0.0000 |
-| 78 | 9 | 8.9373 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.0421 | 8.8406 | +0.0000 |
-| 95 | 10 | 9.8318 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.1453 | 9.8229 | +0.0000 |
-| 96 | 10 | 9.8882 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.0888 | 9.8229 | +0.0000 |
-| 97 | 10 | 9.9443 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.0328 | 9.8229 | +0.0000 |
+| 51 | 8 | 7.1644 | 7.7008 | 7.9816 | — | 7.9816 | packing | +0.5364 | 7.5637 | +0.3993 |
+| 26 | 6 | 5.1231 | 5.6213 | 5.9862 | — | 5.9862 | packing | +0.4982 | 5.5213 | +0.3982 |
+| 39 | 7 | 6.2915 | 6.8107 | 6.9839 | — | 6.9839 | packing | +0.5192 | 6.6895 | +0.3980 |
+| 38 | 7 | 6.1962 | 6.7071 | 6.9839 | — | 6.9839 | packing | +0.5110 | 6.5877 | +0.3916 |
+| 37 | 7 | 6.0990 | 6.5986 | 6.9839 | — | 6.9839 | packing | +0.4996 | 6.4812 | +0.3822 |
+| 68 | 9 | 8.2801 | 8.8034 | 8.9793 | — | 8.9793 | packing | +0.5233 | 8.6467 | +0.3666 |
+| 27 | 6 | 5.2426 | 5.7071 | 5.9862 | — | 5.9862 | packing | +0.4645 | 5.6055 | +0.3629 |
+| 28 | 6 | 5.3589 | 5.8244 | 5.9862 | — | 5.9862 | packing | +0.4655 | 5.7208 | +0.3619 |
+| 66 | 9 | 8.1414 | 8.6569 | 8.9793 | — | 8.9793 | packing | +0.5154 | 8.5028 | +0.3614 |
+| 53 | 8 | 7.3246 | 7.8229 | 7.9816 | — | 7.9816 | packing | +0.4983 | 7.6836 | +0.3591 |
+| 29 | 6 | 5.4721 | 5.9338 | 5.9862 | 5.9308 | 5.9308 | cap | +0.4587 | 5.8282 | +0.3561 |
+| 50 | 8 | 7.0828 | 7.5714 | 7.9816 | — | 7.9816 | packing | +0.4887 | 7.4367 | +0.3539 |
+| 84 | 10 | 9.1854 | 9.7071 | 9.9770 | — | 9.9770 | packing | +0.5218 | 9.5343 | +0.3490 |
+| 86 | 10 | 9.3066 | 9.8229 | 9.9770 | — | 9.9770 | packing | +0.5163 | 9.6480 | +0.3414 |
+| 67 | 9 | 8.2111 | 8.7071 | 8.9793 | — | 8.9793 | packing | +0.4960 | 8.5521 | +0.3410 |
+| 83 | 10 | 9.1240 | 9.6348 | 9.9770 | — | 9.9770 | packing | +0.5108 | 9.4633 | +0.3393 |
+| 41 | 7 | 6.4772 | 6.9267 | 6.9839 | — | 6.9839 | packing | +0.4495 | 6.8034 | +0.3262 |
+| 52 | 8 | 7.2450 | 7.7071 | 7.9816 | — | 7.9816 | packing | +0.4621 | 7.5699 | +0.3249 |
+| 55 | 8 | 7.4807 | 7.9458 | 7.9816 | — | 7.9816 | packing | +0.4650 | 7.8044 | +0.3236 |
+| 85 | 10 | 9.2462 | 9.7426 | 9.9770 | — | 9.9770 | packing | +0.4964 | 9.5692 | +0.3230 |
+| 40 | 7 | 6.3852 | 6.8284 | 6.9839 | — | 6.9839 | packing | +0.4433 | 6.7069 | +0.3217 |
+| 69 | 9 | 8.3485 | 8.8272 | 8.9793 | — | 8.9793 | packing | +0.4787 | 8.6701 | +0.3216 |
+| 65 | 9 | 8.0711 | 8.5355 | 8.9793 | — | 8.9793 | packing | +0.4645 | 8.3836 | +0.3126 |
+| 30 | 6 | 5.5826 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.4036 | 5.8932 | +0.3106 |
+| 42 | 7 | 6.5678 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.4162 | 6.8754 | +0.3077 |
+| 70 | 9 | 8.4162 | 8.8817 | 8.9793 | — | 8.9793 | packing | +0.4655 | 8.7236 | +0.3074 |
+| 54 | 8 | 7.4031 | 7.8467 | 7.9816 | — | 7.9816 | packing | +0.4435 | 7.7070 | +0.3039 |
+| 82 | 10 | 9.0623 | 9.5355 | 9.9770 | — | 9.9770 | packing | +0.4733 | 9.3658 | +0.3036 |
+| 71 | 9 | 8.4833 | 8.9441 | 8.9793 | — | 8.9793 | packing | +0.4608 | 8.7849 | +0.3016 |
+| 56 | 8 | 7.5574 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.4242 | 7.8576 | +0.3002 |
+| 87 | 10 | 9.3666 | 9.8388 | 9.9770 | — | 9.9770 | packing | +0.4722 | 9.6637 | +0.2971 |
+| 72 | 9 | 8.5498 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.4295 | 8.8398 | +0.2900 |
+| 89 | 10 | 9.4853 | 9.9497 | 9.9770 | — | 9.9770 | packing | +0.4645 | 9.7727 | +0.2874 |
+| 88 | 10 | 9.4261 | 9.8882 | 9.9770 | — | 9.9770 | packing | +0.4620 | 9.7122 | +0.2860 |
+| 90 | 10 | 9.5440 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.4330 | 9.8220 | +0.2780 |
+| 57 | 8 | 7.6332 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.3484 | 7.8576 | +0.2244 |
+| 73 | 9 | 8.6158 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.3636 | 8.8398 | +0.2240 |
+| 91 | 10 | 9.6023 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.3747 | 9.8220 | +0.2197 |
+| 43 | 7 | 6.6569 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.3271 | 6.8754 | +0.2186 |
+| 31 | 6 | 5.6904 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.2958 | 5.8932 | +0.2028 |
+| 92 | 10 | 9.6603 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.3168 | 9.8220 | +0.1618 |
+| 74 | 9 | 8.6811 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.2982 | 8.8398 | +0.1587 |
+| 58 | 8 | 7.7082 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.2734 | 7.8576 | +0.1494 |
+| 18 | 5 | 4.5900 | 4.8229 | 4.9885 | 4.8216 | 4.8216 | cap | +0.2316 | 4.7370 | +0.1470 |
+| 44 | 7 | 6.7446 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.2394 | 6.8754 | +0.1309 |
+| 93 | 10 | 9.7178 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.2592 | 9.8220 | +0.1042 |
+| 32 | 6 | 5.7958 | 6.0000 | 5.9862 | 5.9862 | 5.9862 | ceiling | +0.1904 | 5.8932 | +0.0974 |
+| 75 | 9 | 8.7460 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.2334 | 8.8398 | +0.0939 |
+| 59 | 8 | 7.7823 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.1993 | 7.8576 | +0.0753 |
+| 20 | 5 | 4.8500 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1385 | 4.9110 | +0.0610 |
+| 21 | 5 | 4.8500 | 5.0000 | 4.9885 | 4.9885 | 4.9885 | ceiling | +0.1385 | 4.9110 | +0.0610 |
+| 94 | 10 | 9.7750 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.2021 | 9.8220 | +0.0471 |
+| 45 | 7 | 6.8310 | 7.0000 | 6.9839 | 6.9839 | 6.9839 | ceiling | +0.1530 | 6.8754 | +0.0445 |
+| 76 | 9 | 8.8102 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.1691 | 8.8398 | +0.0296 |
+| 17 | 5 | 4.5900 | 4.6755 | 4.9885 | 4.6710 | 4.6710 | cap | +0.0810 | 4.5923 | +0.0023 |
+| 60 | 8 | 7.8557 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.1260 | 7.8576 | +0.0020 |
+| 11 | 4 | 3.8100 | 3.8771 | 3.9908 | 3.8690 | 3.8690 | cap | +0.0590 | 3.8081 | +0.0000 |
+| 12 | 4 | 3.9600 | 4.0000 | 3.9908 | 3.9908 | 3.9908 | ceiling | +0.0308 | 3.9288 | +0.0000 |
+| 19 | 5 | 4.8000 | 4.8856 | 4.9885 | — | 4.9885 | packing | +0.0856 | 4.7987 | +0.0000 |
+| 61 | 8 | 7.9282 | 8.0000 | 7.9816 | 7.9816 | 7.9816 | ceiling | +0.0534 | 7.8576 | +0.0000 |
+| 77 | 9 | 8.8740 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.1053 | 8.8398 | +0.0000 |
+| 78 | 9 | 8.9373 | 9.0000 | 8.9793 | 8.9793 | 8.9793 | ceiling | +0.0421 | 8.8398 | +0.0000 |
+| 95 | 10 | 9.8318 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.1453 | 9.8220 | +0.0000 |
+| 96 | 10 | 9.8882 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.0888 | 9.8220 | +0.0000 |
+| 97 | 10 | 9.9443 | 10.0000 | 9.9770 | 9.9770 | 9.9770 | ceiling | +0.0328 | 9.8220 | +0.0000 |
 
 ## Foreclosed
 

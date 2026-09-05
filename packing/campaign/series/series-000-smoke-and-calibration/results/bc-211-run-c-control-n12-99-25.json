@@ -1,0 +1,47 @@
+{
+ "settings": {
+  "n": 12,
+  "outer_side": "99/25",
+  "square_side": "9977/10000",
+  "grid_counts": [
+   23,
+   31,
+   38
+  ],
+  "inset": "1/2",
+  "angle_limit": "207107/500000",
+  "direction_steps": 180,
+  "scale": 200000,
+  "column_rounds": 1,
+  "max_rounds": 60,
+  "rows_per_direction": 3
+ },
+ "seconds": 89.61815913499959,
+ "stopped": "converged: every placement covers mass 1",
+ "converged": true,
+ "objective": 12.312895575912833,
+ "least_covered": 0.9999999999999976,
+ "rounds": [
+  {
+   "index": 0,
+   "rows": 4715,
+   "orbits": 400,
+   "sites": 2921,
+   "lp_rounds": 21,
+   "objective": 12.312895575912833,
+   "least_covered": 0.9999999999999976,
+   "averaged_depth": 1.5867698420566199,
+   "reduced_cost": -4.69415873645296,
+   "added": 1,
+   "seconds": 63.89518473000135,
+   "note": "adding 1 orbits, deepest at (Fraction(161163, 54350), Fraction(448391, 151700))"
+  }
+ ],
+ "total_mass": "1231423/100000",
+ "total_mass_float": 12.31423,
+ "atoms": 529,
+ "ceiling_proved": false,
+ "ceiling_detail": "total 10.302645 over 256 squares, max pointwise depth 1.608912 at 296392 vertices (12384 decided exactly), feasible total 6.403486",
+ "frozen": null,
+ "least_cell_mass": null
+}

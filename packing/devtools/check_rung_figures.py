@@ -294,19 +294,40 @@ def pick_retained(resolved: list[CertificateFigures]) -> CertificateFigures | No
     return pointers[0] if len(pointers) == 1 else None
 
 
-def retained_pointer_problems(result_id: str, resolved: list[CertificateFigures]) -> list[str]:
+def retained_pointer_problems(
+    result_id: str,
+    resolved: list[CertificateFigures],
+    pointers_declared_elsewhere: frozenset[str] = frozenset(),
+) -> list[str]:
     """A certificate-bearing result resolves exactly one live `certificate.json`.
 
     Nothing else can stand in for it. A result that has lost its pointer -- renamed,
     dropped from the artifact list, or deleted -- is refused with the path the pointer
     should be at, and a result declaring two is refused as ambiguous rather than settled
     by declaration order.
+
+    One exception, and it is the case the pointer's own name anticipates: the pointer
+    moves. When a later result certifies a higher side in the same package, the earlier
+    result's rung is renamed to `certificate-A-B.json` and the successor takes
+    `certificate.json`, so the earlier result declares no live pointer and should not.
+    Refusing it would force a superseded result to declare an artifact it did not
+    produce and whose figures contradict its prose, which is the same failure this
+    module exists to catch, one result over. So a result naming only historical rungs is
+    accepted exactly when the live pointer beside them is declared by some other result:
+    the pointer still exists, still has an owner, and the ownership is checkable rather
+    than assumed. A pointer nothing declares is still a refusal.
     """
     if not resolved:
         return []
     pointers = live_pointers(resolved)
     if len(pointers) == 1:
         return []
+    if not pointers:
+        successors = {
+            str(PurePosixPath(c.path).parent / LIVE_CERTIFICATE) for c in resolved
+        } & pointers_declared_elsewhere
+        if successors:
+            return []
     declared = ", ".join(c.path for c in resolved)
     if not pointers:
         expected = ", ".join(
@@ -740,12 +761,21 @@ def movement_problems(result: dict) -> list[str]:
     return problems
 
 
-def check_result(result: dict) -> tuple[list[str], int]:
-    """All figure, movement, and certificate-consistency problems for one result."""
+def check_result(
+    result: dict, pointers_declared_elsewhere: frozenset[str] = frozenset()
+) -> tuple[list[str], int]:
+    """All figure, movement, and certificate-consistency problems for one result.
+
+    `pointers_declared_elsewhere` carries the live `certificate.json` paths every
+    other result declares, which is what lets a superseded result name only the
+    historical rung it actually produced.
+    """
     result_id = result["id"]
     retained, sides, resolved = resolve_certificates(result)
 
-    problems: list[str] = retained_pointer_problems(result_id, resolved)
+    problems: list[str] = retained_pointer_problems(
+        result_id, resolved, pointers_declared_elsewhere
+    )
     for cert in resolved:
         problems.extend(certificate_consistency_problems(cert))
 
@@ -822,8 +852,14 @@ def main() -> int:
 
     problems: list[str] = []
     certificates_checked = 0
+    declared_pointers = frozenset(
+        artifact
+        for result in results
+        for artifact in result.get("artifacts", [])
+        if isinstance(artifact, str) and PurePosixPath(artifact).name == LIVE_CERTIFICATE
+    )
     for result in results:
-        result_problems, count = check_result(result)
+        result_problems, count = check_result(result, declared_pointers)
         problems.extend(result_problems)
         certificates_checked += count
 
