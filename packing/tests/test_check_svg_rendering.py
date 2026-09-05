@@ -63,6 +63,23 @@ def test_no_swept_document_lies_under_a_foreign_directory() -> None:
     assert trespassers == []
 
 
+def test_a_generated_document_under_site_is_not_swept() -> None:
+    """The render output is this repository's, but it is not this repository's prose.
+
+    `packing/site/` is written fresh by every explainer render: the page, the published
+    Markdown, and copies of the composite placed beside them. The published document
+    embeds its neighbouring copy of the atlas, which is not one of the atlas's owned
+    artifacts and never will be, so sweeping that directory makes the ownership control
+    report a finding about a file the renderer is already responsible for.
+
+    Being gitignored is not what excludes it. This sweep walks files git does not track,
+    which is exactly the blind spot D-455 was about; the exclusion has to be stated.
+    """
+    swept = {document.relative_to(REPO).as_posix() for document in repository_documents()}
+    assert not [path for path in swept if path.startswith("packing/site/")]
+    assert "site" in FOREIGN_DIRECTORY_NAMES
+
+
 def test_the_exclusion_set_is_the_one_the_formatter_uses() -> None:
     """`.flowmarkignore` excludes `vendor/` for the same reason, and says so.
 

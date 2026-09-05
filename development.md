@@ -144,6 +144,10 @@ uv run --frozen --all-extras --group dev packing-validate --fast
 # One named component. --only is repeatable and matches displayed step names.
 uv run --frozen --all-extras --group dev packing-validate --only "basin identity"
 
+# Everything but one. --skip takes the same repeatable, substring-matched names, and
+# refuses a pattern that names no step rather than quietly removing nothing.
+uv run --frozen --all-extras --group dev packing-validate --skip "negative controls"
+
 # Full integration checkpoint used locally and in CI.
 uv run --frozen --all-extras --group dev packing-validate
 
@@ -203,19 +207,33 @@ D-239 is resolved.
 
 On pull requests, [`packing-validation.yml`](.github/workflows/packing-validation.yml)
 runs `packing-validate --fast` on Linux and reports the stable `packing-required`
-aggregate. The fast behavioral step excludes only measured slow nodes declared on named
-test functions with the `exhaustive_exact` marker; the workflow contract checks that
-exact function set and rejects module-level marking.
+aggregate. Since 2026-09-05 that tier is fifty-eight of the sixty-one steps rather than
+thirty-seven: twenty-one steps that had run only after a merge were promoted into it,
+because a tier costs the longer of its behavioral suite and everything else, not the sum
+([D-455, D-456](defects.md), think-k4fb). Three steps stay out, each on a measurement
+recorded beside `STEPS` in `packing/src/sqpack/cli/validate.py`: the negative controls,
+the `n=40` rigidity bracket, and the exhaustive exact tier.
+The fast behavioral step excludes only measured slow nodes declared on named test
+functions with the `exhaustive_exact` marker; the workflow contract checks that exact
+function set and rejects module-level marking.
 Measured 2026-08-31: the tree collects 1,045 tests, of which the fast step runs 1,020
 and deselects 25 exhaustive exact cases, in 646 seconds of essentially serial wall time
 — which is why `--push` selects a reachable subset instead of the whole step.
 
 Pushes to `main`, manual dispatches, and the weekly schedule run the complete locked
-command on Linux and macOS. The macOS integration job also runs the focused deep-golden
-step directly. The default validator runs the 118-test core and 21-test exhaustive exact
-branches as separate direct steps.
-Negative controls use at most two workers while honoring the `--inner-jobs` cap;
-integration CI opts into two inner workers explicitly.
+command on Linux and macOS, split across two jobs since 2026-09-05: `validate` runs
+everything but the exhaustive exact tier (`--skip`), and `exhaustive` runs that tier and
+nothing else (`--only`), so a tier that was 1943s of a 2755s surface carries its own
+budget and its own verdict instead of deciding whether the other sixty steps are
+reported at all (think-tr2z). `--skip TEXT` is `--only` read the other way round,
+repeatable and matching displayed step names the same way; a pattern naming no step is
+refused rather than ignored, since a `--skip` that silently matches nothing runs more
+than it meant to and says nothing.
+The macOS integration job also runs the focused deep-golden step directly.
+Measured 2026-09-05: the tree collects 2,099 tests, of which the exhaustive exact marker
+selects 53 and the fast behavioral step runs the other 2,046. Negative controls use at
+most two workers while honoring the `--inner-jobs` cap; integration CI opts into two
+inner workers explicitly.
 D-203’s temporary expected-failure classifier was removed after the repaired producer
 passed on both architectures; the workflow test rejects its return.
 Never accept a rebuilt golden to make the probe green, and do not add a second CI-only

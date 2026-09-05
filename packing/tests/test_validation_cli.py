@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -18,6 +19,11 @@ import pytest
 
 from sqpack.cli import validate
 from sqpack.cli.validate import main
+from sqpack.yamlio import safe_load
+
+WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/packing-validation.yml"
+"""The gate's own workflow, read by the test that keeps its two post-merge jobs a
+partition of `STEPS`. Repository-relative from `packing/tests/`, so two levels up."""
 
 
 def _invoke(*arguments: str) -> tuple[int, str, str]:
@@ -294,7 +300,7 @@ def test_list_is_read_only_and_exposes_fast_and_full_check_groups() -> None:
     assert stderr == ""
     assert "fast behavioral tests [fast]" in stdout
     assert "exhaustive exact behavioral tests [full]" in stdout
-    assert "soundness perimeter [full, engine]" in stdout
+    assert "soundness perimeter [fast, engine]" in stdout
 
 
 def test_list_applies_the_same_fast_and_name_filters_as_execution() -> None:
@@ -304,13 +310,69 @@ def test_list_applies_the_same_fast_and_name_filters_as_execution() -> None:
     assert stderr == ""
     assert "fast behavioral tests [fast]" in stdout
     assert "exhaustive exact behavioral tests" not in stdout
-    assert "soundness perimeter" not in stdout
+    assert "negative controls" not in stdout
 
     status, stdout, stderr = _invoke("--list", "--only", "negative control")
 
     assert status == 0
     assert stderr == ""
     assert stdout.splitlines() == ["negative controls [full]"]
+
+
+def test_skip_is_only_read_the_other_way_round() -> None:
+    """`--skip` selects a tier and removes named steps, leaving the rest untouched.
+
+    The flag exists because two CI jobs cannot divide the gate with `--only` alone: the
+    job that keeps everything but one step would have to name the other sixty, and the
+    step that got left out of that list is a step nobody runs.
+    """
+    status, stdout, stderr = _invoke("--list", "--skip", "exhaustive exact behavioral tests")
+
+    assert status == 0
+    assert stderr == ""
+    listed = stdout.splitlines()
+    assert len(listed) == len(validate.STEPS) - 1
+    assert not any("exhaustive exact" in line for line in listed)
+    assert "fast behavioral tests [fast]" in stdout
+
+
+def test_a_skip_naming_no_step_is_refused_rather_than_ignored() -> None:
+    """The asymmetry with `--only` is the point.
+
+    An `--only` that matches nothing empties the selection and announces itself. A
+    `--skip` that matches nothing leaves the selection whole, so the run merely does more
+    than it meant to -- safe for the verdict and silent about the fact that the name it
+    was written against has moved. The workflow's post-merge split depends on one such
+    name, so a rename has to fail the job that carries it rather than quietly cost that
+    job half an hour.
+    """
+    status, _, stderr = _invoke("--list", "--skip", "not-a-real-step")
+
+    assert status == 2
+    assert "matched no validation step" in stderr
+    assert "packing-validate --list" in stderr
+
+
+def test_a_skip_outside_the_selected_tier_is_a_no_op_not_an_error() -> None:
+    """Patterns are matched against every declared step, not against this tier.
+
+    Whether a real step is in the tier someone asked for is the tier's business. Refusing
+    `--fast --skip "negative controls"` would make the flag depend on which tier it was
+    combined with, which is a worse contract than one that removes nothing.
+    """
+    status, stdout, stderr = _invoke("--list", "--fast", "--skip", "negative controls")
+
+    assert status == 0
+    assert stderr == ""
+    assert len(stdout.splitlines()) == len([step for step in validate.STEPS if step.fast])
+
+
+def test_a_skip_that_empties_an_only_selection_names_the_skip() -> None:
+    """The refusal has to name the narrowing that caused it, not the other one."""
+    status, _, stderr = _invoke("--only", "negative controls", "--skip", "negative controls")
+
+    assert status == 2
+    assert "--skip 'negative controls' left no validation step to run" in stderr
 
 
 def test_fast_behavioral_step_excludes_exhaustive_exact_tests(
@@ -425,6 +487,7 @@ def test_invalid_worker_count_and_unmatched_selection_are_actionable() -> None:
     "narrowing",
     [
         ("--only", "fast behavioral tests"),
+        ("--skip", "negative controls"),
         ("--fast",),
         ("--records",),
         ("--edit",),
@@ -469,10 +532,17 @@ def test_the_records_tier_selects_every_record_check_and_no_test() -> None:
 def test_strict_mode_enables_deep_validation(monkeypatch: pytest.MonkeyPatch) -> None:
     observed: validate.Context | None = None
 
+    # The narrowing patterns are collected with `*` and discarded on purpose. This stub
+    # exists to read the `Context`, and a stub that also pins how many pattern lists the
+    # caller passes is a test that fails when the flag surface is extended correctly --
+    # which it was, twice: `--only`, then `--skip` on 2026-09-05. Same reason
+    # `test_strict_mode_refuses_a_partial_validation_surface` stopped pinning the
+    # refusal's exact sentence.
     def capture_context(
-        selected: list[validate.Step], context: validate.Context, patterns: list[str]
+        selected: list[validate.Step],
+        context: validate.Context,
+        *_narrowing: object,
     ) -> validate.RunSummary:
-        del patterns
         nonlocal observed
         observed = context
         return validate.RunSummary(
@@ -560,9 +630,9 @@ def test_timeout_cli_override_wins_over_environment(monkeypatch: pytest.MonkeyPa
     observed: validate.Context | None = None
 
     def capture(
-        selected: list[validate.Step], context: validate.Context, patterns: list[str]
+        selected: list[validate.Step], context: validate.Context, *_narrowing: object
     ) -> validate.RunSummary:
-        del selected, patterns
+        del selected
         nonlocal observed
         observed = context
         return validate.RunSummary([], 0, selected_count=0, total_count=0)
@@ -580,9 +650,9 @@ def test_default_timeout_covers_the_measured_full_census(
     observed: validate.Context | None = None
 
     def capture(
-        selected: list[validate.Step], context: validate.Context, patterns: list[str]
+        selected: list[validate.Step], context: validate.Context, *_narrowing: object
     ) -> validate.RunSummary:
-        del selected, patterns
+        del selected
         nonlocal observed
         observed = context
         return validate.RunSummary([], 0, selected_count=0, total_count=0)
@@ -902,6 +972,120 @@ def test_every_step_is_reachable_from_some_tier() -> None:
     assert reachable == {step.name for step in validate.STEPS}
 
 
+def test_the_pull_request_surface_defers_only_what_was_measured() -> None:
+    """A step outside `--fast` is a step no pull request runs, so the set is pinned.
+
+    This is the guard think-k4fb asked for, and it exists because `fast` defaults to
+    False. Twenty-four of sixty-one steps had accumulated outside the tier, nobody had
+    decided that for most of them, and on 2026-09-05 two defects reached main through the
+    gap and stayed red for nine hours (D-455, D-456). Twenty-one were promoted; a
+    twenty-fifth step added tomorrow would rebuild the gap silently unless adding it to
+    this set is a thing someone has to type.
+
+    Each remaining name is deferred on a measurement, and the measurements are on CI's
+    two-core runner in the complete surface of run 33987628341:
+
+    - `exhaustive exact behavioral tests` at 1943.05s has its own workflow job, which is
+      what a step that size needs rather than a larger share of someone else's;
+    - `negative controls` at 543.67s clones the tree per worker for 148 declared
+      mutations, and would become the thing a pull request waits for -- about five
+      minutes longer than the suite it would displace;
+    - `n=40 rigidity bracket still reproduces` at 221.36s is the one that would have fit,
+      and only just: it is about the whole remaining margin. It also re-derives
+      mathematics rather than checking a record, no pull request changes its answer
+      without editing the assessor, and `--since` selects it for exactly those changes.
+
+    Deferring a fourth means arguing here that the tier's wall time -- `max(the
+    behavioural suite, everything else over the remaining workers)` -- has moved.
+    """
+    assert {step.name for step in validate.STEPS if not step.fast} == {
+        "exhaustive exact behavioral tests",
+        "negative controls",
+        "n=40 rigidity bracket still reproduces",
+    }
+
+
+def test_the_post_merge_jobs_partition_the_gate() -> None:
+    """The two jobs a merge runs must together select every step, and none twice.
+
+    think-tr2z split the exhaustive tier onto its own runner so that it reports its own
+    verdict against its own budget; `--skip` on the other job is what stops it being paid
+    for twice. Both halves of that are a name typed into a YAML file, so this reads the
+    workflow, parses each command with the CLI's own parser, and resolves it through the
+    CLI's own selector: a step added to `STEPS` lands in one job or the other, and a
+    rename that breaks the split fails here rather than after a merge.
+    """
+    document = safe_load(WORKFLOW.read_text(encoding="utf-8"))
+    jobs = document["jobs"]
+    selections: dict[str, set[str]] = {}
+    for job_name in ("validate", "exhaustive"):
+        for step in jobs[job_name]["steps"]:
+            command = str(step.get("run", ""))
+            if "packing-validate" not in command:
+                continue
+            if step.get("if") == "github.event_name == 'pull_request'":
+                continue
+            tokens = shlex.split(command)
+            arguments = tokens[tokens.index("packing-validate") + 1 :]
+            namespace = validate._parser().parse_args(arguments)
+            selections[job_name] = {
+                selected.name
+                for selected in validate._select_steps(
+                    only=namespace.only,
+                    skip=namespace.skip,
+                    fast=namespace.fast,
+                    records=namespace.records,
+                    edit=namespace.edit,
+                )
+            }
+
+    assert set(selections) == {"validate", "exhaustive"}
+    assert selections["exhaustive"] == {"exhaustive exact behavioral tests"}
+    assert not selections["validate"] & selections["exhaustive"]
+    assert selections["validate"] | selections["exhaustive"] == {
+        step.name for step in validate.STEPS
+    }
+
+
+def test_the_longest_steps_are_submitted_first() -> None:
+    """A long step submitted late finishes late, and the run ends when it does.
+
+    The pool takes steps in submission order, and the behavioural suite is declared
+    fifteenth. That cost nothing while the fourteen ahead of it were seconds of record
+    checks; the 2026-09-05 promotion put eleven steps and 476s there, which greedy
+    submission would have spent delaying the suite's start rather than running beside it.
+
+    Ordering by declared budget rather than by a guessed duration keeps the file the only
+    place a step's cost is asserted.
+    """
+    order = [step.name for step in validate._submission_order(validate.STEPS)]
+
+    assert order[:3] == [
+        "exhaustive exact behavioral tests",  # 3600s
+        "negative controls",  # 1800s, and declared before the suite
+        "fast behavioral tests",  # 1800s
+    ]
+    assert order[3:] == [step.name for step in validate.STEPS if step.budget_seconds is None]
+
+
+def test_submission_order_does_not_change_the_reported_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Output is replayed in declared order, which is what keeps two runs comparable."""
+    monkeypatch.setattr(validate, "ACTIVITY_MARKER", tmp_path / ".gate-running")
+    context = _budget_context(timeout_seconds=5, explicit=False)
+    first = _sleeping_step("declared first", 0.05, None)
+    second = _sleeping_step("declared second", 0.05, 4)
+
+    summary = validate._run_selected([first, second], context, [])
+
+    assert [result.name for result in summary.results] == ["declared first", "declared second"]
+    assert [step.name for step in validate._submission_order([first, second])] == [
+        "declared second",
+        "declared first",
+    ]
+
+
 def test_broad_is_opt_out_so_a_new_step_joins_the_edit_tier() -> None:
     """Forgetting the marker must make the tier slower, never blinder.
 
@@ -918,6 +1102,28 @@ def test_broad_is_opt_out_so_a_new_step_joins_the_edit_tier() -> None:
         # retained -- which is to say rarely, and never from an edit. It still runs in
         # `--fast` and above, and CI runs the full gate on every push.
         "the decimal route still cannot price an exact pose",
+        # The rest arrived together on 2026-09-05, when twenty-one steps that had run
+        # only after a merge joined the pull-request tier (think-k4fb). Being in that
+        # tier is what makes `broad` load-bearing for them: without it each would also
+        # have joined a 40s edit loop, and these fifteen measure 529s between them.
+        # The rule applied was a cost one -- above about five seconds locally, or
+        # needing a toolchain the edit loop should not be starting -- and the six
+        # promoted steps that fell under it are in `--edit` rather than here.
+        "soundness perimeter",  # 47.14s, and selecting it builds sqsearch
+        "search engine (sqsearch)",  # 2.19s, but needs that same build
+        "differential: search energy vs validity oracle",  # 0.34s, likewise
+        "lint floor (rust)",  # 14.94s of cargo clippy and rustfmt
+        "known-best n=1..100 atlas",  # 148.50s
+        "prospective n=101..324 source map and safe seed",  # 102.56s
+        "single-square translation escape screen",  # 73.07s
+        "historical regressions",  # 29.35s
+        "deterministic SVG rendering",  # 26.39s
+        "D-034's n=5 identity pair still reproduces",  # 23.54s
+        "small-n exact models and local geometry",  # 19.80s
+        "Trump exact branchwise linearized cones",  # 13.82s
+        "fixed-angle cell is an LP, rebuilt independently",  # 9.76s
+        "basin atlas",  # 9.63s
+        "basin event record and replay",  # 7.89s
     }
 
 

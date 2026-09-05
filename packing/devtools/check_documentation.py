@@ -13,7 +13,18 @@ from devtools.render_document_map import MAP, REPO, SYNOPSIS, expected_synopsis,
 from sqpack.yamlio import safe_load
 
 FOOTER = "This document follows common-doc-guidelines.md."
-IGNORED_PARTS = {".pytest_cache", ".venv", "__pycache__", "node_modules", "attic"}
+# `site` is the explainer's render output, gitignored and rebuilt by every run. It is
+# not durable, so it has nothing to be mapped to; the page and the Markdown document
+# beside it are checked by the renderer's own `--check`, which compares them byte for
+# byte against a fresh render.
+IGNORED_PARTS = {
+    ".pytest_cache",
+    ".venv",
+    "__pycache__",
+    "node_modules",
+    "attic",
+    "site",
+}
 REPOSITORY_ROOT = REPO
 RETIRED_PHRASES = (
     "approximately verified",

@@ -56,6 +56,7 @@ dev = [
     # are exempt, and the exemption still applies: vendoring removes the upload
     # from the path entirely, since the source installed here is the source
     # reviewable in this repository's own history.
+    "flowmark==0.8.0",
     "kpress",
     # The motion-lab contract tests execute the exact JavaScript shipped to browsers.
     "nodejs-wheel-binaries>=24.16.0",

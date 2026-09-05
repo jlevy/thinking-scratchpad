@@ -34,13 +34,14 @@ import base64
 import json
 import re
 import shutil
+import struct
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
 from fractions import Fraction
 from math import isqrt
 from pathlib import Path
-from typing import TypedDict
+from typing import NamedTuple, TypedDict
 
 from strif import atomic_output_file
 
@@ -61,6 +62,12 @@ from sqpack.yamlio import safe_load
 PACKING = Path(__file__).resolve().parents[1]
 REPO = PACKING.parent
 CASE = PACKING / "cases" / "n11_fractional_certificate"
+# The registered result these certificates belong to, lowercased as a filename
+# stem. `conventions.md` builds every document name for a result from this id --
+# `t-018-proof-card.md`, `t-018-verifiable-claim-<bound>.md`, `t-018-explainer.md` --
+# and says the published form takes the same name as the case-local one, so the
+# id is written once here and the names are derived rather than typed.
+RESULT_ID = "t-018"
 TEMPLATES = Path(__file__).with_name("templates")
 TEMPLATE = TEMPLATES / "explainer-shell.html"
 MARKDOWN = TEMPLATES / "explainer-article.md"
@@ -236,14 +243,35 @@ PROBLEM_URL = "https://erich-friedman.github.io/papers/squares/squares.html"
 BEST_URL = "https://kingbird.myphotos.cc/packing/squares_in_squares.html"
 PRIOR_URL = "https://www.combinatorics.org/ojs/index.php/eljc/article/view/v10i1r8"
 REPO_URL = "https://github.com/jlevy/squares"
+# Where the deploy serves this page: the GitHub Pages site for the repository, at
+# the project subpath, with the trailing slash the directory URL actually resolves
+# to. A link preview is the one part of the page that cannot be relative -- a
+# crawler resolves `og:image` and `og:url` on its own machine, not against the
+# document -- so the deployment's own address has to be stated somewhere, and this
+# is that one place.
+SITE_URL = "https://jlevy.github.io/squares/"
+SITE_NAME = "Squares"
 BEST_RENDERING = PACKING / "atlas" / "known-best" / "rendering" / "n-011.svg"
 # The atlas composite of every known-best packing, shown as Figure 1 and served
 # beside the page rather than inlined: the PNG is the image, the PDF the link.
 #: The composite travels with the page: the SVG the figure shows, the PDF it links for
 #: print, and the PNG for a reader whose context cannot render the vector.
-COMPOSITE_ASSETS = tuple(
-    PACKING / "atlas" / "known-best" / f"known-best-1-100.{ext}"
-    for ext in ("svg", "png", "pdf")
+COMPOSITE_STEM = PACKING / "atlas" / "known-best" / "known-best-1-100"
+COMPOSITE_ASSETS = tuple(COMPOSITE_STEM.with_suffix(f".{ext}") for ext in ("svg", "png", "pdf"))
+#: The one of the three a link preview shows. No unfurler renders SVG and none follows a
+#: PDF, so the card names the raster, and it names the 1x rather than the committed
+#: `@2x`: 2400x2896 is inside the 4096x4096 ceiling X applies to a card image and
+#: 4800x5792 is outside it on both axes, while every consumer downscales to 600px or
+#: less anyway. The 1x is also already copied beside the page; the 2x is not, and adding
+#: it would put another 1.2 MiB in every deploy for resolution nothing displays.
+COMPOSITE_PNG = COMPOSITE_STEM.with_suffix(".png")
+#: What Figure 1 and the link preview are both a picture of, written once. The figure
+#: shows the SVG and the card the PNG, but they are the same drawing, so a reader on a
+#: screen reader and a reader seeing an unfurl get the same sentence.
+COMPOSITE_ALT = (
+    "The best known packings of one through one hundred unit squares, in a ten-by-ten "
+    "grid, each labelled with its best known upper bound and, where the value is still "
+    "open, the best proved lower bound"
 )
 VERIFIER = PACKING / "src" / "sqpack" / "fractional" / "certificate.py"
 GENERATOR = PACKING / "src" / "sqpack" / "fractional" / "generate.py"
@@ -259,6 +287,34 @@ def repo_file(path: Path) -> str:
             f"{path} is outside the repository and cannot be linked on main"
         ) from None
     return f"{REPO_URL}/blob/main/{relative.as_posix()}"
+
+
+def site_file(path: Path) -> str:
+    """The asset's absolute URL on the deployed site, for a consumer off the page.
+
+    Everything the page itself points at is relative, because the page has to open
+    the same way from a file, from Pages and from an artifact host. A link preview
+    cannot: the crawler that reads `og:image` has no base to resolve against and
+    drops a relative one, so the card states the deployed address in full.
+    """
+    return SITE_URL + path.name
+
+
+def png_size(path: Path) -> tuple[int, int]:
+    """The pixel dimensions in a PNG's IHDR, read from the file the render publishes.
+
+    `og:image:width` and `og:image:height` let a consumer reserve the card's box
+    before it has fetched the image, and a pair that disagrees with the file is worse
+    than none: the preview reflows, or is dropped. Reading them from the bytes that
+    are copied beside the page means a re-exported atlas moves the tags with it and
+    no dimension is typed twice.
+    """
+    with path.open("rb") as handle:
+        header = handle.read(24)
+    if header[:8] != b"\x89PNG\r\n\x1a\n" or header[12:16] != b"IHDR":
+        raise SystemExit(f"{path} is not a PNG; the link preview cannot state its size")
+    width, height = struct.unpack(">II", header[16:24])
+    return width, height
 
 
 # The certificates the page walks through, in tab order. The first is shown by
@@ -1013,8 +1069,21 @@ def coarsening_verdict(rows: list[CoarseningRow] | None) -> str:
     raise SystemExit("the net-coarsening rows pass in no order the figure's sentence can state")
 
 
+# The check is about fetches, not about outward addresses, and the two came apart
+# when the page gained a link preview. `rel="canonical"` is the only `<link>` a
+# browser does not act on: it is a statement to a crawler about which URL this
+# document is, read from the markup and never resolved or requested while the page
+# is being viewed, so a page carrying one still opens from a file with the network
+# off. Every other `<link ... href=>` -- a stylesheet, an icon, a preload, a
+# manifest -- is a fetch and is still refused, and the exemption is written as the
+# exact quoted form the shell emits so nothing broader slips through it. The
+# `og:*` and `twitter:*` URLs need no exemption: they are `<meta content=>`, which
+# this pattern has never matched, and are likewise read rather than fetched.
 EXTERNAL_REFERENCE = re.compile(
-    r"<script[^>]*\ssrc=|<link[^>]*\shref=|@import\b|url\((?!\s*[\"']?(?:data:|#))",
+    r"<script[^>]*\ssrc="
+    r'|<link(?![^>]*\srel="canonical")[^>]*\shref='
+    r"|@import\b"
+    r"|url\((?!\s*[\"']?(?:data:|#))",
     re.IGNORECASE,
 )
 
@@ -1026,6 +1095,10 @@ def assert_self_contained(page: str) -> None:
     meant to open from a file with the network off. A script or stylesheet element
     with a source, a CSS import, or a `url()` that is not a data URI or a fragment
     is a fetch, so the render refuses it rather than leaving it to a grep in CI.
+
+    Metadata is not a fetch. The canonical link and the link-preview `<meta>` tags
+    carry absolute URLs on purpose -- a crawler has no base to resolve a relative one
+    against -- and no browser requests any of them to display the page.
     """
     hit = EXTERNAL_REFERENCE.search(page)
     if hit:
@@ -1041,7 +1114,7 @@ def slug(facts: Facts) -> str:
 
 def claim_path(facts: Facts) -> Path:
     """The certificate's verifiable-claim document, one self-contained file beside it."""
-    return CASE / f"t-018-verifiable-claim-{slug(facts)}.md"
+    return CASE / f"{RESULT_ID}-verifiable-claim-{slug(facts)}.md"
 
 
 # The claim verifier's whole decision, `python verify_claim.py <certificate>`,
@@ -1086,6 +1159,46 @@ def claim_substitutions(headline: Facts, default: Facts) -> dict[str, str]:
     return values
 
 
+#: The deck, which the hero sets under the title and the card repeats after it.
+SUBTITLE = "A New Lower Bound on the Square Packing Problem"
+
+
+def card_substitutions(headline: Facts, headline_frac: str) -> dict[str, str]:
+    """What a link preview shows: the title, the sentence, the canonical URL, the image.
+
+    Every one of these is a string the page already states somewhere -- the title in
+    `<title>`, the sentence in `<meta name="description">`, the picture in Figure 1 --
+    and each is built here once and substituted into both places, so a shared link and
+    the page it opens cannot say different things. The bound in the title and in the
+    sentence is the headline certificate's own, like every other number on the page.
+
+    The card names the composite because that is the picture of the result: a portrait
+    at 150:181. X and Facebook centre-crop it to their landscape card and show the
+    middle four rows of the grid; Slack, Discord and iMessage scale the whole thing and
+    show all hundred packings with the title on it. Both readings are of the atlas, so
+    the aspect is left alone rather than a landscape variant being derived for the
+    croppers at the cost of the ones that do not crop.
+    """
+    width, height = png_size(COMPOSITE_PNG)
+    title = f"s({headline.n}) ≥ {headline_frac}: {SUBTITLE}"
+    description = (
+        f"How a weighted point set and a pigeonhole prove s({headline.n}) ≥ "
+        f"{headline_frac}, apparently the first improvement in "
+        f"{RESULT_YEAR - PRIOR_YEAR} years on the smallest open case of the "
+        "square packing problem."
+    )
+    return {
+        "PAGE_TITLE": title,
+        "PAGE_DESCRIPTION": description,
+        "CANONICAL_URL": SITE_URL,
+        "SITE_NAME": SITE_NAME,
+        "CARD_IMAGE_URL": site_file(COMPOSITE_PNG),
+        "CARD_IMAGE_WIDTH": str(width),
+        "CARD_IMAGE_HEIGHT": str(height),
+        "COMPOSITE_ALT": COMPOSITE_ALT,
+    }
+
+
 def shared_substitutions(facts: list[Facts], headline: Facts, default: Facts) -> dict[str, str]:
     """Values the whole page states: the headline bound, the deck, the shared axis.
 
@@ -1094,12 +1207,15 @@ def shared_substitutions(facts: list[Facts], headline: Facts, default: Facts) ->
     the stamped article; the band it shades runs from the headline bound to the
     best packing known, which is what remains unknown after all of them.
     """
+    headline_frac = f"{headline.outer_side.numerator}/{headline.outer_side.denominator}"
     return {
         "BELOW_ONE": BELOW_ONE,
         "NEAR_LIMIT": NEAR_LIMIT,
         "N": str(headline.n),
-        "HEADLINE_L_FRAC": f"{headline.outer_side.numerator}/{headline.outer_side.denominator}",
+        "HEADLINE_L_FRAC": headline_frac,
         "HEADLINE_L_DEC": decimal(headline.outer_side),
+        "SUBTITLE": SUBTITLE,
+        **card_substitutions(headline, headline_frac),
         "DEFAULT_L_FRAC": f"{default.outer_side.numerator}/{default.outer_side.denominator}",
         "DEFAULT_ID": default.identifier,
         # Print shows one certificate deterministically, and this names which.
@@ -1108,7 +1224,7 @@ def shared_substitutions(facts: list[Facts], headline: Facts, default: Facts) ->
         "YEARS_SINCE_PRIOR": str(RESULT_YEAR - PRIOR_YEAR),
         "N_RESULTS": str(registered_results()),
         "N_STARRED": str(starred_lower_bounds()),
-        "SOURCE_URL": repo_file(MARKDOWN),
+        "SOURCE_URL": MARKDOWN_OUTPUT.name,
         "REPO_URL": REPO_URL,
         "PUBLISHED": PUBLICATION_DATE,
         "EDITION": PUBLICATION_EDITION,
@@ -1339,22 +1455,163 @@ def kerned_math_spans(source: str) -> str:
     )
 
 
-def markdown_body(
+#: Where the published Markdown is written, beside the page it is the source of. Named
+#: for the result the way a case-local document is: what a file is called does not
+#: depend on which directory it is served from.
+MARKDOWN_OUTPUT = PACKING / "site" / f"{RESULT_ID}-explainer.md"
+
+
+def _balanced(source: str, start: int, tag: str) -> int:
+    """The index just past the `</tag>` that closes the `<tag` opening at `start`."""
+    depth = 0
+    position = start
+    opening = f"<{tag}"
+    closing = f"</{tag}>"
+    while position < len(source):
+        next_open = source.find(opening, position)
+        next_close = source.find(closing, position)
+        if next_close == -1:
+            raise SystemExit(f"{MARKDOWN.name}: an unclosed <{tag}> reached the publisher")
+        if next_open != -1 and next_open < next_close:
+            depth += 1
+            position = next_open + len(opening)
+            continue
+        depth -= 1
+        position = next_close + len(closing)
+        if depth == 0:
+            return position
+    raise SystemExit(f"{MARKDOWN.name}: an unclosed <{tag}> reached the publisher")
+
+
+_TEX_SPAN = re.compile(r'<span class="tex">(.*?)</span>', re.DOTALL)
+_SCREEN_ONLY = re.compile(r'<span class="screen-only">.*?</span>', re.DOTALL)
+_ANCHOR = re.compile(r'<a\s[^>]*?href="([^"]*)"[^>]*>(.*?)</a>', re.DOTALL)
+_IMG = re.compile(r"<img\s[^>]*>")
+_ATTRIBUTE = re.compile(r'(\w[\w-]*)="([^"]*)"')
+_SIMPLE_TAG = re.compile(r"</?(?:strong|b|em|i|code|span|br)\b[^>]*>")
+
+
+def _inline_markdown(fragment: str) -> str:
+    """Inline HTML the article uses inside a caption, written as Markdown instead."""
+    fragment = _SCREEN_ONLY.sub("", fragment)
+    fragment = _TEX_SPAN.sub(lambda m: f"${m.group(1).strip()}$", fragment)
+    fragment = _ANCHOR.sub(
+        lambda m: f"[{_inline_markdown(m.group(2))}]({m.group(1)})", fragment
+    )
+    for opening, closing, mark in (("<strong>", "</strong>", "**"), ("<b>", "</b>", "**")):
+        fragment = fragment.replace(opening, mark).replace(closing, mark)
+    for opening, closing, mark in (("<em>", "</em>", "*"), ("<i>", "</i>", "*")):
+        fragment = fragment.replace(opening, mark).replace(closing, mark)
+    fragment = fragment.replace("<code>", "`").replace("</code>", "`")
+    fragment = _SIMPLE_TAG.sub("", fragment)
+    return re.sub(r"[ \t]*\n[ \t]*", " ", fragment).strip()
+
+
+def _image_markdown(tag: str) -> str:
+    attributes = dict(_ATTRIBUTE.findall(tag))
+    return f"![{attributes.get('alt', '').strip()}]({attributes.get('src', '')})"
+
+
+def published_markdown(source: str, *, default_slug: str) -> str:
+    """The article as a document, for a reader or a model rather than for a browser.
+
+    The page and this file say the same things; they differ in what they can do. A
+    canvas the reader drags, a panel of controls, a chooser between certificates and a
+    drawn diagram are all apparatus, and none of it survives as text. What the figures
+    mean is in their captions, so a figure here is its caption, plus its image where the
+    image is a file rather than markup.
+
+    Two reductions beyond that. The page carries one copy of every figure per retained
+    certificate and switches between them, which as text would read as the same figure
+    stated twice; only the certificate the page opens on is kept. And the chip row is
+    navigation, whose one purpose is to offer this file.
+    """
+    kept = f'<div class="cert-figure" data-cert="{default_slug}"'
+    while (start := source.find('<div class="cert-figure"')) != -1:
+        end = _balanced(source, start, "div")
+        block = source[start:end]
+        if not block.startswith(kept):
+            source = source[:start] + source[end:]
+            continue
+        inner = block[block.index(">") + 1 : -len("</div>")]
+        source = source[:start] + inner + source[end:]
+
+    for opening in ('<div class="doc-links', '<div class="fig-choose"'):
+        while (start := source.find(opening)) != -1:
+            source = source[:start] + source[_balanced(source, start, "div") :]
+
+    out: list[str] = []
+    position = 0
+    while (start := source.find("<figure", position)) != -1:
+        end = _balanced(source, start, "figure")
+        block = source[start:end]
+        out.append(source[position:start])
+        images = [_image_markdown(tag) for tag in _IMG.findall(block)]
+        caption = re.search(r"<figcaption>(.*?)</figcaption>", block, re.DOTALL)
+        parts = [*images]
+        if caption:
+            parts.append(_inline_markdown(caption.group(1)))
+        out.append("\n\n".join(part for part in parts if part))
+        position = end
+    out.append(source[position:])
+    source = "".join(out)
+
+    source = _IMG.sub(lambda m: _image_markdown(m.group(0)), source)
+
+    # The credits are one span per line inside a div. As a list they survive the
+    # formatter, which would otherwise run four separate facts into one paragraph.
+    def _credits(match: re.Match[str]) -> str:
+        items = re.findall(r"<span>(.*?)</span>", match.group(1), re.DOTALL)
+        return "\n".join(f"- {_inline_markdown(item)}" for item in items)
+
+    source = re.sub(r'<div class="credits">(.*?)</div>', _credits, source, flags=re.DOTALL)
+    # Every remaining div is a named block whose name is a style. The content is the
+    # document; the box around it is the page's.
+    source = re.sub(r"</?div\b[^>]*>", "", source)
+    source = re.sub(r"</?p\b[^>]*>", "", source)
+    source = _inline_markdown_document(source)
+    source = re.sub(r"\n{3,}", "\n\n", source).strip() + "\n"
+
+    # Formatted by the same tool that owns every other Markdown file here, so the
+    # published document wraps the way the repository's prose does. It has to run in
+    # process: the Makefile drives the Rust build through `uvx`, and a network fetch
+    # inside the page build would make the deploy depend on an index being reachable.
+    # `flowmark` is the Python build of the same formatter, pinned in the dev group.
+    from flowmark import reformat_text  # noqa: PLC0415
+
+    return reformat_text(source, semantic=True, cleanups=True)
+
+
+def _inline_markdown_document(source: str) -> str:
+    """`_inline_markdown` over a whole document, line structure intact.
+
+    The caption form collapses its input to one line, which is right for a caption and
+    wrong for prose, so the paragraph shape is preserved by running the conversion
+    within each line rather than over the whole string.
+    """
+    return "\n".join(
+        _inline_markdown(line) if line.strip() else "" for line in source.split("\n")
+    )
+
+
+def markdown_source(
     per_certificate: list[dict[str, str]],
     headline_values: dict[str, str],
     shared: dict[str, str],
     *,
     claimed: bool,
 ) -> str:
-    """The page body: the Markdown source assembled, then rendered once by kpress.
+    """The article's Markdown with every value filled in: what the page is made of.
 
-    Order matters twice. The figures are stamped before anything is
-    substituted, so each copy is filled with its own certificate's values, and
-    the pass that follows fills the prose once, with the headline certificate's
-    values and the shared ones. And every placeholder is
-    substituted before the Markdown is parsed, because markdown-it
-    percent-encodes a link destination: `[computed]({{RENDERER_URL}})` parsed
-    first would leave `href="%7B%7B..."` behind.
+    Split out from the render because it is an artifact in its own right, not just an
+    intermediate. The template is not publishable -- it carries `{{PLACEHOLDERS}}`, so
+    it states no bound and names no number -- and this is the same document with the
+    certificate's own values in it.
+
+    The maths is left unkerned here. `kerned_math_spans` inserts `\\mkern1mu` so KaTeX
+    does not set an italic function name against its parenthesis, which is a fact about
+    typesetting and not about the mathematics; a reader, or a model, reading this file
+    should see `s(11)`.
     """
     source = MARKDOWN.read_text(encoding="utf-8")
     if not claimed:
@@ -1370,16 +1627,30 @@ def markdown_body(
     source = fill(
         _HTML_COMMENT.sub("", source), {**headline_values, **shared}, where=MARKDOWN.name
     )
-    source = kerned_math_spans(source)
     left = {m.group(1) for m in re.finditer(r"\{\{([A-Z_]+)\}\}", source)}
     if left:
         raise SystemExit(f"{MARKDOWN.name}: a substituted value carried {sorted(left)} into it")
+    return source
+
+
+def markdown_body(source: str, *, title: str) -> str:
+    """The page body: the Markdown source assembled, then rendered once by kpress.
+
+    Order matters twice. The figures are stamped before anything is
+    substituted, so each copy is filled with its own certificate's values, and
+    the pass that follows fills the prose once, with the headline certificate's
+    values and the shared ones. And every placeholder is
+    substituted before the Markdown is parsed, because markdown-it
+    percent-encodes a link destination: `[computed]({{RENDERER_URL}})` parsed
+    first would leave `href="%7B%7B..."` behind.
+    """
+    source = kerned_math_spans(source)
 
     from kpress.format.markdown import parse_markdown  # noqa: PLC0415
 
     document = parse_markdown(
         source,
-        title=f"s({shared['N']}) >= {shared['HEADLINE_L_FRAC']}",
+        title=title,
         trust_mode="trusted",
         math="auto",
     )
@@ -1391,7 +1662,14 @@ def markdown_body(
     return document.html
 
 
-def render(certificate_paths: tuple[Path, ...], *, full_sweep: bool = False) -> str:
+class Render(NamedTuple):
+    """What one render produces: the page, and the document it is made of."""
+
+    page: str
+    markdown: str
+
+
+def render(certificate_paths: tuple[Path, ...], *, full_sweep: bool = False) -> Render:
     """One page for every certificate given, the first shown by default."""
     if not certificate_paths:
         raise SystemExit("no certificate to render")
@@ -1414,7 +1692,8 @@ def render(certificate_paths: tuple[Path, ...], *, full_sweep: bool = False) -> 
         print("a certificate lacks a claim document or a timing; the page drops that section")
     static = kpress_static()
     headline_values = per_certificate[facts.index(headline)]
-    prose = markdown_body(per_certificate, headline_values, shared, claimed=claimed)
+    source = markdown_source(per_certificate, headline_values, shared, claimed=claimed)
+    prose = markdown_body(source, title=f"s({shared['N']}) >= {shared['HEADLINE_L_FRAC']}")
     # The sprite leads the body the way kpress's own renderer places it: the copy
     # button on a code block draws its glyph from a fragment of it.
     body = f"{icon_sprite(static)}\n{prose}"
@@ -1423,7 +1702,7 @@ def render(certificate_paths: tuple[Path, ...], *, full_sweep: bool = False) -> 
     )
     page = fill(shell, shell_substitutions(static, shared, body), where=TEMPLATE.name)
     assert_self_contained(page)
-    return page
+    return Render(page=page, markdown=published_markdown(source, default_slug=slug(facts[0])))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -1456,23 +1735,30 @@ def main(argv: Sequence[str] | None = None) -> int:
     certificates = (
         tuple(path.resolve() for path in args.certificate) if args.certificate else WALKTHROUGH
     )
-    page = render(certificates, full_sweep=args.verify_condition_5)
+    rendered = render(certificates, full_sweep=args.verify_condition_5)
+    document = output.parent / MARKDOWN_OUTPUT.name
+    written = ((output, rendered.page), (document, rendered.markdown))
     if args.check:
-        if not output.is_file():
-            print(f"{label} has not been rendered", file=sys.stderr)
-            return 1
-        if output.read_bytes() != page.encode("utf-8"):
-            print(f"{label} is stale; rerender it", file=sys.stderr)
-            return 1
+        for path, content in written:
+            name = path.relative_to(REPO).as_posix() if path.is_relative_to(REPO) else str(path)
+            if not path.is_file():
+                print(f"{name} has not been rendered", file=sys.stderr)
+                return 1
+            if path.read_bytes() != content.encode("utf-8"):
+                print(f"{name} is stale; rerender it", file=sys.stderr)
+                return 1
         print(f"{label} is current")
         return 0
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    with atomic_output_file(output) as temporary:
-        temporary.write_text(page, encoding="utf-8")
+    for path, content in written:
+        with atomic_output_file(path) as temporary:
+            temporary.write_text(content, encoding="utf-8")
     for asset in COMPOSITE_ASSETS:
         shutil.copyfile(asset, output.parent / asset.name)
-    print(f"wrote {label} ({len(page) / 1024:.0f} KB)")
+    print(f"wrote {label} ({len(rendered.page) / 1024:.0f} KB)")
+    name = document.relative_to(REPO).as_posix()
+    print(f"wrote {name} ({len(rendered.markdown) / 1024:.0f} KB)")
     return 0
 
 

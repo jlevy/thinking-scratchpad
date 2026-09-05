@@ -24,7 +24,7 @@ per certificate; the prose is filled once, with the headline certificate's value
 
 # <span class="symbol">s({{N}}) <span class="rel">≥</span> {{HEADLINE_L_FRAC}}</span>
 
-<p class="subtitle">A New Lower Bound on the Square Packing Problem</p>
+<p class="subtitle">{{SUBTITLE}}</p>
 
 <div class="credits">
   <span>{{PUBLISHED}} ({{EDITION}}, revision {{REVISION}})</span>
@@ -70,7 +70,7 @@ rotate.[^survey] The value is known for every $n \le 10$. Stromquist settled
 $s(10) = 3 + 1/\sqrt{2}$ in {{PRIOR_YEAR}}.[^stromquist]
 
 <figure>
-  <div class="stage"><a href="known-best-1-100.pdf"><img src="known-best-1-100.svg" alt="The best known packings of one through one hundred unit squares, in a ten-by-ten grid, each labelled with its best known upper bound and, where the value is still open, the best proved lower bound" width="2400" height="2896"></a></div>
+  <div class="stage"><a href="known-best-1-100.pdf"><img src="known-best-1-100.svg" alt="{{COMPOSITE_ALT}}" width="2400" height="2896"></a></div>
   <figcaption><strong>Figure 1.</strong> The best known packings of 1 through 100 unit squares. Each cell is the tightest
   arrangement on record for that <span class="tex">n</span>, with the best known upper bound beneath it and, where
   <span class="tex">s(n)</span> is not yet settled, the best proved lower bound below that. A crimson star marks a lower
@@ -84,9 +84,9 @@ $s(10) = 3 + 1/\sqrt{2}$ in {{PRIOR_YEAR}}.[^stromquist]
 
 $s(11)$ is the smallest case still open.
 Trump’s 1979 packing shows $s(11) \le {{BEST_PACKING_TEX}}$.[^trump] Here we prove
-$s(11) \ge {{HEADLINE_L_FRAC}} = {{HEADLINE_L_DEC}}$. The project proves two bounds, and
-the figures below open on the looser one, $s({{N}}) \ge {{DEFAULT_L_FRAC}}$, whose
-smaller numbers are easier to follow.
+$s(11) \ge {{HEADLINE_L_FRAC}} = {{HEADLINE_L_DEC}}$. The project proves two bounds.
+(Some of the figures below also show the looser one, $s({{N}}) \ge {{DEFAULT_L_FRAC}}$,
+whose smaller numbers make the illustration simpler.)
 <span class="screen-only">The chooser under each figure switches every figure between
 the two at once.</span>
 
@@ -134,16 +134,20 @@ $t_k$, and a shrink $B \lt 1$, such that:
 
 <div class="conditions boxed-text">
 
-- **Condition 1.** The atom set is invariant under the container’s symmetry group
-  $\mathbf{D}_4$.
-- **Condition 2.** The total mass of the atoms, the sum of all their weights, is
-  strictly below $n$.
-- **Condition 3.** The net reaches $\pi/4$: its last half-tangent is at least
-  $\tan(\pi/8)$.
-- **Condition 4.** $B(1 + D) \lt 1$, where $D$ is the largest of the net’s half-gap
-  tangents, each the tangent of half the angle between two consecutive net directions.
-- **Condition 5.** At every net direction, every placement of a square of side $B$
-  inside the container covers mass at least $1$.
+**Condition 1.** The atom set is invariant under the container’s symmetry group
+$\mathbf{D}_4$.
+
+**Condition 2.** The total mass of the atoms, the sum of all their weights, is strictly
+below $n$.
+
+**Condition 3.** The net reaches $\pi/4$: its last half-tangent is at least
+$\tan(\pi/8)$.
+
+**Condition 4.** $B(1 + D) \lt 1$, where $D$ is the largest of the net’s half-gap
+tangents, each the tangent of half the angle between two consecutive net directions.
+
+**Condition 5.** At every net direction, every placement of a square of side $B$ inside
+the container covers mass at least $1$.
 
 </div>
 

@@ -1,31 +1,33 @@
 # Square Packing
 
-Three things here, and each is a reason to look:
+Three things here:
 
-- **New results.** The lower bound on `s(11)`, the smallest open case, has moved for the
-  first time in the located public record since Stromquist set it in 2003 — and with it
-  the first located public bounds specifically for twelve, twenty and twenty-one
-  squares, and values from `n = 17` through `n = 21` that displace what was in print.
-  [Details below](#new-results).
-- **A survey of the whole problem in one place.** Every case `n = 1…100`, the primary
+- **[New results](#new-results).** The lower bound on `s(11)` has moved.
+  It appears to be the first improvement in 23 years on the smallest open case; the
+  previous bound, `3.7888543…`, was Stromquist’s in 2003. With it come the first bounds
+  located in the public record for twelve, twenty and twenty-one squares, and values
+  from `n = 17` through `n = 21` that displace what was in print.
+- **[A survey of the whole problem](#survey).** Every case `n = 1…100`, the primary
   literature retained and transcribed, and the bound a source *reports* kept apart from
-  the bound this repository has *verified* — the most comprehensive single-source
-  treatment of square packing we are aware of.
-  [Details below](#survey).
-- **An automated research workflow underneath all of it.** The results and the survey
-  are produced and checked by AI agents running a recorded process — hypotheses
-  registered before measurement, every claim graded, every defect logged.
-  [Details below](#autonomous-research-process).
+  the bound this repository has *verified*. Seven of the lower bounds it shows were
+  proved here.
+- **[An automated research workflow](#autonomous-research-process).** The results and
+  the survey are produced and checked by AI agents running a recorded process:
+  hypotheses registered before measurement, every claim graded, every defect logged.
 
-[![One hundred known-best square packings arranged from n equals one through one hundred, each labelled with its best known upper bound and, where the value is still open, the best proved lower bound.](packing/atlas/known-best/known-best-1-100.png)](packing/atlas/known-best/known-best-1-100.svg)
+The [**explainer page**](https://jlevy.github.io/squares/) is the best introduction to
+the proof: the `s(11)` bound and its five conditions in one page, with every figure
+drawn from the certificate it explains.
+
+[![One hundred known-best square packings arranged from n equals one through one hundred, each labelled with its best known upper bound and, where the value is still open, the best proved lower bound.](packing/atlas/known-best/known-best-1-100.png)](https://jlevy.github.io/squares/known-best-1-100.pdf)
 
 *The retained `n = 1…100` atlas, with each packing normalized to its own container and
 labeled by its best known side upper bound and, where `s(n)` is still open, the best
 proved lower bound beneath it.
 A crimson star marks a lower bound proved here.
-Select the image for the zoomable SVG, take the
-[4800 × 5792 raster](packing/atlas/known-best/known-best-1-100@2x.png) to attach or
-downscale, or use the [print-ready PDF](packing/atlas/known-best/known-best-1-100.pdf).*
+The image is available in [**SVG**](packing/atlas/known-best/known-best-1-100.svg),
+[**PDF**](https://jlevy.github.io/squares/known-best-1-100.pdf), and
+[**high-rez PNG**](packing/atlas/known-best/known-best-1-100@2x.png).*
 
 `s(n)` is the side of the smallest square that holds `n` non-overlapping unit squares.
 The problem is elementary to state and remains open even at small `n`.
@@ -61,8 +63,8 @@ Results first established here, as far as the recorded source searches show:
   recorded public search found no stronger lower bound after Stromquist published
   `2 + 4/√5 = 3.788854` in 2003. A first-party
   [weighted fractional unavoidable-set certificate](packing/cases/n11_fractional_certificate/)
-  — 1121 weighted atoms, total mass `434547/40000`, every placement of a shrunken square
-  covering mass at least `1` — proves that eleven unit squares do not fit in a container
+  —1121 weighted atoms, total mass `434547/40000`, every placement of a shrunken square
+  covering mass at least `1`—proves that eleven unit squares do not fit in a container
   of side `3.81`. The interval narrows from `0.088230` to `0.067084`; the gap is not
   closed. Two rungs are retained below it: `19/5`, the value that first passed
   Stromquist, and `189/50`, the calibration rung below him that was run first on purpose
@@ -77,10 +79,10 @@ Results first established here, as far as the recorded source searches show:
 - **T-019: `s(17), s(18), s(19) ≥ 459/100`, displacing the published value (`S4`).** The
   adopted bound for [these](packing/frontier/n-017.md) three cases was Massaccesi’s
   `4.5058`, taken from a source rather than proved here.
-  The same generator returns `4.59` — 1184 atoms, total mass `423327/25000 = 16.9331`
-  against `n = 17`, least covered mass `200009/200000` — so the repository now carries a
-  first-party certificate `0.0842` above the number it had adopted, with the `229/50`
-  and `451/100` rungs it climbed through retained below.
+  The same generator returns `4.59`, on 1184 atoms with total mass
+  `423327/25000 = 16.9331` against `n = 17` and least covered mass `200009/200000`, so
+  the repository now carries a first-party certificate `0.0842` above the number it had
+  adopted, with the `229/50` and `451/100` rungs it climbed through retained below.
   One certificate covers all three sizes without a monotonicity step: only `Condition 2`
   mentions `n`, so an atom set certifies its side for every integer above its own mass.
   `T-020` has since carried `n = 19` past it; `n = 17` and `n = 18` are this result’s
@@ -89,7 +91,7 @@ Results first established here, as far as the recorded source searches show:
   years (`S4`).** Twenty and twenty-one squares had never had a bound of their own: both
   carried Nagamochi’s 2005 general formula, `1 + √13 = 4.6055…` and `1 + √14 = 4.7416…`,
   and nothing else. A [certificate at `4.80`](packing/cases/n20_fractional_certificate/)
-  — 2260 atoms, total mass `946131/50000`, least covered mass `50007/50000` — moves
+  —2260 atoms, total mass `946131/50000`, least covered mass `50007/50000`—moves
   [`n = 20`](packing/frontier/n-020.md) by `0.194449`, `n = 21` by `0.058343`, and
   `n = 19` by `0.21`, the largest single-case movement in the register.
   The three sizes again come out of `Condition 2` alone.
@@ -100,9 +102,9 @@ Results first established here, as far as the recorded source searches show:
   [`n = 12`](packing/frontier/n-012.md) had only the `n = 11` bound inherited by
   monotonicity; the frontier record said in as many words that nothing specific to
   `n = 12` had ever been proved.
-  An eight-rung ladder — `19/5`, `77/20`, `97/25`, `39/10`, `393/100`, `197/50`,
-  `79/20`, `99/25` — is retained, all from one generator that applies at every `n`,
-  which is why this is scored `S4` as a bound family rather than a case result.
+  An eight-rung ladder—`19/5`, `77/20`, `97/25`, `39/10`, `393/100`, `197/50`, `79/20`,
+  `99/25`—is retained, all from one generator that applies at every `n`, which is why
+  this is scored `S4` as a bound family rather than a case result.
   At `99/25 = 3.96` it also separates the cases: `s(12) > s(11)`, since Trump’s 1979
   packing puts `s(11) ≤ 3.877084`. That did not follow from anything on record before.
   The case is now `0.04` from its conjectured optimum of `4`, and no single certificate
@@ -112,7 +114,8 @@ Results first established here, as far as the recorded source searches show:
   question about the covering value.
 - **T-010: `s(11) ≥ 2 + 4/√5`, repaired (`S4`).** The printed 2003 Figure 14
   unavoidability claim has a strict counterexample, so the literature’s standing `s(11)`
-  bound rested on a broken step — the
+  bound rested on a broken step.
+  The
   [case report](docs/project/research/research-2026-08-22-packing-11-unit-squares.md)
   walks through what survived it.
   A preregistered, source-distinct replacement point set restores the full lower-bound
@@ -128,7 +131,7 @@ annotation, or an erratum.
 - **T-001 / T-002: `s(17) ≥ 4.426213` and `s(18) ≥ 4.426213`.** A sixteen-point
   unavoidable set is certified by exact rational cover verification and an independent
   interval branch-and-bound over the full pose space.
-  Both are superseded as the verified lower bound — first by the source-backed `4.5058`
+  Both are superseded as the verified lower bound: first by the source-backed `4.5058`
   adopted on 2026-09-03, and now by `T-019`, which proves more than either.
 - **T-009: `s(29) ≤ 5.93383346267692918974379895098`.** A Krawczyk interval certificate
   encloses a unique exact solution around a rational witness.
@@ -145,7 +148,7 @@ annotation, or an erratum.
   independently reviewed.
   The side is fixed throughout; nothing is claimed about an isolation radius, about any
   other `n = 5` optimum, or about global uniqueness, and nothing follows for the side as
-  a variable — with the side free the obstruction fails, which X-007 measured.
+  a variable: with the side free the obstruction fails, which X-007 measured.
 - **T-005: an erratum in Bentz 2010.** Lemma 10’s middle replacement point is transposed
   in print. An exact escape certificate refutes the printed point, and the corrected
   reading certifies exactly against the journal page image.

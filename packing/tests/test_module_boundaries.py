@@ -172,7 +172,7 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
 
     assert PYTHON_VERSION.read_text(encoding="utf-8").strip() == "3.14.7"
 
-    for job_name in ("validate", "macos-portability"):
+    for job_name in ("validate", "exhaustive", "macos-portability"):
         raw_steps = _mapping(jobs[job_name])["steps"]
         assert isinstance(raw_steps, list)
         steps = [_mapping(step) for step in raw_steps]
@@ -239,9 +239,38 @@ def test_ci_jobs_fetch_provenance_history_and_key_the_uv_cache_from_the_lock() -
         if _mapping(step).get("name") == "Run the complete integration surface"
     )
     assert full_step["if"] == "github.event_name != 'pull_request'"
+    # `--skip`, because the exhaustive exact tier is the `exhaustive` job's whole
+    # selection and 1943s is not a bill to pay twice. That the two selections still
+    # partition `STEPS` is checked against the CLI's own selector in
+    # `test_the_post_merge_jobs_partition_the_gate`; what is pinned here is that this
+    # command is the one that leaves the tier out.
     assert " ".join(str(full_step["run"]).split()) == (
-        "uv run --frozen --all-extras --group dev packing-validate --jobs 2 --inner-jobs 2"
+        'uv run --frozen --all-extras --group dev packing-validate --skip "exhaustive '
+        'exact behavioral tests" --jobs 2 --inner-jobs 2'
     )
+
+    # The exhaustive exact tier, split onto its own runner on 2026-09-05 (think-tr2z) so
+    # that a step which had been half the complete surface's wall time reports its own
+    # verdict against its own budget. D-456 is what that fixes: killed at its budget with
+    # its output still in an unflushed pipe, it turned `validate` red on three
+    # consecutive merges while saying nothing about the sixty steps beside it.
+    exhaustive_job = _mapping(jobs["exhaustive"])
+    assert exhaustive_job["if"] == "github.event_name != 'pull_request'"
+    assert "continue-on-error" not in exhaustive_job
+    exhaustive_steps = exhaustive_job["steps"]
+    assert isinstance(exhaustive_steps, list)
+    exhaustive_commands = [
+        " ".join(str(_mapping(step)["run"]).split())
+        for step in exhaustive_steps
+        if isinstance(_mapping(step).get("run"), str)
+        and "packing-validate" in str(_mapping(step)["run"])
+    ]
+    assert exhaustive_commands == [
+        (
+            'uv run --frozen --all-extras --group dev packing-validate --only "exhaustive '
+            'exact behavioral tests" --jobs 1 --inner-jobs 2'
+        )
+    ]
 
     required_job = _mapping(jobs["packing-required"])
     assert required_job["needs"] == "validate"

@@ -3,8 +3,9 @@
 The command is read-only. Checks run concurrently, but their captured output is
 replayed in the declared order so two runs remain comparable. Use `--edit` while
 editing, `--push` before a push (the edit tier plus the behavioral tests reachable from
-the change), `--only TEXT` for one named surface, the default command before a commit,
-and `--strict` before an unattended research session or merge.
+the change), `--only TEXT` for one named surface, `--skip TEXT` for everything but one,
+the default command before a commit, and `--strict` before an unattended research
+session or merge.
 
 `--records` exists because of what breaks. Every CI failure on this branch was a
 registry, generated view, or declared contract going stale, and none was a test; the
@@ -324,6 +325,11 @@ class RunSummary:
     selected_count: int = 0
     total_count: int = 0
     partial_pattern: list[str] = field(default_factory=list)
+    skipped_pattern: list[str] = field(default_factory=list)
+    """The `--skip` patterns, kept apart from `--only` so the closing line can say which
+    narrowing produced a partial surface. A run that skipped one named step is not the
+    same thing as a tier, and reporting it as one is how a job that quietly stopped
+    running something looks exactly like a job that was never meant to."""
 
 
 def _timeout_output(error: subprocess.TimeoutExpired) -> str:
@@ -1376,6 +1382,11 @@ def _n40_rigidity_bracket(context: Context) -> str:
     # makes and nothing here is a duplicate of anything else; the honest alternative, if
     # the cost bites, is to move the whole step behind a flag rather than to thin the
     # checks until they stop covering what is asserted.
+    #
+    # The third step the pull-request tier does not carry, and the only one of the three
+    # that would have fit: 221.36s on CI. What it re-derives is mathematics, not a
+    # record, and a pull request that can change the answer has edited the assessor,
+    # which `--since` selects this step for. See the note above `STEPS`.
     return _module(context, "devtools.assess_n40_rigidity", "--check")
 
 
@@ -1519,28 +1530,100 @@ _CASES = ("packing/cases/*",)
 # discover which archives to replay by globbing, so adding one changes what runs.
 _RESULTS = ("packing/campaign/series/*",)
 
+# What `fast` means since 2026-09-05: the tier a pull request runs, and therefore the
+# tier that has to hold everything a merge would otherwise be the first to check.
+# Twenty-four of the sixty-one steps ran only after merge until this date, and two
+# defects reached main through that gap in one afternoon and sat there red for nine
+# hours -- D-455 caught by `deterministic SVG rendering` and D-456 by the exhaustive
+# tier, neither of them reachable from any pull request (think-k4fb).
+#
+# Twenty-one of the twenty-four are promoted, and what makes that affordable is that a
+# tier does not cost the sum of its steps. At `--jobs 2` one worker is inside the
+# behavioural suite for the whole run, so the tier costs
+# `max(that suite, everything else run serially on the other worker)`. The measurements,
+# local at 4 cores and one step at a time under `--only`, with CI about 1.3x slower
+# (`type floor` is 45.51s there against 35.62s here):
+#
+#   115s  the fast tier as it stood, minus the suite
+#   538s  the twenty-one promoted steps, one at a time under `--only`
+#   663s  the promoted tier minus the suite, measured whole rather than summed
+#         (`--fast --skip "fast behavioral tests" --jobs 2 --inner-jobs 1`, 334s of wall
+#         over two workers), which is the 653s the two rows above predict
+#  1034s  the suite itself -- not a new reading, but the one already recorded beside
+#         `FAST_SUITE_BUDGET_SECONDS` below, and about 1100s of CI's twenty-minute job
+#
+# So the second worker goes from 115s to 663s of serial work, or about 860s scaled to
+# CI, and stays under the suite that sets the wall time. The pull-request job takes what
+# it took. The margin is about 240s of CI time and it is the number to re-measure before
+# promoting a twenty-second step: past it the tier stops being priced by the suite and
+# starts being priced by this queue.
+#
+# `_run_selected` submits the budgeted steps first for this reason and no other. The
+# suite is declared fifteenth and eleven of the promoted steps are declared ahead of it,
+# including the three sweeps that are half the promoted total; in submission order the
+# suite would have started only once those had cleared, which would have spent on the
+# scheduler exactly what the arithmetic above saves.
+#
+# Three are deferred, each on its own measurement rather than on a rule:
+#
+# - `exhaustive exact behavioral tests`, 1943s on CI: the suite it would have to fit
+#   beside is not that large, so it would set the tier's wall time itself. It has its
+#   own workflow job as of think-tr2z, which is what a step of that size needs -- its
+#   own budget and its own verdict rather than a larger share of someone else's.
+# - `negative controls`, 544s on CI: the same arithmetic, the other side of the line. It
+#   would put the second worker at about 1400s against the suite's 1100s, so the pull
+#   request would start waiting on the controls instead of on its own tests and take
+#   about five minutes longer. It clones the tree per worker for 148 declared mutations,
+#   which makes it the one surface here that really is a second test suite.
+# - `n=40 rigidity bracket still reproduces`, 221s on CI: this one fits, and only just --
+#   it is about the whole remaining margin, which would leave the tier priced by the
+#   queue rather than by the suite and the next promotion with nothing to spend. It also
+#   re-derives mathematics rather than checking a record, no pull request moves its
+#   answer without editing `assess_n40_rigidity.py` or the assessor beneath it, and
+#   `--since` already selects it for exactly those changes.
+#
+# `test_the_pull_request_surface_defers_only_what_was_measured` is where a fourth
+# deferral has to be argued. `fast` defaults to False, so without that test this gap
+# reopens quietly the next time a step is added.
 STEPS: tuple[Step, ...] = (
+    # 47.14s, and the reason every engine-dependent step below is `broad` as well as
+    # `fast`: selecting one of them builds sqsearch before any step starts, and that
+    # build is serial time the edit loop should never pay. The edit tier stays Python
+    # with no toolchain behind it; the pull request compiles the engine once and gets
+    # the perimeter, the selftest, the differential and the Rust lint floor for it,
+    # none of which any pull request checked before.
     Step(
         "soundness perimeter",
         _soundness_perimeter,
+        fast=True,
+        broad=True,
         needs_engine=True,
         touches=(*_CORE, *_ENGINE_SRC, "packing/devtools/check_soundness_perimeter.py"),
     ),
     Step("lint floor (ruff)", _lint_floor, fast=True, records=True, touches=_ANY_PYTHON),
     Step("type floor (basedpyright)", _type_floor, fast=True, touches=_ANY_PYTHON),
+    # 9.63s.
     Step(
         "basin atlas",
         _basin_atlas,
+        fast=True,
+        broad=True,
         touches=(*_CORE, "packing/atlas/*", "packing/devtools/check_atlas.py"),
     ),
+    # 7.89s.
     Step(
         "basin event record and replay",
         _basin_events,
+        fast=True,
+        broad=True,
         touches=(*_CORE, *_CASES, *_RESULTS, "packing/frontier/*"),
     ),
+    # 29.35s.
     Step(
         "historical regressions",
         _historical_regressions,
+        fast=True,
+        broad=True,
         touches=(
             *_CORE,
             *_ENGINE_SRC,
@@ -1549,14 +1632,21 @@ STEPS: tuple[Step, ...] = (
             "packing/devtools/check_regressions.py",
         ),
     ),
+    # 19.80s.
     Step(
         "small-n exact models and local geometry",
         _small_n,
+        fast=True,
+        broad=True,
         touches=(*_CORE, *_CASES, *_RESULTS, "packing/atlas/*"),
     ),
+    # 26.39s, and the step D-455 was caught by -- on main, three merges and nine hours
+    # after the commit that broke it, because this tier ran nowhere else.
     Step(
         "deterministic SVG rendering",
         _svg_rendering,
+        fast=True,
+        broad=True,
         touches=(
             *_CORE,
             "packing/atlas/*",
@@ -1568,9 +1658,18 @@ STEPS: tuple[Step, ...] = (
             "*.md",
         ),
     ),
+    # The three record sweeps below are the tier's expensive half -- 170.44s, 122.17s and
+    # 96.50s on CI -- and they are promoted anyway. They are the class D-369 measured:
+    # every CI failure on that branch was a registry, a generated view or a declared
+    # contract going stale, and these three are what re-derives the largest of those from
+    # 100 retained witnesses. A pull request that retains a witness or edits a source map
+    # is exactly the change that breaks them, and until now exactly the change that could
+    # not find out until after the merge.
     Step(
         "known-best n=1..100 atlas",
         _known_best_atlas,
+        fast=True,
+        broad=True,
         touches=(
             *_CORE,
             *_CASES,
@@ -1584,6 +1683,8 @@ STEPS: tuple[Step, ...] = (
     Step(
         "prospective n=101..324 source map and safe seed",
         _prospective_atlas,
+        fast=True,
+        broad=True,
         touches=(
             *_CORE,
             "packing/atlas/prospective/*",
@@ -1597,6 +1698,8 @@ STEPS: tuple[Step, ...] = (
     Step(
         "single-square translation escape screen",
         _translation_escape_screen,
+        fast=True,
+        broad=True,
         touches=(
             *_CORE,
             "packing/atlas/known-best/*",
@@ -1604,9 +1707,12 @@ STEPS: tuple[Step, ...] = (
             "packing/devtools/screen_translation_escape.py",
         ),
     ),
+    # 2.09s, so `fast` without `broad`: cheaper than several steps the edit tier already
+    # carries, and the rule for `broad` is a cost argument, not a tier's habit.
     Step(
         "abstract size-five contact-scaffold atlas",
         _contact_scaffold_atlas,
+        fast=True,
         touches=(
             *_CORE,
             "packing/atlas/enumerated/*",
@@ -1617,10 +1723,18 @@ STEPS: tuple[Step, ...] = (
     # budget is that measurement plus room for the growth, not a number chosen to make
     # today's run pass; a control suite that doubles again should be re-argued, not
     # re-padded.
+    #
+    # One of the three steps the pull-request tier deliberately does not carry: 543.67s
+    # on CI, which is the point at which a promoted step stops fitting beside the
+    # behavioural suite and starts being the thing the job waits for. See the note above
+    # `STEPS`.
     Step("negative controls", _negative_controls, budget_seconds=1800),
+    # 9.76s.
     Step(
         "fixed-angle cell is an LP, rebuilt independently",
         _independent_lp,
+        fast=True,
+        broad=True,
         touches=(*_CORE, "packing/cases/trump11/*"),
     ),
     # 1209s measured on 2026-09-03 at 1607 passing tests, in the full gate at 13:47Z,
@@ -1659,6 +1773,11 @@ STEPS: tuple[Step, ...] = (
         broad=True,
         budget_seconds=FAST_SUITE_BUDGET_SECONDS,
     ),
+    # 1943.05s on CI, and since 2026-09-05 the only step its workflow job runs: the
+    # `exhaustive` job selects it with `--only` and every other job excludes it with
+    # `--skip`, so it reports its own verdict against its own budget instead of deciding
+    # whether sixty other steps are reported at all (think-tr2z). It is also the one
+    # step whose cost rules it out of the pull-request tier outright.
     Step(
         "exhaustive exact behavioral tests",
         _exhaustive_exact_tests,
@@ -1673,9 +1792,11 @@ STEPS: tuple[Step, ...] = (
         # change produces no changed path at all -- which selects the whole gate.
         touches=(*_CORE, ".tbd/*", "packing/devtools/check_bead_tree.py"),
     ),
+    # 0.51s on the fast path, which is what runs without `--deep`.
     Step(
         "golden basin maps (proved cases, checked against mathematics)",
         _golden_basins,
+        fast=True,
         touches=(
             *_CORE,
             *_ENGINE_SRC,
@@ -1684,9 +1805,11 @@ STEPS: tuple[Step, ...] = (
             "packing/devtools/check_golden_basins.py",
         ),
     ),
+    # 4.95s.
     Step(
         "basin identity",
         _canonical_identity,
+        fast=True,
         touches=(
             *_CORE,
             "packing/cases/trump11/*",
@@ -1701,16 +1824,33 @@ STEPS: tuple[Step, ...] = (
         fast=True,
         touches=(*_CORE, "packing/cases/trump11/*"),
     ),
-    Step("search engine (sqsearch)", _search_engine, needs_engine=True, touches=_ENGINE_SRC),
-    Step("lint floor (rust)", _rust_quality, touches=_ENGINE_SRC),
+    # 2.19s and 14.94s, both `broad` for the toolchain rather than for their own cost:
+    # the first needs the built engine and the second runs clippy and rustfmt. Until
+    # 2026-09-05 no pull request compiled this crate at all, so a Rust change was linted
+    # and selftested for the first time after it had merged.
+    Step(
+        "search engine (sqsearch)",
+        _search_engine,
+        fast=True,
+        broad=True,
+        needs_engine=True,
+        touches=_ENGINE_SRC,
+    ),
+    Step("lint floor (rust)", _rust_quality, fast=True, broad=True, touches=_ENGINE_SRC),
+    # 13.82s.
     Step(
         "Trump exact branchwise linearized cones",
         _trump_cones,
+        fast=True,
+        broad=True,
         touches=(*_CORE, "packing/cases/trump11/*", *_RESULTS),
     ),
+    # 0.49s and 0.34s: two replays of a retained certificate, cheap enough for the edit
+    # tier on the same rule as the scaffold atlas above.
     Step(
         "H-041 Stromquist repaired-cover exact certificate",
         _stromquist_repair,
+        fast=True,
         touches=(
             *_CORE,
             "packing/cases/stromquist/*",
@@ -1721,6 +1861,7 @@ STEPS: tuple[Step, ...] = (
     Step(
         "H-010 Stromquist printed-cover exact rejection",
         _stromquist_rejection,
+        fast=True,
         touches=(
             *_CORE,
             "packing/cases/stromquist/*",
@@ -1750,9 +1891,12 @@ STEPS: tuple[Step, ...] = (
     ),
     # D-355's measured case: a two-file edit to the rigidity assessor was verified with a
     # 979.79s full gate, and these three are what such an edit can reach.
+    #
+    # 0.53s: a hundred frontmatter blocks and one replay of the n=29 source.
     Step(
         "frontier corpus",
         _frontier_corpus,
+        fast=True,
         touches=(
             *_CORE,
             "packing/frontier/*",
@@ -1847,12 +1991,15 @@ STEPS: tuple[Step, ...] = (
             *_CORE,
         ),
     ),
-    # 28s, so it stays out of `--edit` -- but that follows from `fast=False` alone, since
-    # `_select_steps` filters to the fast steps before `broad` is consulted. The flag was
-    # set here and did nothing; a step is excluded from `--edit` by not being fast.
+    # 23.54s, so it stays out of `--edit`. That used to follow from `fast=False` alone --
+    # `_select_steps` filters to the fast steps before `broad` is consulted, so the flag
+    # was once set here and did nothing. Now that the step is in the pull-request tier the
+    # flag is what keeps it out of the edit loop, which is the job it was written for.
     Step(
         "D-034's n=5 identity pair still reproduces",
         _n5_identity_pair,
+        fast=True,
+        broad=True,
         touches=(
             *_CORE,
             "packing/devtools/build_n5_identity_pair.py",
@@ -2105,9 +2252,12 @@ STEPS: tuple[Step, ...] = (
             "packing/campaign/series/*/results/bc-049-n40-rigidity-bracket.json",
         ),
     ),
+    # 0.34s, and `broad` only because it needs the engine built.
     Step(
         "differential: search energy vs validity oracle",
         _differential,
+        fast=True,
+        broad=True,
         needs_engine=True,
         touches=(*_CORE, *_ENGINE_SRC, "packing/devtools/check_search_differential.py"),
     ),
@@ -2310,8 +2460,34 @@ def _push_test_step(base: str) -> Step:
 
 
 def _select_steps(
-    *, only: list[str], fast: bool, records: bool = False, edit: bool = False
+    *,
+    only: list[str],
+    fast: bool,
+    records: bool = False,
+    edit: bool = False,
+    skip: Sequence[str] = (),
 ) -> list[Step]:
+    """The steps a tier and its name filters select.
+
+    `--skip` is `--only` read the other way round, and it exists so a surface can be run
+    as everything-but-one. Two CI jobs cannot divide the gate between them with `--only`
+    alone: naming the sixty steps one job keeps is a list that goes stale the moment a
+    step is added, and the step that gets forgotten is one nobody runs.
+
+    An unmatched `--skip` pattern is refused, and this is the half worth arguing. An
+    unmatched `--only` empties the selection, so it announces itself; an unmatched
+    `--skip` leaves the selection whole and the run merely does more than it meant to --
+    safe for the verdict, silent about the fact that the name it was written against has
+    moved. The workflow's exhaustive-tier split is exactly that dependency, so a renamed
+    step has to fail the job that names it rather than quietly cost it half an hour.
+
+    The pattern is matched against every declared step rather than against this tier, so
+    `--fast --skip "negative controls"` is a no-op and not an error: whether a real step
+    is in the chosen tier is the tier's business, and only a name that matches nothing at
+    all is a mistake. `--push` builds its test step outside `STEPS`, so naming that step
+    is refused rather than silently ignored, which is the honest answer to a request this
+    selector cannot carry out.
+    """
     selected = [step for step in STEPS if not (fast or edit) or step.fast]
     if edit:
         selected = [step for step in selected if not step.broad]
@@ -2319,13 +2495,31 @@ def _select_steps(
         selected = [step for step in selected if step.records]
     if only:
         selected = [step for step in selected if any(pattern in step.name for pattern in only)]
+        if not selected:
+            patterns = ", ".join(repr(pattern) for pattern in only)
+            raise UsageError(
+                f"--only {patterns} matched no validation step; "
+                "`packing-validate --list` shows names"
+            )
+    if skip:
+        unmatched = [
+            pattern for pattern in skip if not any(pattern in step.name for step in STEPS)
+        ]
+        if unmatched:
+            patterns = ", ".join(repr(pattern) for pattern in unmatched)
+            raise UsageError(
+                f"--skip {patterns} matched no validation step; "
+                "`packing-validate --list` shows names"
+            )
+        selected = [
+            step for step in selected if not any(pattern in step.name for pattern in skip)
+        ]
     if not selected:
-        patterns = ", ".join(repr(pattern) for pattern in only)
-        message = (
-            f"--only {patterns} matched no validation step; "
+        patterns = ", ".join(repr(pattern) for pattern in skip)
+        raise UsageError(
+            f"--skip {patterns} left no validation step to run; "
             "`packing-validate --list` shows names"
         )
-        raise UsageError(message)
     return selected
 
 
@@ -2421,8 +2615,33 @@ def _selection_needs_marker(selected: Sequence[Step]) -> bool:
     return any(not step.fast or step.broad for step in selected)
 
 
+def _submission_order(selected: Sequence[Step]) -> list[Step]:
+    """The order steps are handed to the pool: longest first, declared order after.
+
+    The pool has `--jobs` workers and takes steps in submission order, so a long step
+    submitted late starts late and the run ends when it finishes. In declared order the
+    behavioural suite is fifteenth, and the fourteen ahead of it were seconds of record
+    checks until 2026-09-05, when eight promoted steps joined them (think-k4fb). Those
+    eight would have delayed the suite's start by about half their total, and a tier
+    whose wall time is one long step would have started paying for the short ones.
+
+    `budget_seconds` is the ordering key because it is already the file's declaration
+    that a step runs long, argued next to each of the three that carry one; nothing here
+    guesses a duration. Descending, so the longest budget goes first, and stable, so
+    everything unbudgeted keeps declared order.
+
+    This changes when steps start, never what is reported: `_run_selected` collects
+    results by name and replays them in declared order, which is the property that keeps
+    two runs comparable.
+    """
+    return sorted(selected, key=lambda step: -(step.budget_seconds or 0.0))
+
+
 def _run_selected(
-    selected: Sequence[Step], context: Context, patterns: list[str]
+    selected: Sequence[Step],
+    context: Context,
+    patterns: list[str],
+    skipped: Sequence[str] = (),
 ) -> RunSummary:
     started = time.perf_counter()
     if _selection_needs_marker(selected):
@@ -2435,7 +2654,8 @@ def _run_selected(
         by_name: dict[str, StepResult] = {}
         with ThreadPoolExecutor(max_workers=context.jobs) as pool:
             futures = {
-                pool.submit(_execute_step, step, context): step.name for step in selected
+                pool.submit(_execute_step, step, context): step.name
+                for step in _submission_order(selected)
             }
             try:
                 for future in as_completed(futures):
@@ -2454,6 +2674,7 @@ def _run_selected(
         selected_count=len(selected),
         total_count=len(STEPS),
         partial_pattern=patterns,
+        skipped_pattern=list(skipped),
     )
 
 
@@ -2500,9 +2721,15 @@ def _render_text(summary: RunSummary, *, strict: bool) -> int:
             print("strict mode: a skipped check is not a passed check", file=sys.stderr)
             return _summary_status(summary, strict=strict)
     if summary.selected_count != summary.total_count:
-        qualifier = (
-            f"--only {summary.partial_pattern!r}" if summary.partial_pattern else "a named tier"
-        )
+        narrowings = [
+            f"{flag} {patterns!r}"
+            for flag, patterns in (
+                ("--only", summary.partial_pattern),
+                ("--skip", summary.skipped_pattern),
+            )
+            if patterns
+        ]
+        qualifier = "; ".join(narrowings) if narrowings else "a named tier"
         print(
             f"{summary.selected_count} of {summary.total_count} STEPS PASSED "
             f"({qualifier}; this is not the full gate)"
@@ -2554,6 +2781,16 @@ def _parser() -> ArgumentParser:
         help="run step names containing TEXT; repeat for more than one pattern",
     )
     parser.add_argument(
+        "--skip",
+        action="append",
+        default=[],
+        metavar="TEXT",
+        help=(
+            "run everything the tier selects except step names containing TEXT; "
+            "repeat for more than one pattern, and a TEXT naming no step is refused"
+        ),
+    )
+    parser.add_argument(
         "--strict", action="store_true", help="run deep checks and fail on skips"
     )
     parser.add_argument(
@@ -2590,11 +2827,12 @@ def _validate_invocation(
     edit: bool = False,
     since: str | None = None,
     push: bool = False,
+    skip: Sequence[str] = (),
 ) -> None:
-    if strict and (only or fast or records or edit or since or push):
+    if strict and (only or skip or fast or records or edit or since or push):
         raise UsageError(
-            "--strict cannot be combined with --only, --fast, --records, --edit, "
-            "--push, or --since"
+            "--strict cannot be combined with --only, --skip, --fast, --records, "
+            "--edit, --push, or --since"
         )
     if edit and fast:
         raise UsageError(
@@ -2627,6 +2865,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             edit=namespace.edit,
             since=namespace.since,
             push=namespace.push,
+            skip=namespace.skip,
         )
         jobs_value = namespace.jobs or os.environ.get("PACKING_VALIDATE_JOBS")
         jobs = (
@@ -2659,6 +2898,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             fast=namespace.fast,
             records=namespace.records,
             edit=namespace.edit or namespace.push,
+            skip=namespace.skip,
         )
         if namespace.push:
             base = namespace.since or "origin/main"
@@ -2701,7 +2941,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             timeout_seconds=timeout_seconds,
             timeout_is_explicit=timeout_is_explicit,
         )
-        summary = _run_selected(selected, context, namespace.only)
+        summary = _run_selected(selected, context, namespace.only, namespace.skip)
     except ParserExitError as error:
         if error.message:
             stream = sys.stdout if error.status == 0 else sys.stderr

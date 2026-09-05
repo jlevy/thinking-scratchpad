@@ -26,7 +26,15 @@ REPO = ROOT.parent
 #: dot-prefixed directory is tool-owned. Stated here rather than at each sweep: the two
 #: controls below must agree about which documents count, because a target that one
 #: sweep calls unowned and the other cannot see is a contradiction, not a finding.
-FOREIGN_DIRECTORY_NAMES = frozenset({"resources", "vendor", "node_modules"})
+#:
+#: `site` is the explainer's render output. It is this repository's, unlike the rest,
+#: but it is generated: rebuilt by every run, gitignored, and already guaranteed by the
+#: renderer's own `--check`, which compares each artifact byte for byte against a fresh
+#: render. The published document there embeds the copy of the composite that the
+#: renderer places beside it, which is not one of the atlas's owned artifacts and never
+#: will be. Being gitignored is not what excludes it: this sweep walks files git does
+#: not track, which is the blind spot D-455 was about.
+FOREIGN_DIRECTORY_NAMES = frozenset({"resources", "vendor", "node_modules", "site"})
 
 
 def repository_documents() -> Iterator[Path]:

@@ -14681,6 +14681,11 @@ defects:
     stated over the whole result so a second vendored tree cannot slip in; and
     `.flowmarkignore` and FOREIGN_DIRECTORY_NAMES agree about `vendor`, since the two
     lists are maintained by hand in different languages.
+    The second half of the exposure closed later the same day: `deterministic SVG
+    rendering` is itself in the pull-request tier as of 2026-09-05, so the step that
+    caught this one now runs before a merge rather than three merges after it
+    (think-k4fb). The clause above about a gate that "runs only on main" describes what
+    was true when this entry was written and is no longer.
   status: fixed
   recorded_in: packing/devtools/check_svg_rendering.py
 - id: D-456
@@ -14730,11 +14735,28 @@ defects:
     work that no core count reduces, so the budget buys roughly two weeks. The tier
     already runs only after merge, so the move that scales is its own job rather than a
     larger share of this one; carried as think-tr2z rather than done here.
+    think-tr2z was done later the same day. The tier has its own `exhaustive` workflow
+    job, which selects it with `--only` while every other job leaves it out with `--skip`
+    -- a new CLI flag, since `--only` alone cannot express everything-but-one and a job
+    that named the other sixty steps would go stale the moment one was added. What that
+    buys is not speed but separation: the tier's 1943s no longer sits inside a job whose
+    verdict covers sixty other steps, so the failure mode this entry records -- killed at
+    the budget, output lost in an unflushed pipe, the whole surface red and silent about
+    everything else -- can no longer take the rest of the gate down with it. Wall time
+    moves as a side effect rather than as the point: the exhaustive job is its 1943s plus
+    setup, `validate` keeps the other 2917s of step time across its two workers, and the
+    two start together instead of sharing one runner for 2755s.
   regression: >-
     packing/tests/test_validation_cli.py pins the budget table, so the three budgets
     cannot drift silently. What no test can pin is the tier fitting the budget, since
     measuring that costs the tier; the gate itself is that check, and it now runs with
     room to report rather than to be killed.
+    The split adds `test_the_post_merge_jobs_partition_the_gate`, which is the check the
+    split needs rather than one about the budget: it reads the workflow, parses both
+    post-merge commands with the CLI's own parser, resolves them through the CLI's own
+    selector, and requires the two selections to be disjoint and to cover every declared
+    step. A `--skip` naming no step is refused for the same reason, so the split cannot
+    survive a rename by quietly running the tier twice or not at all.
   status: fixed
   recorded_in: packing/src/sqpack/cli/validate.py
   bead: think-tr2z

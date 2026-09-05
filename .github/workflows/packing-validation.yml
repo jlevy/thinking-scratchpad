@@ -49,17 +49,79 @@ jobs:
       - name: Synchronize the locked development environment
         run: uv sync --frozen --all-extras --group dev
 
+      # `--fast` is the pull-request surface, and since 2026-09-05 it is nearly the whole
+      # gate: fifty-eight of the sixty-one steps, against thirty-seven before. Twenty-four
+      # steps used to run only after a merge, and on 2026-09-05 two defects reached main
+      # through that gap and sat there red for nine hours -- D-455 in `deterministic SVG
+      # rendering` and D-456 in the exhaustive tier -- neither of them something a pull
+      # request could have caught. The three steps still deferred are argued by their
+      # measurements above `STEPS` in `packing/src/sqpack/cli/validate.py`.
       - name: Run the required pull-request surface
         if: "github.event_name == 'pull_request'"
         run: >-
           uv run --frozen --all-extras --group dev
           packing-validate --fast --jobs 2 --inner-jobs 1
 
+      # Everything except the exhaustive exact tier, which is the `exhaustive` job below.
+      # `--skip` is what stops it running here as well: without it the two jobs would both
+      # pay 1943s for the same step. The two selections partition the gate, and
+      # `test_the_post_merge_jobs_partition_the_gate` is what keeps them a partition when a
+      # step is added.
       - name: Run the complete integration surface
         if: "github.event_name != 'pull_request'"
         run: >-
           uv run --frozen --all-extras --group dev
-          packing-validate --jobs 2 --inner-jobs 2
+          packing-validate --skip "exhaustive exact behavioral tests"
+          --jobs 2 --inner-jobs 2
+
+  exhaustive:
+    # The exhaustive exact tier, on its own runner, reporting its own verdict against its
+    # own budget (think-tr2z).
+    #
+    # It was 1943s of the complete surface's 2755s, sharing a two-core runner with the
+    # behavioural suite. When it outgrew its budget on 2026-09-05 the gate killed it with
+    # its output still in an unflushed pipe (D-456), so `validate` went red on three
+    # consecutive merges while saying nothing at all about the sixty other steps, and a
+    # real failure arriving behind it would have looked identical. Split, this job answers
+    # one question -- do the complete finite certificate decisions still pass -- and the
+    # job above answers the rest.
+    #
+    # No `packing-required` dependency: it does not run on pull requests, because at half
+    # an hour it is the one step whose cost rules it out of the pull-request tier. The
+    # workflow-level concurrency group still cancels it with the rest of a superseded run.
+    if: "github.event_name != 'pull_request'"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packing
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        # Shallow is enough: the provenance step that needs full history is not in this
+        # selection. kpress is vendored at vendor/kpress and installed from that path, so
+        # the environment does not resolve without the submodule checked out.
+        with:
+          submodules: true
+
+      - name: Install uv and Python 3.14
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.12.8"
+          python-version: "3.14.7"
+          working-directory: packing
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Synchronize the locked development environment
+        run: uv sync --frozen --all-extras --group dev
+
+      # One step, so `--jobs 1`; `--inner-jobs 2` is the setting the 1943s reading was
+      # taken under, and this job now has the whole two-core runner to spend on it.
+      - name: Run the exhaustive exact tier
+        run: >-
+          uv run --frozen --all-extras --group dev
+          packing-validate --only "exhaustive exact behavioral tests"
+          --jobs 1 --inner-jobs 2
 
   packing-required:
     # `!cancelled()` rather than `always()`. With `always()`, a run superseded by the next

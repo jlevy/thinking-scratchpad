@@ -6,8 +6,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <meta name="generator" content="kpress">
-<title>s({{N}}) ≥ {{HEADLINE_L_FRAC}}: A New Lower Bound on the Square Packing Problem</title>
-<meta name="description" content="How a weighted point set and a pigeonhole prove s({{N}}) &gt;= {{HEADLINE_L_FRAC}}.">
+<title>{{PAGE_TITLE}}</title>
+<meta name="description" content="{{PAGE_DESCRIPTION}}">
+<!-- What a shared link shows. Everything the page itself loads is inlined or relative,
+     because it has to open the same way from a file, from Pages and from an artifact
+     host; these are the exception, and they are not loads. A crawler reads them off the
+     markup with no base to resolve against, so each URL is absolute, and no browser
+     fetches any of them to display the page. The image is the atlas composite served
+     beside this file: portrait, so X and Facebook crop it to a band of the grid and
+     Slack, Discord and iMessage scale all hundred packings down whole. The width and
+     height are read from that PNG, so a consumer can reserve the box before it has the
+     bytes. -->
+<link rel="canonical" href="{{CANONICAL_URL}}">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="{{SITE_NAME}}">
+<meta property="og:title" content="{{PAGE_TITLE}}">
+<meta property="og:description" content="{{PAGE_DESCRIPTION}}">
+<meta property="og:url" content="{{CANONICAL_URL}}">
+<meta property="og:image" content="{{CARD_IMAGE_URL}}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="{{CARD_IMAGE_WIDTH}}">
+<meta property="og:image:height" content="{{CARD_IMAGE_HEIGHT}}">
+<meta property="og:image:alt" content="{{COMPOSITE_ALT}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{PAGE_TITLE}}">
+<meta name="twitter:description" content="{{PAGE_DESCRIPTION}}">
+<meta name="twitter:image" content="{{CARD_IMAGE_URL}}">
+<meta name="twitter:image:alt" content="{{COMPOSITE_ALT}}">
 <style>{{KPRESS_CSS}}</style>
 <script>{{THEME_BOOTSTRAP}}</script>
 <style>
@@ -91,8 +116,17 @@ body {
 .section-head { margin-block: calc(var(--kpress-font-size-base) * 2.6) 0.9rem; text-align: center; }
 /* A section starts with room above its heading and a breath below it. */
 .cert-page h2 { margin-block: calc(var(--kpress-font-size-base) * 2.8) 1.3rem; text-align: center; }
-.conditions ol { margin-block: 0.6rem 0.8rem; padding-inline-start: 1.4rem; }
-.conditions li { margin-block: 0.3rem; }
+/* A box holds discrete statements rather than continuous argument, so its
+   paragraphs stand a little further apart than running prose, which kpress sets at
+   0.75rem. One rule serves both boxes on the page, the five conditions and the
+   contradiction, so they cannot drift into two rhythms.
+
+   The conditions were a bulleted list and are now paragraphs. The bold lead already
+   numbers and names each one, so a marker beside it said the same thing twice, and
+   losing the list's hanging indent lets each condition start on the measure with
+   everything else. `.conditions ol` and `.conditions li` styled an ordered list this
+   page had stopped emitting; they are gone with it. */
+.cert-page .boxed-text p { margin-block: 0.95rem; }
 .intro .section-head { margin-block-start: 0; }
 
 .hero { padding-block-start: calc(var(--kpress-font-size-base) * 3); }
@@ -242,10 +276,16 @@ body {
   letter-spacing: var(--kpress-caps-spacing);
   padding: 0.05rem 0.4rem;
 }
-/* `.kpress-figcaption` carries the voice; a bordered figure needs the rule and
-   the padding, which the component leaves to the container. */
+/* No box around a figure, and no rule under it. kpress draws both, and on a page
+   this dense they add a grid of grey the content did not ask for; the figures are
+   already set apart by their own white space and by the caption's voice.
+
+   The padding stays. It was there to hold the caption off the border, and with the
+   border gone it does the work the border was doing: the caption sits inset from the
+   measure, so a reader can see where the figure ends and the prose resumes. */
+.cert-page .kpress-figure { border: 0; }
 .cert-page .kpress-figcaption {
-  border-block-start: 1px solid var(--kpress-doc-border);
+  border-block-start: 0;
   margin-block-start: 0;
   padding: 0.85rem 1.1rem 1rem;
 }
@@ -454,9 +494,24 @@ body {
 
   /* The panel is gone, so the figure body is a single column, and a canvas
      is capped by height rather than width so a square one fits the page with
-     its caption. Both were taller than a page before. */
+     its caption. Both were taller than a page before.
+
+     The canvas cap is 4.5in rather than 5.4in to buy back printed pages. A figure
+     is `break-inside: avoid`, so one too tall for the space left is pushed whole to
+     the next page and the current page ends early: measured, this document left
+     32.94in of premature whitespace across four pages, which reads as a break
+     arriving just after a heading even though a paragraph intervenes. It is not
+     that: no heading in the document is stranded, kpress's `break-after: avoid`
+     matches every one of them and was confirmed load-bearing by removing it. The
+     figures were simply too tall. 4.5in and 4.6in measure the same and 4.4in is
+     worse, because pagination is discrete.
+
+     The image cap stays at 7in deliberately. Taking it to 6in would close the
+     largest gap and save two more pages, but the image it caps is the hundred-cell
+     atlas, whose per-cell labels already set at about 2.4pt; the whitespace is the
+     cheaper thing to keep. */
   .split { display: block; }
-  .stage canvas { max-height: 5.4in; width: auto; max-width: 100%; margin-inline: auto; }
+  .stage canvas { max-height: 4.5in; width: auto; max-width: 100%; margin-inline: auto; }
   .cert-page figure img { max-height: 7in; width: auto; max-width: 100%; }
 
   /* Link targets are deliberately not spelled out after each link: a URL set in
