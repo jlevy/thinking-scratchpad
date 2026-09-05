@@ -435,6 +435,255 @@ def test_exhaustive_exact_marker_is_declared_only_by_measured_slow_nodes() -> No
     assert declared == expected
 
 
+def test_the_slow_marker_is_declared_only_by_measured_nodes() -> None:
+    """Which tests the pull-request surface defers, and what each one measured.
+
+    The boundary is a ceiling the gate applies (`QUICK_TEST_CEILING_SECONDS`, enforced by
+    `fast behavioral tests` through pytest's `--durations-min`), and this registry is the
+    record of who is currently over it. The two are not the same thing and both are
+    needed: the ceiling is what stops the lane rotting, and the registry is what stops a
+    marker being added quietly to make a red test go away, because adding one edits this
+    file and has to state a number.
+
+    Measured on 2026-09-05 (`BC-214`), one contended local box, `pytest --durations=0`
+    over the whole non-exhaustive suite: 2,080 tests and 1,038s of recorded phase time,
+    of which 61 of these functions carry 890s -- 86 per cent of the suite in 2.9 per cent
+    of it. The sixty-second, `test_each_new_size_verifies_exactly`, was added later the
+    same day on its own CI measurement and is argued where it is marked.
+    The marking threshold is 2s of `call` time, which is what leaves the quick lane
+    inside the ceiling `devtools/gate-budgets.yaml` declares for the `fast` tier -- the
+    figure is not repeated here, because the register is where it is read and a second
+    copy is the thing that rots. The gate's own failure threshold is higher, so ordinary
+    runner variance cannot turn a passing test into a red pull request.
+
+    Four limits of the rule, recorded rather than smoothed over:
+
+    * A marker is per function, so a parametrized test moves with all of its cases even
+      when only one case was over. The 62 functions are 92 collected tests.
+    * `call` time only. A module-scoped fixture bills its whole cost to whichever test
+      triggers it first -- `test_every_control_rejects` reports 13.1s of setup that
+      belongs to `determination`, which three other tests in that file also use -- so
+      marking that test moves the fixture's cost rather than removing it.
+    * `test_the_n17_certificate_verifies_in_the_fast_tier_now` is 17.4s and is now
+      deferred, so its name no longer describes where it runs. The name is left to its
+      owner rather than changed here.
+    * A *shared build* between a deferred test and a retained one is the second limit
+      again, and it is worse, because the ceiling and the floor cannot both be satisfied.
+      `BC-218` measured two: `test_seed_cross_fields_...` and
+      `test_known_best_composite_png_...` each call a module-level cached builder that a
+      test marked here used to trigger first, and each went from cheap to 93.86s and
+      26.83s of `call` when its neighbour was deferred. Marking them does not fix it: run
+      in the slow lane they cost 0.01s and 0.00s, because there the neighbour pays the
+      build again first, and the floor then fails the deep surface and asks for the
+      marker back. The same test is 93.86s in one lane and 0.01s in the other, and
+      neither reading is wrong -- the cost belongs to a build, not to a test, so no
+      per-test rule can place it.
+
+      It is resolved rather than classified, and the resolution is what the limit is now
+      a record of. Each of those tests asks what a *valid* artifact contains, not what a
+      *freshly built* one contains, so each reads the committed file; the equality of
+      committed and built stays asserted, once in the slow lane by the neighbour that
+      already pays for the build and again in the full gate by the artifact's own
+      `--check` step. Six tests moved that way -- one in
+      `test_prospective_atlas_seed.py`, one in `test_contact_scaffold_atlas.py` (whose
+      builder is not even memoized, so every caller re-enumerated) and four composite
+      tests in `test_known_best_atlas.py`. Four of the six reported at or above the
+      ceiling on the failing run, at 124.86s, 82.00s, 78.78s and 6.04s of `call`; the
+      other two were under it only because a sibling in the same worker had already paid
+      the build. None of the six is marked here, which is the point: a shared build is a
+      signal to move the read, not a signal to move the test.
+    """
+    expected: dict[str, set[str]] = {
+        # 18s of call time across 3.
+        "test_audit_n54_source_formula.py": {
+            "test_n54_source_formula_cli_agrees_under_optimization",  # 7.8s
+            "test_changed_minimal_polynomial_is_refused",  # 7.4s
+            "test_n54_source_formula_closes_in_one_quartic_field",  # 3.2s
+        },
+        # 4s of call time across 2.
+        "test_bentz46.py": {
+            "test_certificate_refuses_a_displaced_point",  # 2.2s
+            "test_certificate_builds_and_charges_every_point",  # 2.1s
+        },
+        # 3s of call time across 1.
+        "test_campaign_runner_trust_boundary.py": {
+            "test_each_cell_gets_its_own_share_of_the_timebox",  # 3.0s
+        },
+        # 3s of call time across 1.
+        "test_check_declared_bounds.py": {
+            "test_n68_depth_bound_is_named_by_its_refusal_test",  # 3.4s
+        },
+        # 24s of call time across 1.
+        "test_contact_assembly_labels.py": {
+            "test_every_rich_d4_and_relabeling_image_has_one_label",  # 23.6s
+        },
+        # 9s of call time across 4.
+        "test_contact_scaffold_atlas.py": {
+            "test_contact_scaffold_atlas_supports_direct_stable_identity_lookup",  # 2.8s
+            "test_contact_scaffold_atlas_and_house_overview_replay_byte_for_byte",  # 2.1s
+            "test_contact_scaffold_show_is_read_only_and_explicitly_abstract",  # 2.1s
+            "test_contact_scaffold_atlas_cross_field_mutations_fail",  # 2.1s
+        },
+        # 22s of call time across 1.
+        "test_exact_construction_price.py": {
+            "test_the_record_round_trips",  # 21.8s
+        },
+        # 9s of call time across 3.
+        "test_fractional_certificate.py": {
+            "test_containment_at_exactly_one_is_refused",  # 4.4s
+            "test_the_retained_atoms_are_refused_in_a_container_they_cannot_cover",  # 2.5s
+            "test_breaking_the_symmetry_of_the_n12_atoms_is_refused",  # 2.0s
+        },
+        # 264s of call time across 1.
+        "test_fractional_generate.py": {
+            "test_the_float_oracle_scores_every_cell_the_exact_sweep_scores",  # 263.7s
+        },
+        # 5s of call time across 2.
+        "test_fractional_interval.py": {
+            "test_both_n12_certificates_certify_every_direction_of_the_sub_net",  # 3.1s
+            "test_box_bounds_bracket_the_exact_mass_at_sampled_centres",  # 2.3s
+        },
+        # 36s of call time across 3.
+        "test_fractional_sweep_integer.py": {
+            "test_the_n17_certificate_verifies_in_the_fast_tier_now",  # 17.4s
+            "test_the_parallel_direction_loop_matches_the_serial_one",  # 15.2s
+            "test_every_reported_witness_is_an_admissible_centre_on_the_373_atom_rung",  # 3.1s
+        },
+        # 5s of call time across 2.
+        "test_gobel_family.py": {
+            "test_the_record_round_trips",  # 2.9s
+            "test_the_new_sizes_are_built_here_and_not_merely_asserted",  # 2.6s
+        },
+        # 2s of call time across 1, at its slowest parametrization. Not a shared build:
+        # `cases.gobel_family.packing.build` is not memoized, so this pays only for
+        # itself -- 3,916 exact pair decisions at (4, 7), 5.09s on CI's two-core runner.
+        "test_gobel_family_construction.py": {
+            "test_each_new_size_verifies_exactly",  # 1.7s local, 5.09s on CI
+        },
+        # 6s of call time across 1.
+        "test_green17.py": {
+            "test_interval_audit_certifies_an_interior_side",  # 6.0s
+        },
+        # 27s of call time across 1. This test also carries the pin the four composite
+        # tests in its file now stand on: it asserts the retained composite SVG is
+        # byte-identical to the one `expected_outputs()` builds, which costs nothing here
+        # because the build is already paid, and is what lets those four read the file.
+        "test_known_best_atlas.py": {
+            "test_known_best_composite_contains_every_case_and_square",  # 27.3s
+        },
+        # 101s of call time across 3.
+        "test_minus_w_bridge.py": {
+            "test_the_bridge_agrees",  # 80.4s
+            "test_the_scale_constant_actually_measures_the_direction",  # 15.7s
+            "test_a_doctored_direction_is_refused",  # 5.0s
+        },
+        # 6s of call time across 2.
+        "test_motion_lab.py": {
+            "test_motion_lab_is_environment_independent",  # 3.3s
+            "test_rendered_lab_is_deterministic_retained_and_offline",  # 3.0s
+        },
+        # 16s of call time across 5.
+        "test_n40_rigidity.py": {
+            "test_the_witness_is_a_motion_checked_from_the_pose",  # 4.2s
+            "test_only_tight_rows_enter_the_obstruction",  # 3.8s
+            "test_the_witness_turns_every_block_square_at_the_same_rate",  # 3.5s
+            "test_the_retained_rays_are_rebuilt_from_the_pose_not_trusted",  # 2.1s
+            "test_the_null_space_is_what_makes_the_candidate_exact",  # 2.1s
+        },
+        # 35s of call time across 7.
+        "test_n54_source_contract.py": {
+            "test_author_cli_is_stdout_only_and_identical_under_optimization",  # 10.9s
+            "test_synthetic_fixture_evaluates_exactly_in_assignment_order",  # 6.7s
+            "test_canonical_json_round_trip_and_float_refusal",  # 3.6s
+            "test_n54_result_has_the_exact_frozen_profile_and_mutation_receipts",  # 3.5s
+            "test_field_receipt_digest_drift_is_refused",  # 3.5s
+            "test_exact_evaluation_refuses_an_algebraically_zero_denominator",  # 3.4s
+            "test_audited_receipt_binds_exact_field_builtins_and_digest",  # 3.1s
+        },
+        # 8s of call time across 1.
+        "test_n54_source_contract_independent.py": {
+            "test_author_and_verifier_are_normal_optimized_byte_identical",  # 7.6s
+        },
+        # 11s of call time across 2.
+        "test_n5_local_rigidity.py": {
+            "test_every_control_rejects",  # 8.0s
+            "test_a_declared_count_disagreement_blocks_readiness",  # 2.6s
+        },
+        # 16s of call time across 1.
+        "test_promote_elimination.py": {
+            "test_promote_elimination",  # 15.7s
+        },
+        # 14s of call time across 1.
+        "test_promote_exact_lp.py": {
+            "test_promote_exact_lp",  # 14.0s
+        },
+        # 63s of call time across 1.
+        "test_promote_exact_phase1.py": {
+            "test_promote_exact_phase1",  # 63.1s
+        },
+        # 11s of call time across 1.
+        "test_promote_solve.py": {
+            "test_promote_solve",  # 10.9s
+        },
+        # 11s of call time across 1.
+        "test_promote_system.py": {
+            "test_promote_system",  # 10.6s
+        },
+        # 15s of call time across 1.
+        "test_promote_system_degree.py": {
+            "test_promote_system_degree",  # 14.6s
+        },
+        # 98s of call time across 2. The first of these is also the pin
+        # `test_seed_cross_fields_...` stands on -- it asserts the retained manifest
+        # equals the built one -- which is what lets that test read the file rather than
+        # trigger this build.
+        "test_prospective_atlas_seed.py": {
+            "test_seed_replays_every_safe_source_and_excludes_kingbird",  # 92.5s
+            "test_seed_witnesses_and_house_renderings_match_the_manifest",  # 5.7s
+        },
+        # 7s of call time across 1.
+        "test_render_colors.py": {
+            "test_right_angles_and_diagonals_are_pinned_across_the_atlas",  # 6.5s
+        },
+        # 18s of call time across 2.
+        "test_schema_validator_equivalence.py": {
+            "test_mutations_actually_break_something",  # 10.4s
+            "test_validators_agree_on_mutations",  # 7.4s
+        },
+        # 2s of call time across 1.
+        "test_trump_isolation_radius.py": {
+            "test_gap_and_symmetry_certificates_hold",  # 2.5s
+        },
+        # 4s of call time across 2.
+        "test_validation_cli.py": {
+            "test_run_timeout_terminates_child_and_reports_captured_output",  # 2.3s
+            "test_run_selected_interrupt_stops_detached_production_process",  # 2.0s
+        },
+        # 6s of call time across 1.
+        "test_verified_upper_bound_contract.py": {
+            "test_a_third_of_the_corpus_certifies_a_weaker_bound_than_it_reports",  # 6.0s
+        },
+    }
+    declared: dict[str, set[str]] = {}
+    marker = "pytest.mark.slow"
+    for path in (PROJECT_ROOT / "tests").glob("test_*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        marked: set[str] = set()
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and any(
+                ast.unparse(decorator) == marker for decorator in node.decorator_list
+            ):
+                marked.add(node.name)
+            if isinstance(node, (ast.Assign, ast.AnnAssign)) and "mark.slow" in ast.unparse(
+                node
+            ):
+                marked.add("<module-level assignment>")
+        if marked:
+            declared[path.name] = marked
+
+    assert declared == expected
+
+
 def test_devtools_use_public_package_interfaces() -> None:
     violations: list[str] = []
     path = PROJECT_ROOT / "devtools" / "check_canonical.py"

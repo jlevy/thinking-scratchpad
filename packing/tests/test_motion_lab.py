@@ -227,6 +227,7 @@ def test_w_is_an_obstruction_ghost_with_both_quadratic_branches(
     )
 
 
+@pytest.mark.slow
 def test_rendered_lab_is_deterministic_retained_and_offline(
     manifest: dict[str, object],
 ) -> None:
@@ -279,6 +280,7 @@ def test_static_fallback_and_epistemic_labels_are_structural() -> None:
     assert 'display="none"' in closing.group()
 
 
+@pytest.mark.slow
 def test_motion_lab_is_environment_independent(tmp_path: Path) -> None:
     outputs = [tmp_path / "first.html", tmp_path / "second.html"]
     environments = (

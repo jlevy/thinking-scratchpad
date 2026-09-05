@@ -11,7 +11,7 @@ softschema:
   schema: defects.schema.yaml
   envelope: null
   status: enforced
-count: 460
+count: 462
 defects:
 - id: D-001
   title: Fixed-side search never left the grid basin
@@ -14809,6 +14809,9 @@ defects:
     retained_certificates' docstring worked its keying example from the mass the pointer
     used to hold; and six tests across two files pinned the pointer's old side, mass,
     atom count and least size certified.
+    Renumbered from D-455 when this branch merged main on 2026-09-05: main had independently
+    allocated D-455 to the inline-SVG ownership check. Per conventions.md the later branch
+    takes the next free ids, and this entry's references moved with it in that same change.
   consequence: >-
     No bound is wrong, no certificate is unsound and no verdict changes: every artifact
     named exists and every mass quoted is the true mass of the file quoted. What breaks
@@ -14862,6 +14865,9 @@ defects:
     which is what zero check runs also means, and the two are indistinguishable from
     outside. The branch was in fact carrying validated work the whole time; nothing about
     it was wrong except that nobody could see a gate result for it.
+    Renumbered from D-456 at the same merge; main's D-456 is the exhaustive tier's budget.
+    Note that this defect is what made that merge necessary twice, and the second occurrence
+    is what exposed the collision.
   consequence: >-
     No false claim entered the record, and the cost was twenty-five minutes and five
     uninformative pushes. The danger is the direction the failure leans: an absent check
@@ -14904,6 +14910,7 @@ defects:
     nothing in the ledger's cell checks connects the two contracts, so a cell can be
     drafted, budgeted, dispatched and completed before anything notices that its output
     has nowhere to go.
+    Renumbered from D-457 at the same merge; main's D-457 is the atlas line weight.
   consequence: >-
     No measurement was lost and no claim is wrong. BC-206's nine covering-value rows and
     its run register carry everything the cell produced, and recording them as data rather
@@ -14932,3 +14939,112 @@ defects:
   bead: think-c0qm
   status: contained
   recorded_in: packing/campaign/agendas/agenda-022-the-conditional-route.md
+- id: D-461
+  title: The pull-request tier tripled inside a cap with 3.61x of headroom, and no check could have objected
+  date: '2026-09-05'
+  layer: tooling
+  class: performance
+  detected_by: inspection
+  latent_for: >-
+    six days, from the 2026-08-30 measurement to an operator asking on 2026-09-05 why a
+    wait had got long. Every push in that window paid the full cost, and the pushes were
+    frequent: this branch alone made twelve.
+  severity: medium
+  what: >-
+    `packing-validate --fast`, the tier CI runs on every pull request, went from 499 s to
+    1369.60 s -- 2.65x in six days -- and nothing in the repository objected.
+    Three things had to be true at once, and they were. The baseline lived in a docstring
+    beside `Step.broad`, as prose no machine reads. The cap, FAST_SUITE_BUDGET_SECONDS,
+    was 1800 s, which is 3.61x the only measurement anyone had taken, so a cap that
+    generous cannot detect a regression a third its size. And the tier is effectively one
+    step: `fast behavioral tests` is 1324 s of the 1369.60 s, 96.7 per cent, so its growth
+    is the tier's growth with nothing to average it against.
+    The cap was not missing. It was slack, and slack in a ratio nobody had written down as
+    a thing to check.
+    Renumbered from D-458 one merge later, when #83's own renumbering had already taken D-458.
+    Source and target sets overlapped, so the rename ran D-458 -> D-461 before the others.
+  consequence: >-
+    Twenty-three minutes of CI on every push, paid by every contributor and every agent
+    for six days, on a surface whose whole purpose is to be paid constantly.
+    The compounding cost is worse than the arithmetic. The workflow cancels a run in
+    progress when a newer push arrives, so a push cadence faster than the tier's own wall
+    produces no completed run at all: three runs on this branch were cancelled that way
+    before anyone noticed the pattern. A gate slower than the rate work arrives at does
+    not merely tax development, it stops reporting.
+    No result is wrong and no bound is affected. What was lost is signal and time.
+  fix: >-
+    Fixed on 2026-09-05 by BC-216 of agenda-023, and the fix is the relationship rather
+    than the number. devtools/gate-budgets.yaml declares, per tier, a ceiling, the cost
+    last measured at that tier's declared reference runner, the date and CI run behind it,
+    and the reference shape; sqpack/gate_budgets.py judges a finished run against four
+    rules, and devtools/check_gate_budgets.py enforces the static ones in the records
+    tier.
+    Rule 2 is the one that answers this defect and it needs no clock: a ceiling more than
+    max_headroom times the recorded cost fails the declaration. At the policy's 2.0, the
+    2026-08-30 record of 499 s forces the ceiling to at most 998 s, and the 1369.60 s run
+    fails it. Rule 4 is its mirror and answers the rot: a run far under the record also
+    fails, printing the figure to write, so a record bounded only from above cannot decay
+    into prose the way this one did.
+    The ratio rules enforce only where cpu count, --jobs and --inner-jobs match the
+    reference, because a check that fails on a slow runner is a check people disable.
+  regression: >-
+    packing/tests/test_gate_budgets.py, fifteen tests, and six entries in
+    devtools/controls.yaml. The load-bearing one is
+    test_the_2026_08_30_declaration_would_have_been_refused, which replays this incident
+    in both halves: the 1800-beside-499 declaration is refused statically, and then, with
+    the ceiling tightened to the 998 the rule allows, the real 1324 s run is judged and
+    fails with `fast behavioral tests` named as the step that spent the time.
+    Two limits are stated rather than papered over. A 2.0 headroom means a regression
+    smaller than about 1.5x can still hide, and the rules cannot distinguish a genuinely
+    slower runner of the same shape from a regression, because packing-validate is
+    read-only by contract and cannot keep a run history without becoming a writer.
+  bead: think-86cm
+  status: fixed
+  recorded_in: packing/devtools/gate-budgets.yaml
+- id: D-462
+  title: Two branches allocated the same three defect ids to different defects, and nothing local can see it
+  date: '2026-09-05'
+  layer: record
+  class: bookkeeping
+  detected_by: inspection
+  latent_for: >-
+    the life of the branch, from the first entry added on 2026-09-05 until the merge with
+    main the same day surfaced it; a merge is the earliest moment the collision exists at
+    all
+  severity: medium
+  what: >-
+    `main` and `claude/agenda-021-overnight-pass` each allocated D-455, D-456 and D-457
+    while both were open, to six entirely different defects: main's are the inline-SVG
+    ownership check over the vendored submodule, the exhaustive tier outgrowing its
+    budget, and the atlas line weight; the branch's are the moving frozen-artifact
+    pointer, the CI blackout on a conflicted branch, and the hypothesis-less research
+    cell. The collision then repeated one level down when that branch merged into
+    claude/efficiency-block-gate-cost, which had its own D-458.
+    This is the second recorded occurrence. The 2026-09-04 adversarial review of PR 78
+    hit it at D-441 and `conventions.md` carries the rule that came out of it -- the
+    later branch takes the next free ids and updates its references in the same change --
+    which is what was done here, twice.
+  consequence: >-
+    No unsoundness: a collision is visible at merge as a conflict, because both sides
+    edit the same region of one file, and the derived counts disagree, which the
+    `count` cross-check catches independently. The cost is renumbering work at merge
+    time and a window in which a branch's own prose cites ids that mean something else
+    on the trunk. That window is what makes it worth recording rather than absorbing:
+    PR 83's body cited D-455 through D-457 for a day, and after the merge those three
+    strings named main's defects instead.
+  fix: >-
+    Not fixed, and the honest reason is that nothing inside one checkout can detect it.
+    The schema enforces uniqueness within a file, which is exactly the property that
+    still holds on both sides of a collision; contiguity holds too, before and after.
+    Detection needs a comparison against the merge base, so the natural home is a
+    check that reads `git merge-base` and refuses a defect id that names different
+    titles on the two sides -- a merge-time check, not a file-time one. The
+    alternatives conventions.md already rejects are worth not re-proposing: reserving
+    ids, and a second coordination ledger.
+  regression: >-
+    None. The renumbering itself is recorded as an annotation on each affected entry, as
+    conventions.md requires, so the trail from D-455 to D-458 is in the register rather
+    than only in a commit message.
+  bead: think-8bcl
+  status: outstanding
+  recorded_in: conventions.md

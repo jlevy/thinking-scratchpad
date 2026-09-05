@@ -43,6 +43,8 @@ from dataclasses import dataclass
 from fractions import Fraction
 from pathlib import Path
 
+import pytest
+
 from cases.trump11.packing import build
 from sqpack.exact_lp import (
     ExactLP,
@@ -351,6 +353,7 @@ def main() -> int:
     return 0
 
 
+@pytest.mark.slow
 def test_promote_exact_phase1() -> None:
     assert main() == 0
 

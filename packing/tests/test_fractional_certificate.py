@@ -305,6 +305,7 @@ def test_the_n12_certificate_improves_the_inherited_bound() -> None:
     assert (bound - 2) ** 2 * 5 > 16
 
 
+@pytest.mark.slow
 def test_breaking_the_symmetry_of_the_n12_atoms_is_refused() -> None:
     """Condition 1 is not decoration: drop one orbit member and the reduction is void."""
     certificate = load()
@@ -334,6 +335,7 @@ def test_the_independent_verifier_agrees_on_the_first_rung() -> None:
     assert report["info"]["min_rep"] == Fraction(1)
 
 
+@pytest.mark.slow
 def test_containment_at_exactly_one_is_refused() -> None:
     """Condition 4 must be strict: equality leaves the shrunken squares able to touch,
     and touching closed squares can share an atom, which breaks the count."""
@@ -398,6 +400,7 @@ def test_the_sweep_scores_every_cell_it_scored_before() -> None:
         )
 
 
+@pytest.mark.slow
 def test_the_retained_atoms_are_refused_in_a_container_they_cannot_cover() -> None:
     """The must-refuse fixture: same atoms, a container too large for them.
 

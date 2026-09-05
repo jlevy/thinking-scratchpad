@@ -250,6 +250,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         if selection.everything
         else [str((ROOT.parent / test).relative_to(ROOT)) for test in selection.tests]
     )
+    # `not exhaustive_exact`, which keeps the `slow` lane in. That is deliberate and it
+    # is the difference between this tier and the pull-request surface: `--fast` defers
+    # every test above the per-test ceiling because it pays for them on every pull
+    # request, while `--push` pays only for the tests your own change reaches, and a slow
+    # test your change reaches is exactly the one worth waiting for.
     command = (
         sys.executable,
         "-m",

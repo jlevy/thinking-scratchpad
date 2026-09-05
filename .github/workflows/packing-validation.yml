@@ -2,8 +2,13 @@ name: Packing validation
 
 "on":
   workflow_dispatch: {}
+  # Daily, not weekly, since BC-214. The pull-request surface no longer runs the slow
+  # behavioural lane or the exhaustive tier, so this schedule is the backstop that reports
+  # a deferred test breaking on a branch that never reached `main`. Weekly would put up to
+  # seven days between the break and the run that names it, and the deep surface is runner
+  # time nobody waits on -- which is the whole point of having moved it here.
   schedule:
-    - cron: "17 8 * * 6"
+    - cron: "17 8 * * *"
   # Keep the stable packing-required context present for every pull request. Path-level
   # filtering would leave a configured required check pending forever when no path matched.
   pull_request: {}
@@ -18,8 +23,17 @@ permissions:
   contents: read
 
 concurrency:
-  group: packing-validation-${{ github.ref }}
-  cancel-in-progress: true
+  # Keyed by event as well as ref, so a scheduled deep run and a push-to-main deep run --
+  # both on `refs/heads/main` -- stop cancelling each other.
+  group: packing-validation-${{ github.event_name }}-${{ github.ref }}
+  # Supersede pull-request runs only. Dropping a superseded pull-request run is what makes
+  # "push, then keep working" cheap, and the `!cancelled()` guard on `packing-required`
+  # below (D-380) exists because that supersession is routine. On `main` and on the
+  # schedule the trade is now the other way round: since BC-214 those are the only runs
+  # that execute the slow behavioural lane and the exhaustive tier, so a cancelled deep run
+  # is not a superseded duplicate -- it is the only deep coverage that tree was going to
+  # get.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
@@ -31,7 +45,8 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The provenance step verifies historical engine commits, not just HEAD.
+          # The provenance step verifies historical engine commits, not just HEAD, and it
+          # is an edit-tier step, so the pull-request surface needs the history too.
           fetch-depth: 0
           # kpress is vendored at vendor/kpress and installed from that path, so
           # the environment does not resolve without the submodule checked out.
@@ -49,12 +64,72 @@ jobs:
       - name: Synchronize the locked development environment
         run: uv sync --frozen --all-extras --group dev
 
+      # Two surfaces, and the reason they are two (BC-214).
+      #
+      # The pull-request surface is `--fast`, re-priced rather than replaced. On
+      # 2026-09-05 that tier cost 1369.60s on this runner (run 33982455466) and
+      # `fast behavioral tests` was 1324s -- 96.7 per cent -- of it, so every pull request
+      # paid twenty-two minutes, and a gate that charges that much is a gate people learn
+      # to route around.
+      #
+      # The obvious cut was to take the behavioural suite off the pull request entirely.
+      # The measurement refused it: the eight real failures that suite caught on this
+      # branch were all sub-0.15-second tests, 0.46s of call time between them, so the
+      # wall was not where the detection was. Deferring the tier would have thrown away
+      # nearly all of the value for nearly none of the cost. What moves instead is the
+      # tail -- the tests measured at or above `QUICK_TEST_CEILING_SECONDS`, which carry
+      # the wall and, on the evidence of the last month, none of the failures.
+      #
+      # Nothing becomes optional. `QUICK_TESTS` and `SLOW_TESTS` are complements within
+      # the non-exhaustive suite and `EXHAUSTIVE_TESTS` is the rest, so every test is in
+      # exactly one lane; the step below runs the whole gate, all three lanes and every
+      # other declared step, on each push to `main`, on the daily schedule, and on
+      # `workflow_dispatch`, which can be dispatched against any branch -- so the deep
+      # surface is available on a pull request's own head on request. The two `if`
+      # conditions here are exact complements so that no event reaches neither step.
+      #
+      # What the split costs is stated rather than hidden: a pull request can now be green
+      # while a deferred test is broken. What is deferred is the slow tail, and the honest
+      # summary of it is that no failure in the last month has come from there.
+      # One job, and BC-218 priced the alternatives rather than assuming this one.
+      #
+      # The tempting read of BC-214's 409s is that it is a queue: a dozen steps of
+      # comparable cost on one runner, waiting for each other, and a fan-out of jobs would
+      # pay their maximum instead of their sum. The step table refuses it. At 88f7e5f8
+      # (run 33985984585, job 101359470209) the tier's wall was 408.55s and `fast
+      # behavioral tests` was 408.09s of it -- 99.9 per cent. `--jobs 2` had already put
+      # every other step in the second lane, where the whole visible cost was 135.17s, and
+      # they finished with the wall to spare. There was no queue. There was one step.
+      #
+      # So the shapes priced out like this, all against a measured 11s of checkout, uv
+      # install and `uv sync` that any new job repeats:
+      #
+      #   * A second job for the record checks: wall unchanged at ~425s, because the
+      #     behavioural step still runs alone for 409s of it, and +3 billed minutes for
+      #     work that was already free. Strictly worse, and rejected on the numbers.
+      #   * A matrix over the deep surface: same argument one level up. That surface's
+      #     wall is 2491.83s (run 33982793449) and `exhaustive exact behavioral tests` is
+      #     1765.82s of it, so a matrix pays N setups to arrive at a floor set by one step.
+      #   * Parallelism inside the step: 306.4s to 135.0s at `-n 4` on a four-core box,
+      #     and 56.6s with two shared cached builds removed from the lane. This is the one
+      #     that moves, and the measured half of it is wired in `_fast_tests`.
+      #
+      # Two things follow, for whoever reads this next. The remaining wall is not sequencing
+      # either: 121s of the 306.4s is two tests being billed for a build they share with a
+      # test BC-214 deferred, they are why this step still fails its own per-test ceiling,
+      # and `test_the_slow_marker_is_declared_only_by_measured_nodes` records why marking
+      # them is not the fix. And once they go, the second `--jobs` lane's ~135s becomes the
+      # wall, so `--jobs 3` is the next lever rather than a third job. It stays at 2 here
+      # because BC-218 could not clock it on CI, and an unmeasured CI change is D-380.
       - name: Run the required pull-request surface
         if: "github.event_name == 'pull_request'"
         run: >-
           uv run --frozen --all-extras --group dev
           packing-validate --fast --jobs 2 --inner-jobs 1
 
+      # The deep surface: no tier flag, so every declared step runs, and everything the
+      # pull-request surface stopped running lands here. Do not narrow this command --
+      # a tier flag here is how a step ends up in neither surface.
       - name: Run the complete integration surface
         if: "github.event_name != 'pull_request'"
         run: >-

@@ -81,6 +81,7 @@ def test_cell_certifier_refuses_a_side_past_the_lemma4_ceiling() -> None:
         )
 
 
+@pytest.mark.slow
 def test_interval_audit_certifies_an_interior_side() -> None:
     stats = interval_certify(side=Fraction(22, 5), max_boxes=2_000_000)
     assert stats.boxes > 10_000

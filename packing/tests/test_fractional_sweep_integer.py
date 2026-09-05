@@ -160,6 +160,7 @@ def _admissible(
     return half <= x <= far and half <= y <= far
 
 
+@pytest.mark.slow
 def test_every_reported_witness_is_an_admissible_centre_on_the_373_atom_rung() -> None:
     """D-449: the witness used to be the midpoint of the attaining event cell.
 
@@ -306,6 +307,7 @@ def test_a_single_threaded_process_forks_and_a_threaded_one_without_a_main_runs_
     assert sweep_all_directions(small, workers=3) == sweep_all_directions(small, workers=1)
 
 
+@pytest.mark.slow
 def test_the_parallel_direction_loop_matches_the_serial_one() -> None:
     """Same minima, same order, same first-attaining label, whatever the schedule."""
 
@@ -316,6 +318,7 @@ def test_the_parallel_direction_loop_matches_the_serial_one() -> None:
     assert [label for _, label in serial] == [d.label for d in certificate.directions]
 
 
+@pytest.mark.slow
 def test_the_n17_certificate_verifies_in_the_fast_tier_now() -> None:
     """1473 s by Fraction on 2026-09-04; 21.8 s here on a loaded four-core box.
 

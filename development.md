@@ -131,6 +131,10 @@ Choose the smallest loop that protects the change:
 # Discover the available contracts.
 uv run --frozen --all-extras --group dev packing-validate --list
 
+# Records loop: registries, generated views and declared contracts, and no solver.
+# The cheapest thing that catches what actually breaks; takes no gate marker.
+uv run --frozen --all-extras --group dev packing-validate --records
+
 # Edit loop: everything fast except the broad test suite. Seconds, runs during a gate.
 uv run --frozen --all-extras --group dev packing-validate --edit
 
@@ -138,7 +142,8 @@ uv run --frozen --all-extras --group dev packing-validate --edit
 # (against origin/main, or --since REF). About a minute for a code change; never blind.
 uv run --frozen --all-extras --group dev packing-validate --push
 
-# Fast edit loop: pytest plus Python quality, schemas, exact witness, and cheap drift.
+# The pull-request surface: the edit tier plus every behavioral test under the
+# per-test ceiling. This is what CI runs on a pull request.
 uv run --frozen --all-extras --group dev packing-validate --fast
 
 # One named component. --only is repeatable and matches displayed step names.
@@ -203,23 +208,93 @@ D-239 is resolved.
 
 On pull requests, [`packing-validation.yml`](.github/workflows/packing-validation.yml)
 runs `packing-validate --fast` on Linux and reports the stable `packing-required`
-aggregate. The fast behavioral step excludes only measured slow nodes declared on named
-test functions with the `exhaustive_exact` marker; the workflow contract checks that
-exact function set and rejects module-level marking.
-Measured 2026-08-31: the tree collects 1,045 tests, of which the fast step runs 1,020
-and deselects 25 exhaustive exact cases, in 646 seconds of essentially serial wall time
-— which is why `--push` selects a reachable subset instead of the whole step.
+aggregate.
 
-Pushes to `main`, manual dispatches, and the weekly schedule run the complete locked
-command on Linux and macOS. The macOS integration job also runs the focused deep-golden
-step directly. The default validator runs the 118-test core and 21-test exhaustive exact
-branches as separate direct steps.
+The behavioral suite runs in three lanes, and they partition it: `QUICK_TESTS`,
+`SLOW_TESTS` and `EXHAUSTIVE_TESTS` in `sqpack/cli/validate.py` are marker expressions
+over `slow` and `exhaustive_exact`, and every test satisfies exactly one, so a test
+cannot be in two lanes and cannot be in none.
+`--fast` runs the quick lane; the full gate adds `slow behavioral tests` and
+`exhaustive exact behavioral tests`, so nothing the pull-request surface stops running
+stops running.
+
+**The boundary is a ceiling the gate enforces, not a list it trusts.**
+`fast behavioral tests` passes `QUICK_TEST_CEILING_SECONDS` to pytest as
+`--durations-min` and fails, naming the test, when a test it ran reports a `call` phase
+at or above it. A test that grows past the ceiling therefore fails the pull-request
+surface in the week it grows; the fix is to make it faster, or to mark it `slow` with
+its measurement in `test_the_slow_marker_is_declared_only_by_measured_nodes`, which
+moves it to the deep surface rather than stopping it running.
+The `call` phase and not setup, because a module-scoped fixture bills its whole cost to
+whichever test triggers it first, and marking that test would move the cost rather than
+remove it. The marker registries are checked the same way for both markers: the declared
+set is pinned by a test, so a marker cannot be added without stating what it measured.
+
+Pushes to `main`, manual dispatches, and the daily schedule run the complete locked
+command on Linux and macOS. The daily cadence is `BC-214`: it is the schedule that
+catches a deferred test breaking on a branch that never reaches `main`, and a weekly one
+would leave up to seven days between the break and the run that names it.
+The macOS integration job also runs the focused deep-golden step directly.
+The default validator runs the 118-test core and 21-test exhaustive exact branches as
+separate direct steps.
 Negative controls use at most two workers while honoring the `--inner-jobs` cap;
 integration CI opts into two inner workers explicitly.
 D-203’s temporary expected-failure classifier was removed after the repaired producer
 passed on both architectures; the workflow test rejects its return.
 Never accept a rebuilt golden to make the probe green, and do not add a second CI-only
 implementation of either check.
+
+### What each tier costs, and where its ceiling lives
+
+A contributor runs `--edit` in the loop and `--push` before a push.
+CI runs the tier named in
+[`packing-validation.yml`](.github/workflows/packing-validation.yml) on a pull request,
+and the complete locked command on `main`, on dispatch, and on the daily schedule.
+
+**What each tier is allowed to cost is data the gate reads, not prose in this file.** It
+is declared in
+[`packing/devtools/gate-budgets.yaml`](packing/devtools/gate-budgets.yaml), one entry
+per tier, and every whole-tier run compares its own wall against it:
+
+```shell
+uv run --frozen --all-extras --group dev packing-validate --budgets
+```
+
+| Tier | Who runs it | Ceiling | Cost when last measured |
+| --- | --- | --- | --- |
+| `--records` | contributor, before touching a registry | 300 s | 13.6 s, four contended cores, 2026-09-05 |
+| `--edit` | contributor, in the edit loop | 240 s | 59.4 s, four contended cores, 2026-09-05 |
+| `--push` | contributor, before a push | 1800 s | about a minute for a code change; the whole quick lane when the diff reaches everything |
+| `--fast` | CI, on a pull request | 550 s | 409 s on CI’s two-core runner, 2026-09-05, run 33985984585 — the split tier’s own first reading |
+| (default) | CI, on `main` and on the daily schedule | 3600 s | not clocked end to end on one runner; CI splits it across jobs |
+
+The ceiling column is enforced and the cost column is not: the register is the
+authority, and `packing-validate --budgets` prints it as of now.
+Read that command rather than this table.
+
+**A run outside its tier’s band fails and names the step that spent the time**, because
+“the tier is slow” is not actionable and “`fast behavioral tests` is 1324 s of a 1370 s
+tier” is. The band has more edges than a cap, and they exist because a cap alone did not
+catch the 2026-08-30 to 2026-09-05 drift — 499 s to 1369.60 s, entirely inside an 1800 s
+cap:
+
+- a run over the ceiling fails;
+- a run more than `drift_ratio` above the cost the register records for that tier fails,
+  which is the edge a 2.65× regression crosses long before it reaches a generous cap;
+- a run far enough *below* the recorded cost also fails, printing the figure to write —
+  because a record bounded only from above rots downward, and a stale record makes the
+  first two edges meaningless;
+- and `python -m devtools.check_gate_budgets`, in the records tier, refuses a ceiling
+  more than `max_headroom` above the cost its own tier records, without running anything
+  at all. That is the rule that fires on 1800 s declared beside 499 s.
+
+**Wall time is not comparable across machines, so the ratio rules enforce only on the
+runner the ceiling was measured for.** Each tier declares a reference — CPU count,
+`--jobs` and `--inner-jobs` — and a run whose shape differs is measured, reported, and
+never failed; `--enforce-budget` overrides that for an operator who means it.
+This is a deliberate trade: it makes the check quiet on a developer’s laptop and on a
+contended agent box, and it means a regression is caught by CI rather than before the
+push.
 
 ### A pull request with no checks at all is a mergeability question
 
@@ -473,6 +548,83 @@ owns it.
 
 Gate wall time, solver throughput, pair tests, and time-to-retained-result are useful
 metrics. Line count, abstraction count, and test count are not performance measures.
+
+### The gate’s standing cost, which a W5 block reads rather than re-measures
+
+A `W5` `efficiency-loop` block on the gate has a baseline before it starts, and the
+baseline is not in anybody’s prose:
+
+```shell
+uv run --frozen --all-extras --group dev packing-validate --budgets
+```
+
+[`packing/devtools/gate-budgets.yaml`](packing/devtools/gate-budgets.yaml) is the
+standing measurement.
+It carries, per tier, the ceiling the gate enforces, the cost last measured at that
+tier’s reference runner, the date and the CI run that measured it, and the argument for
+the number. `W5`’s entry contract asks for a baseline, a profile, a target and a guard;
+this file is where the first two live for the gate, and the gate keeps them current
+itself — a run outside the band fails and prints the figure to write.
+
+**Do not re-measure the gate by hand and record the result in a comment.** That is the
+failure `agenda-023` `BC-216` was opened to close: `validate.py` recorded `--fast` at
+499 s on 2026-08-30 in a docstring beside an 1800 s cap, the tier reached 1369.60 s six
+days later on CI run `33982455466`, and nothing objected, because 1370 is inside 1800
+and because 499 was prose.
+A number a machine does not read is a number that drifts.
+
+The profile that block worked from, for the next one to start against rather than
+rediscover: the tier was one step — `fast behavioral tests` was 1324 s of the 1369.60 s,
+96.7 per cent of wall, and every other step in the tier together was about 45 s.
+`--edit`, which is every floor and every record check but not the broad suite, was 59.35
+s on a contended four-core box the same day.
+The target was the operator’s own: a pull-request-blocking surface of at most four
+minutes.
+
+### What a deep run repeats, and what that licenses
+
+The deep surface runs on every push to `main`, on the daily schedule and on dispatch,
+and nothing about it is scoped to the change.
+How much of it repeats work whose inputs did not move is a measurement, and it has a
+tool rather than an opinion:
+
+```shell
+uv run --frozen --all-extras --group dev packing-validate --format json > run.json
+uv run --frozen --all-extras --group dev python -m devtools.measure_gate_repetition \
+    --timings run.json --days 30 --attribution
+```
+
+It prices every deep run in a window against the run before it, taking reachability from
+`Step.touches` and seconds from a real run summary.
+A step the summary does not price, prices twice over, or records as skipped is a
+refusal, because a step priced at zero repeats for free by arithmetic rather than by
+evidence.
+
+Three of its numbers, measured on 2026-09-05 over thirty days, set the shape of any skip
+rule and none of them is about `touches`:
+
+- **13 of 70 deep runs ran against a tree that had not moved** since the run before
+  them. Every one of those repeated the whole gate.
+- **53 of 55 merges to `main` carried a tree byte-identical to the pull-request head**
+  merged, so the pull-request surface had already run against exactly those bytes.
+- **8 of the 64 steps declare no `touches` at all**, deliberately, and they are the
+  expensive ones — so `touches` cannot prune the deep surface by cost.
+  The escape hatch that protects a mis-declared pattern is reachable by 17 of 1,933
+  tracked files, 0.9 per cent, which is far less protection than its own docstring
+  assumes.
+
+**The exact content address here is the git tree id, not a pattern.** Equal tree ids
+mean equal bytes for every tracked file, including the code that does the verifying —
+which is strictly stronger than hashing the artifacts a step reads.
+**But it addresses only the tree**, and three steps in this gate answer to something
+else: `campaign record` reads the wall clock and three of its refusals become true with
+time alone (an expired lease, a passed session deadline, a passed delegation deadline),
+`bead tree` reads the bead store in `.git/tbd/data-sync-worktree`, which is not in any
+tree, and `provenance: recorded commits are reachable` reads the git graph and the clone
+depth — `D-226` is the run where CI discarded the history its own provenance gate
+needed. A rule that skips on tree identity has to keep running those three.
+`tests/test_gate_repetition.py` holds the clock counter-example as an assertion rather
+than a paragraph.
 
 ### Codex research-loop rollups
 

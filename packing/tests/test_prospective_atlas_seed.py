@@ -27,6 +27,7 @@ def isolated_seed_build_cache():
     prospective.clear_build_caches()
 
 
+@pytest.mark.slow
 def test_seed_replays_every_safe_source_and_excludes_kingbird() -> None:
     retained = json.loads(MANIFEST.read_text(encoding="utf-8"))
     _outputs, expected = expected_outputs()
@@ -52,6 +53,7 @@ def test_seed_replays_every_safe_source_and_excludes_kingbird() -> None:
     assert "kingbird-svg" not in json.dumps(entries, sort_keys=True)
 
 
+@pytest.mark.slow
 def test_seed_witnesses_and_house_renderings_match_the_manifest() -> None:
     seed = json.loads(MANIFEST.read_text(encoding="utf-8"))["atlas_seed"]
     release = json.loads(UNITSQUARE_RESULTS.read_text(encoding="utf-8"))
@@ -87,7 +89,26 @@ def test_seed_sources_retain_attribution_without_local_hashes() -> None:
 
 
 def test_seed_cross_fields_reject_source_annotation_and_identity_mutations() -> None:
-    seed = expected_outputs()[1]["atlas_seed"]
+    """`seed_errors` is what the schema cannot say, so every mutation has to be refused.
+
+    The seed under test is the committed manifest, not a fresh build. What this test
+    needs is a *valid* seed to break in five specific ways, and the manifest is one --
+    checked here in its unmutated form before anything is done to it, which is a
+    statement the quick lane did not make before. Rebuilding the seed to obtain it cost
+    124.86s on CI's two-core runner (run for `c1120c44`, job 101371257966): 101 witnesses
+    and 101 renderings, billed in full to this test since `BC-214` deferred the neighbour
+    that used to trigger the module-level memo first. `BC-218` measured that and recorded
+    why marking this test `slow` cannot fix it -- in the deep surface the same test costs
+    0.01s, because there the neighbour pays the build again.
+
+    Nothing is dropped by reading the file. That the committed manifest *is* the built
+    one is asserted by `test_seed_replays_every_safe_source_and_excludes_kingbird` in the
+    deep surface's slow lane, and again by the full gate's `prospective n=101..324 source
+    map and safe seed` step, which re-derives all 203 artifacts through
+    `build_prospective_atlas --check`. The pair covers what one expensive test did.
+    """
+    seed = json.loads(MANIFEST.read_text(encoding="utf-8"))["atlas_seed"]
+    assert not seed_errors(seed)
     mutations = []
 
     admitted_kingbird = deepcopy(seed)

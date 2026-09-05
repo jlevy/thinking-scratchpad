@@ -24,6 +24,7 @@ from cases.bentz46.verify_cover import (
 from sqpack.cover import validate_square_tiling
 
 
+@pytest.mark.slow
 def test_certificate_builds_and_charges_every_point() -> None:
     certificate = build_certificate()
     assert certificate["cells"] == {"lemma2": 66, "lemma4": 14, "lemma5": 12}
@@ -60,6 +61,7 @@ def test_tiling_refuses_a_missing_face() -> None:
         )
 
 
+@pytest.mark.slow
 def test_certificate_refuses_a_displaced_point() -> None:
     field, sqrt2, sqrt3, set_points, vertices, plan = build()
     tampered = dict(vertices)

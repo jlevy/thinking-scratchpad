@@ -504,6 +504,7 @@ def test_execute_caps_the_timebox_at_the_remaining_lease(
     assert "lease caps this round" in capsys.readouterr().out
 
 
+@pytest.mark.slow
 def test_each_cell_gets_its_own_share_of_the_timebox(
     tree: Tree, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

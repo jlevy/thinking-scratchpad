@@ -417,6 +417,7 @@ def test_the_active_margin_guard_recomputes_rather_than_trusting_the_record(
         require_active_margins_zero(forged)
 
 
+@pytest.mark.slow
 def test_a_declared_count_disagreement_blocks_readiness(chart: Chart, t012) -> None:
     """The receipt printed the comparison; now a verdict reads it."""
     wrong, _ = assess(chart, t012, audit=False, expected_counts={"active_total": 19})
@@ -470,6 +471,7 @@ def test_an_edge_flush_touch_is_refused_rather_than_intersected() -> None:
         build_system(Chart(pose))
 
 
+@pytest.mark.slow
 def test_every_control_rejects(chart: Chart, system, t012, determination) -> None:
     """A certificate that cannot fail is not evidence. All eight must refuse."""
     outcomes = controls.run_all(chart, system, determination, t012)

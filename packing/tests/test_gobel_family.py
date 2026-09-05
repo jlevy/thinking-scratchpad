@@ -16,6 +16,8 @@ from __future__ import annotations
 import json
 import math
 
+import pytest
+
 from cases.gobel40.packing import build as retained_n40
 from devtools.price_gobel_family import OUT, assess, build, parameters
 from sqpack.verify import exact_sign, verify_packing
@@ -82,6 +84,7 @@ def test_the_generalization_reproduces_the_retained_n40_case() -> None:
     assert shape(mine) == shape(theirs)
 
 
+@pytest.mark.slow
 def test_the_new_sizes_are_built_here_and_not_merely_asserted() -> None:
     """`n = 65` and `n = 89` verified from the pose rather than read from the record."""
     for a, b, n in ((4, 5, 65), (4, 7, 89)):
@@ -105,5 +108,6 @@ def test_nothing_here_promotes_anything() -> None:
     assert "only makes possible" in subject["promotes_nothing"]
 
 
+@pytest.mark.slow
 def test_the_record_round_trips() -> None:
     assert _record() == assess()

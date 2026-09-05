@@ -50,6 +50,7 @@ def _record() -> dict:
     return json.loads(OUT.read_text(encoding="utf-8"))
 
 
+@pytest.mark.slow
 def test_the_witness_is_a_motion_checked_from_the_pose() -> None:
     """The finding, re-derived. Nothing here trusts the record's copy of it."""
     pose = load_pose()
@@ -100,6 +101,7 @@ def test_intersecting_the_disjunctions_reports_the_pose_rigid() -> None:
     assert verification["pairs_giving_up_an_axis"] == 24
 
 
+@pytest.mark.slow
 def test_the_null_space_is_what_makes_the_candidate_exact() -> None:
     """No rounding anywhere: a null vector is in the cone by construction.
 
@@ -153,6 +155,7 @@ def test_the_contact_model_is_measured_not_assumed() -> None:
         assert not separating(pose, one.host, one.edge, one.moving)
 
 
+@pytest.mark.slow
 def test_the_witness_turns_every_block_square_at_the_same_rate() -> None:
     """What the motion is, geometrically: the block's squares counter-rotating in place."""
     pose = load_pose()
@@ -213,6 +216,7 @@ def test_the_obstruction_is_not_read_as_second_order_rigidity() -> None:
     assert "Second-order rigidity" in built["scope"]["not_established"]
 
 
+@pytest.mark.slow
 def test_only_tight_rows_enter_the_obstruction() -> None:
     """The soundness condition on the self-stress, checked against the branch itself.
 
@@ -298,6 +302,7 @@ def test_every_retained_ray_is_refused_at_second_order() -> None:
     assert "no argument here" in _record()["scope"]["not_established"]
 
 
+@pytest.mark.slow
 def test_the_retained_rays_are_rebuilt_from_the_pose_not_trusted() -> None:
     """The data module holds coefficients; the field arithmetic is redone here."""
     pose = load_pose()

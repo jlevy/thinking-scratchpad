@@ -320,9 +320,36 @@ def test_known_best_v1_schema_accepts_a_manifest_without_the_new_composite() -> 
     jsonschema.validate(atlas, schema)
 
 
+def _committed_composite_svg() -> str:
+    """The retained composite vector, read the way its drift checks compare it.
+
+    Four tests below ask what the composite *contains* or what an export was drawn
+    *from*, and a valid composite answers both; none of them needs a freshly built one.
+    Building it costs about 80s on CI's two-core runner and was billed to whichever of
+    them ran first in each xdist worker, which is why two of them reported 82.00s and
+    78.78s against a 5s per-test ceiling (run for `c1120c44`, job 101371257966). `BC-214`
+    deferred the neighbour that used to pay it; `BC-218` measured that the cost belongs
+    to the build rather than to any test, so no marker can place it.
+
+    `read_text(encoding="utf-8")` rather than the bytes, deliberately: it is what
+    `test_known_best_composite_contains_every_case_and_square` compares below and what
+    `build_known_best_atlas.check()` compares in the full gate, so what those two pin is
+    exactly the string these tests read, and the substitution composes rather than
+    nearly composes.
+    """
+    return (ATLAS / "known-best-1-100.svg").read_text(encoding="utf-8")
+
+
+@pytest.mark.slow
 def test_known_best_composite_contains_every_case_and_square() -> None:
     outputs, _manifest = known_best_builder.expected_outputs()
     composite_path = ATLAS / "known-best-1-100.svg"
+
+    # The pin the quick lane's four composite tests stand on: they read the retained
+    # vector, and this is where "retained" and "built" are made one thing inside pytest.
+    # Free here -- the build above is already paid -- and checked again from the other
+    # side by the full gate's `known-best n=1..100 atlas` step.
+    assert composite_path.read_text(encoding="utf-8") == outputs[composite_path]
 
     root = ET.fromstring(outputs[composite_path])
     metadata = {
@@ -367,8 +394,7 @@ def test_known_best_composite_contains_every_case_and_square() -> None:
 
 
 def test_known_best_composite_png_is_derived_from_current_svg() -> None:
-    outputs, _manifest = known_best_builder.expected_outputs()
-    svg_text = outputs[ATLAS / "known-best-1-100.svg"]
+    svg_text = _committed_composite_svg()
     png = (ATLAS / "known-best-1-100.png").read_bytes()
 
     assert known_best_builder.png_summary_receipt(png) == (
@@ -390,8 +416,7 @@ def test_known_best_composite_high_resolution_png_is_derived_from_current_svg() 
     pixels do -- a 4096-wide export of this drawing is 11% larger than this one while
     carrying 27% fewer pixels.
     """
-    outputs, _manifest = known_best_builder.expected_outputs()
-    svg_text = outputs[ATLAS / "known-best-1-100.svg"]
+    svg_text = _committed_composite_svg()
     png = (ATLAS / "known-best-1-100@2x.png").read_bytes()
 
     assert known_best_builder.png_summary_receipt(png) == (
@@ -410,8 +435,7 @@ def test_known_best_composite_exports_all_carry_one_source_receipt() -> None:
     differ only in how they antialias an edge, whereas two drawings differ in what
     they show. This is the pin that would fail if an export were refreshed alone.
     """
-    outputs, _manifest = known_best_builder.expected_outputs()
-    svg_text = outputs[ATLAS / "known-best-1-100.svg"]
+    svg_text = _committed_composite_svg()
     expected = hashlib.sha256(svg_text.encode("utf-8")).hexdigest()
 
     receipts = {
@@ -589,8 +613,7 @@ def test_only_the_bound_numeral_carries_the_new_result_accent() -> None:
     into coloured runs can silently drop, and losing it would leave the drawing right
     and every reader that takes the text rather than the ink wrong.
     """
-    outputs, _manifest = known_best_builder.expected_outputs()
-    root = ET.fromstring(outputs[ATLAS / "known-best-1-100.svg"])
+    root = ET.fromstring(_committed_composite_svg())
     record = json.loads((ATLAS / "composite-figure.json").read_text(encoding="utf-8"))
 
     accented: list[str] = []

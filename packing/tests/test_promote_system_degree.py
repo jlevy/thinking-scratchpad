@@ -23,6 +23,7 @@ over SymPy `Float`s is not an exact computation.  The domain is asserted to be `
 
 from __future__ import annotations
 
+import pytest
 import sympy as sp
 
 from devtools.probe_system_degree import half_angle_system, reduce_by_side
@@ -103,6 +104,7 @@ def main() -> int:
     return 0
 
 
+@pytest.mark.slow
 def test_promote_system_degree() -> None:
     assert main() == 0
 

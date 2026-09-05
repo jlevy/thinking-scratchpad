@@ -11,6 +11,26 @@ title: Agent session
 type: object
 additionalProperties: false
 $defs:
+  full_gate_declaration:
+    type: string
+    description: >-
+      One `checks` item naming the gate run that certified this session's handover: the
+      tier, the commit it ran on, and the verdict, optionally followed by a parenthetical
+      note. `full gate: fast at 07a41a89: passed` is the canonical form.
+
+      The commit matters as much as the verdict. A full gate run on a tree three commits
+      behind the handover certifies nothing about what was handed over, and a check that
+      accepts a bare `full gate: passed` is a check that will accept exactly that -- which
+      is what forty-seven of the first eighty-six terminal records amounted to.
+
+      `devtools.check_session_gate` compiles this pattern rather than restating it, so the
+      contract and its enforcement have one definition. The groups are positional (tier,
+      commit, verdict, note) because a JSON Schema pattern is ECMA-262 and Python's `re`
+      does not accept ECMA-262 named groups; a pattern only one consumer can compile is
+      not a shared definition. Nothing `$ref`s this: the requirement starts at
+      `GATE_DECLARED_FROM` and the eighty-six records that predate it are valid, so the
+      boundary is the checker's to hold and not the schema's.
+    pattern: "^full gate: ([a-z][a-z-]*) at ([0-9a-f]{7,40}): (passed|failed)(?: \\(([^()]*)\\))?$"
   workflow:
     enum:
       - research-survey
@@ -285,6 +305,12 @@ properties:
   checks:
     type: array
     items: {type: string, minLength: 1}
+    description: >-
+      What was run and what it said. At a terminal state one of these must be a
+      `full_gate_declaration`, checked by `devtools.check_session_gate`: an item opening
+      `full gate:` that does not match that grammar is a failure rather than prose, and a
+      terminal session at or after the checker's `GATE_DECLARED_FROM` that names none at
+      all is refused.
   resource_rollups:
     type: array
     uniqueItems: true

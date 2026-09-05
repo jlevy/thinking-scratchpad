@@ -46,8 +46,31 @@ def test_the_general_builder_reproduces_the_retained_n40_case() -> None:
     assert shape(mine) == shape(theirs)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(("a", "b"), SUBJECTS)
 def test_each_new_size_verifies_exactly(a: int, b: int) -> None:
+    """Every one of the 2,080 and 3,916 pairs, decided by an exact sign over `Q(sqrt 2)`.
+
+    Deferred at `(4, 7)`, where it measured 5.09s on CI's two-core runner (run for
+    `c1120c44`, job 101371257966) against a 5s per-test ceiling: 1.65s locally, of which
+    the build is 0.56s and the 3,916 exact pair decisions the rest. Unlike the three
+    atlas tests this branch made cheap, the cost here is not a shared build billed to a
+    neighbour -- `build` is not memoized, and this test pays only for itself -- so there
+    is nothing to substitute and the marker is the honest instrument.
+
+    The pull-request surface does not lose the check. `packing-validate`'s
+    `exact verification` step is `fast=True` and runs `python -m
+    cases.gobel_family.verify_exact` on every push, whose `main()` makes these same three
+    assertions at both subjects before it makes the duplicate and witness ones. What
+    moves to the deep surface is a second reading of a decision the fast tier already
+    pays for in another process.
+
+    Its sibling `test_a_duplicated_square_is_rejected` is 1.67s locally at `(4, 7)` --
+    the same work, one square longer -- and reported under 5s on that run. It stays,
+    because OR-13 takes a test off the pull-request surface on its own measured cost and
+    nothing else; the number is recorded here so the next reading has something to
+    compare against rather than a judgement to repeat.
+    """
     n = count(a, b)
     report = verify(a, b)
 

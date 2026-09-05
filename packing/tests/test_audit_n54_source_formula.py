@@ -9,6 +9,7 @@ import pytest
 from devtools.audit_n54_source_formula import derive_receipt
 
 
+@pytest.mark.slow
 def test_n54_source_formula_closes_in_one_quartic_field() -> None:
     receipt = derive_receipt()
 
@@ -26,6 +27,7 @@ def test_n54_source_formula_closes_in_one_quartic_field() -> None:
     }
 
 
+@pytest.mark.slow
 def test_n54_source_formula_cli_agrees_under_optimization() -> None:
     base = ["-m", "devtools.audit_n54_source_formula", "--check"]
     normal = subprocess.run(
@@ -66,6 +68,7 @@ def test_perturbed_side_basis_is_refused() -> None:
     assert "side basis" in refused.stderr
 
 
+@pytest.mark.slow
 def test_changed_minimal_polynomial_is_refused() -> None:
     """The minimal-polynomial comparison must be a second, independent gate."""
     with pytest.raises(ValueError, match="unexpected n=54 minimal polynomials"):

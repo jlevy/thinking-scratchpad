@@ -62,6 +62,7 @@ import dataclasses
 from collections import Counter
 
 import mpmath as mp
+import pytest
 import sympy as sp
 
 from cases.gobel5 import packing as gobel5
@@ -613,6 +614,7 @@ def main() -> int:
     return 0
 
 
+@pytest.mark.slow
 def test_promote_system() -> None:
     assert main() == 0
 

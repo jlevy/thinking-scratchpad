@@ -1285,3 +1285,119 @@ controls:
   run: python3 -m devtools.check_synopsis
   expect: "exactly one canonical Selected next entry marker for think-wufn"
 
+# --- the gate's own declared cost (agenda-023 BC-216) ---
+#
+# The check these fire is the one that was missing when `--fast` went from 499s to
+# 1369.60s in six days inside an 1800s cap. It is static: it reads gate-budgets.yaml and
+# no clock, so it is cheap enough to run in the records tier and cannot be blamed on a
+# busy runner. The dynamic half -- a finished run judged against its tier's band -- is
+# controlled in tests/test_gate_budgets.py, where a fabricated slow step is cheaper than
+# an actually slow one.
+#
+# The first three anchor the `records` tier's measurement block, which is checked in with
+# no recorded cost. Each control writes one in, because a rule about the relationship
+# between a ceiling and a measurement needs a measurement to have something to say.
+- name: gate budgets - a ceiling with more headroom than the policy allows
+  file: devtools/gate-budgets.yaml
+  replace:
+    - |-
+      measured_seconds: null
+        measured_on: null
+        measured_where: null
+        reference: {jobs: 2, inner_jobs: 1, cpus: 2}
+        argument: >-
+          Registries,
+    - |-
+      measured_seconds: 20.0
+        measured_on: '2026-08-30'
+        measured_where: null
+        reference: {jobs: 2, inner_jobs: 1, cpus: 2}
+        argument: >-
+          Registries,
+  run: python3 -m devtools.check_gate_budgets
+  expect: "of headroom where policy.max_headroom allows"
+
+- name: gate budgets - a recorded cost nobody can place in time
+  file: devtools/gate-budgets.yaml
+  replace:
+    - |-
+      measured_seconds: null
+        measured_on: null
+        measured_where: null
+        reference: {jobs: 2, inner_jobs: 1, cpus: 2}
+        argument: >-
+          Registries,
+    - |-
+      measured_seconds: 20.0
+        measured_on: null
+        measured_where: null
+        reference: {jobs: 2, inner_jobs: 1, cpus: 2}
+        argument: >-
+          Registries,
+  run: python3 -m devtools.check_gate_budgets
+  expect: "records a cost without a date"
+
+- name: gate budgets - a ceiling declared below the cost its own tier records
+  file: devtools/gate-budgets.yaml
+  replace:
+    - |-
+      measured_seconds: null
+        measured_on: null
+        measured_where: null
+        reference: {jobs: 2, inner_jobs: 1, cpus: 2}
+        argument: >-
+          Registries,
+    - |-
+      measured_seconds: 3000.0
+        measured_on: '2026-08-30'
+        measured_where: null
+        reference: {jobs: 2, inner_jobs: 1, cpus: 2}
+        argument: >-
+          Registries,
+  run: python3 -m devtools.check_gate_budgets
+  expect: "declared to fail every time it runs"
+
+- name: gate budgets - a selectable tier with no declared ceiling
+  file: devtools/gate-budgets.yaml
+  replace: ["- id: fast\n", "- id: fastest\n"]
+  run: python3 -m devtools.check_gate_budgets
+  expect: "can be selected but declares no ceiling"
+
+- name: gate budgets - a stale floor no honest run could clear
+  file: devtools/gate-budgets.yaml
+  replace: ["  stale_ratio: 0.6", "  stale_ratio: 1.6"]
+  run: python3 -m devtools.check_gate_budgets
+  expect: "fails every honest run"
+
+- name: gate budgets - the guide stops naming a tier it is supposed to describe
+  file: ../development.md
+  replace: ["dev packing-validate --records\n", "dev packing-validate --recordz\n"]
+  run: python3 -m devtools.check_gate_budgets
+  expect: "never names `packing-validate --records`"
+
+# --- the gate's own certificate (agenda-023 BC-217) ---
+#
+# `check_session_gate` refuses a terminal session that cannot name the gate run that
+# certified its handover. Two controls, for the two ways that goes wrong.
+#
+# Both are deliberately independent of Git. A control runs inside a source snapshot with
+# no `.git`, so the checker's ancestry clause is *uncheckable* there by construction and
+# an ancestry control could not fire; that half is covered against a real Git graph -- a
+# divergent branch and a real shallow clone -- in `tests/test_session_gate.py`, which is
+# where a three-commit history is cheaper to build than to fake.
+- name: session gate - a verdict named without the commit it ran on
+  file: campaign/agent-sessions/session-086-agenda021-overnight-pass.md
+  replace:
+    - "  checks:\n  - 'pytest tests/test_trump_isolation_radius.py: 6 passed'\n"
+    - "  checks:\n  - 'full gate: passed'\n  - 'pytest tests/test_trump_isolation_radius.py: 6 passed'\n"
+  run: python3 -m devtools.check_session_gate
+  expect: "claims a gate run and does not parse"
+
+# The primary refusal, and the boundary in the same mutation: session-087 is the first
+# session the rule binds, so terminalizing it with no declaration is exactly the state
+# `GATE_DECLARED_FROM` exists to start refusing.
+- name: session gate - a terminal session that names no gate run at all
+  file: campaign/agent-sessions/session-087-agenda022-continuation.md
+  replace: ["\n  status: in_progress\n", "\n  status: completed\n"]
+  run: python3 -m devtools.check_session_gate
+  expect: "terminal session names no full-gate run"

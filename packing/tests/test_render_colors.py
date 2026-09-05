@@ -7,6 +7,8 @@ from math import sqrt
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+import pytest
+
 from devtools.build_known_best_atlas import frame_from_witness
 from sqpack.render.color import assign_square_colors, hex_oklch, square_fill_palette
 from sqpack.render.model import (
@@ -387,6 +389,7 @@ def _atlas_frames() -> list[PackingFrame]:
     return [frame_from_witness(load_witness(path)) for path in witnesses]
 
 
+@pytest.mark.slow
 def test_right_angles_and_diagonals_are_pinned_across_the_atlas() -> None:
     """Right angles always take hue 0 and 45 degree tilts always take hue 1.
 

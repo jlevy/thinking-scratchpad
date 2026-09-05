@@ -26,6 +26,7 @@ import re
 from decimal import Decimal, localcontext
 from pathlib import Path
 
+import pytest
 import yaml
 
 from sqpack.assurance import bounds_agree_at_declared_precision
@@ -215,6 +216,7 @@ def trailing_ceilings() -> dict[int, tuple[Decimal, Decimal]]:
     return trailing
 
 
+@pytest.mark.slow
 def test_a_third_of_the_corpus_certifies_a_weaker_bound_than_it_reports() -> None:
     trailing = trailing_ceilings()
     # Not a target to be held at any number; a measurement, and a loud one. Every one of

@@ -16,6 +16,7 @@ encoding bug and require the guard to fire on it.
 
 from __future__ import annotations
 
+import pytest
 import sympy as sp
 
 from devtools.probe_elimination import (
@@ -100,6 +101,7 @@ def main() -> int:
     return 0
 
 
+@pytest.mark.slow
 def test_promote_elimination() -> None:
     assert main() == 0
 

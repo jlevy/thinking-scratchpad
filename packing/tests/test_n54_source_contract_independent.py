@@ -137,6 +137,7 @@ def test_independent_verifier_accepts_author_result(prospective_result: Path) ->
     }
 
 
+@pytest.mark.slow
 def test_author_and_verifier_are_normal_optimized_byte_identical(
     prospective_result: Path,
 ) -> None:

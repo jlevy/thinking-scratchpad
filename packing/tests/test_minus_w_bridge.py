@@ -15,10 +15,12 @@ from devtools.check_minus_w_bridge import main
 from sqpack.field import NumberField
 
 
+@pytest.mark.slow
 def test_the_bridge_agrees() -> None:
     assert main() == 0
 
 
+@pytest.mark.slow
 def test_a_doctored_direction_is_refused() -> None:
     """Perturbing one component of -W must break the helpers, not be absorbed."""
     field = NumberField((1, 0, -2), (1, 2))
@@ -32,6 +34,7 @@ def test_a_doctored_direction_is_refused() -> None:
         minus_w_owner4.owner4_record(field, stratum, tuple(minus_w), zero)
 
 
+@pytest.mark.slow
 def test_the_scale_constant_actually_measures_the_direction() -> None:
     """The deciding constant is a genuine quadratic in the velocity, not a fixture.
 

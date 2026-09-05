@@ -2691,6 +2691,18 @@ nothing was tested — but the ledger’s round count and effort attribution do 
 them. The check that would refuse the shape at draft time, rather than at the experiment
 record, is named in the entry and not built.
 
+`D-462` stands `outstanding`, and it is the one entry here that no check inside this
+repository can close.
+Two branches allocated `D-455`, `D-456` and `D-457` to six different defects while both
+were open, and the collision repeated one level down at `D-458` when the second branch
+merged. `conventions.md` already carries the rule — the later branch takes the next free
+ids and moves its references in the same change — which is what was done, twice, and
+each renumbered entry says so in its own text rather than only in a commit message.
+What is missing is detection: the schema enforces uniqueness *within a file*, which is
+exactly the property that still holds on both sides of a collision, so seeing one
+requires comparing against the merge base.
+That is a merge-time check and it is not built (`think-8bcl`).
+
 The [idea board](packing/campaign/ideas.md) carries the full registered portfolio
 alongside raw ideas and dead ends.
 The registry artifact, not the review’s historical prose or this summary, owns each
@@ -3198,16 +3210,16 @@ table above.
 
 Kept with the same discipline as the experiment record, because the aggregate says
 things no individual bug report can.
-The log contains 460 defects, [one line each](defects.md), generated from `defects.yaml`
+The log contains 462 defects, [one line each](defects.md), generated from `defects.yaml`
 and checked in the gate.
 
 | Class | Count | The system … |
 | --- | ---: | --- |
 | soundness | 94 | asserted something false about the mathematics |
 | validity | 117 | was correct, but the measurement did not bear on the question |
-| bookkeeping | 173 | recorded something its own evidence contradicts |
+| bookkeeping | 174 | recorded something its own evidence contradicts |
 | robustness | 59 | did not finish, or finished only by luck |
-| performance | 17 | worked, but cost far more than it should |
+| performance | 18 | worked, but cost far more than it should |
 
 Two observations the log exists to make.
 
@@ -3215,7 +3227,7 @@ Two observations the log exists to make.
 direction**, where the error looks like a success.
 That is the dangerous class, and it is the majority of it.
 
-**The automated gate has caught sixty-nine defects in 460, and no soundness defect
+**The automated gate has caught sixty-nine defects in 462, and no soundness defect
 ever.** Every soundness failure was found by a control cell whose answer was known in
 advance, a rule written down before the measurement, a generated view contradicting its
 source, or someone reading carefully.

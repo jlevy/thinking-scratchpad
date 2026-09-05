@@ -25,6 +25,7 @@ from devtools.build_contact_scaffold_atlas import (
 ROOT = Path(__file__).resolve().parent.parent
 
 
+@pytest.mark.slow
 def test_contact_scaffold_atlas_and_house_overview_replay_byte_for_byte() -> None:
     expected, rendering = expected_outputs()
     retained = json.loads(OUTPUT.read_text(encoding="utf-8"))
@@ -78,6 +79,7 @@ def test_contact_scaffold_atlas_and_house_overview_replay_byte_for_byte() -> Non
     assert decoded[-1][0] == "T5-21/0123230121"
 
 
+@pytest.mark.slow
 def test_contact_scaffold_atlas_cross_field_mutations_fail() -> None:
     atlas = expected_outputs()[0]["atlas"]
     mutations = []
@@ -116,7 +118,21 @@ def test_contact_scaffold_atlas_cross_field_mutations_fail() -> None:
 
 
 def test_contact_scaffold_atlas_contains_no_geometry_or_hypothesis_channel() -> None:
-    atlas = expected_outputs()[0]["atlas"]
+    """The retained atlas carries no geometry channel and claims no packing verdict.
+
+    Read from the committed file rather than enumerated. `expected_outputs()` is not
+    memoized, so every caller re-runs the size-five isomorph-free enumeration -- 6.04s on
+    CI's two-core runner (run for `c1120c44`, job 101371257966), over the pull-request
+    surface's per-test ceiling, for a question about what the retained JSON contains.
+    Marking it `slow` would be the `BC-218` mistake in a third file: the cost is the
+    build's, not this test's, and in the deep surface it is paid by a neighbour first.
+
+    `test_contact_scaffold_atlas_and_house_overview_replay_byte_for_byte` is the pin --
+    it asserts the retained document and rendering replay the enumeration exactly -- and
+    the full gate's `abstract size-five contact-scaffold atlas` step asserts it again
+    through `build_contact_scaffold_atlas --check`.
+    """
+    atlas = json.loads(OUTPUT.read_text(encoding="utf-8"))["atlas"]
     assert atlas["claim_status"] == (
         "abstract-contact-scaffolds-no-geometry-no-packing-verdict"
     )
@@ -133,6 +149,7 @@ def test_contact_scaffold_atlas_contains_no_geometry_or_hypothesis_channel() -> 
     assert (ROOT / atlas["rendering"]["path"]) == RENDERING
 
 
+@pytest.mark.slow
 def test_contact_scaffold_atlas_supports_direct_stable_identity_lookup() -> None:
     atlas = expected_outputs()[0]["atlas"]
 
@@ -154,6 +171,7 @@ def test_contact_scaffold_atlas_supports_direct_stable_identity_lookup() -> None
             scaffold_by_identity(atlas, invalid)
 
 
+@pytest.mark.slow
 def test_contact_scaffold_show_is_read_only_and_explicitly_abstract(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:

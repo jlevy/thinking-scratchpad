@@ -394,6 +394,7 @@ def main() -> int:
     return 0
 
 
+@pytest.mark.slow
 def test_promote_exact_lp() -> None:
     assert main() == 0
 

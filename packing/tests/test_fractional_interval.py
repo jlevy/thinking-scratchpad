@@ -178,6 +178,7 @@ def test_the_doubled_net_reflects_every_direction_but_the_upright_one() -> None:
 # --- the bounds, against exact arithmetic ----------------------------------
 
 
+@pytest.mark.slow
 def test_box_bounds_bracket_the_exact_mass_at_sampled_centres() -> None:
     """A lower bound over a box and an upper bound at a point, both exact-checked.
 
@@ -252,6 +253,7 @@ def test_a_provably_admissible_centre_is_exactly_admissible() -> None:
 # --- acceptance ---------------------------------------------------------------
 
 
+@pytest.mark.slow
 def test_both_n12_certificates_certify_every_direction_of_the_sub_net() -> None:
     """A sub-net run certifies its directions and decides nothing about the rest.
 

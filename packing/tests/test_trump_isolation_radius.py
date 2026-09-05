@@ -92,6 +92,7 @@ def test_every_branch_row_is_a_tied_elementary_gradient() -> None:
     assert all(value > 0 for value in identification["row_curvature"].values())
 
 
+@pytest.mark.slow
 def test_gap_and_symmetry_certificates_hold() -> None:
     w = witness()
     functions = tool.elementary_functions(w, Fraction(1, 64))

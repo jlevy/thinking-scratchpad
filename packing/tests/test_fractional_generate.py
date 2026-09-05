@@ -161,6 +161,7 @@ def _patterned_atoms(outer: Fraction, counts: tuple[int, ...]) -> tuple[Atom, ..
     )
 
 
+@pytest.mark.slow
 def test_the_float_oracle_scores_every_cell_the_exact_sweep_scores() -> None:
     """D-434's regression: the oracle and the verifier must decide one cell set.
 

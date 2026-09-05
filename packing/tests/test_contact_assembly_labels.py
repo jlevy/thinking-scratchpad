@@ -191,6 +191,7 @@ def test_isomorph_free_uniform_slice_has_exact_small_counts_and_typed_caps() -> 
             )
 
 
+@pytest.mark.slow
 def test_every_rich_d4_and_relabeling_image_has_one_label() -> None:
     source = _rich_scaffold()
     expected = canonicalize_scaffold(source)
